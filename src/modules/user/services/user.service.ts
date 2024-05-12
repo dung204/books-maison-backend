@@ -8,7 +8,6 @@ import {
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { UserDto } from '@/modules/user/dto/user.dto';
-import { User } from '@/modules/user/entities/user.entity';
 import { UserRepository } from '@/modules/user/repositories/user.repository';
 
 import { CreateUserDto } from '../dto/create-user.dto';
@@ -21,11 +20,13 @@ export class UserService {
     private userRepository: UserRepository,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<SuccessResponse<User>> {
+  async create(
+    createUserDto: CreateUserDto,
+  ): Promise<SuccessResponse<UserDto>> {
     const createdUser = await this.userRepository.createUser(createUserDto);
 
     return {
-      data: createdUser,
+      data: UserDto.fromUser(createdUser),
     };
   }
 
@@ -63,7 +64,10 @@ export class UserService {
     };
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  async update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<SuccessResponse<UserDto>> {
     if (!this.userRepository.isExistedById(id))
       throw new NotFoundException('User not found.');
 
@@ -74,6 +78,8 @@ export class UserService {
     if (updateStatus != 1)
       throw new ConflictException('Conflicted! Cannot update user.');
 
-    return UserDto.fromUser(await this.userRepository.findById(id));
+    return {
+      data: UserDto.fromUser(await this.userRepository.findById(id)),
+    };
   }
 }
