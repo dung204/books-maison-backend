@@ -15,13 +15,13 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
-  configSwagger(app);
-
   app.setGlobalPrefix('/api');
   app.enableVersioning({
     type: VersioningType.URI,
     defaultVersion: ['1'],
   });
+
+  configSwagger(app);
 
   app.enableCors();
 
