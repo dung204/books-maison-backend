@@ -1,21 +1,35 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 
-import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
-import { LoginRequest } from '@/modules/auth/requests/login.request';
+import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
+import { LocalAuthGuard } from '@/modules/auth/guards/local-auth.guard';
 import { AuthService } from '@/modules/auth/services/auth.service';
 
 @Controller('/auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @UseGuards(LocalAuthGuard)
   @Post('/login')
-  async login(@Body() loginRequest: LoginRequest) {
-    return this.authService.login(loginRequest);
+  async login(@Request() req) {
+    return this.authService.login(req.user);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAccessGuard)
+  @Post('/refresh')
+  async refresh(@Request() req, @Body('refreshToken') refreshToken: string) {
+    return this.authService.refresh(req.user, refreshToken);
+  }
+
+  @UseGuards(JwtAccessGuard)
   @Get('/test')
-  async test() {
-    return 'Hello world';
+  async test(@Request() req) {
+    return req.user;
   }
 }

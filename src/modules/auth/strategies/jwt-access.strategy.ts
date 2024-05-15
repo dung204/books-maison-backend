@@ -5,16 +5,16 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { JwtPayload } from '@/modules/auth/types/jwt-payload.type';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET,
+      secretOrKey: process.env.JWT_ACCESS_SECRET,
     });
   }
 
-  async validate(payload: JwtPayload) {
+  validate(payload: JwtPayload) {
     const result = {
       id: payload.sub,
       email: payload.email,
