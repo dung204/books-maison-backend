@@ -1,26 +1,18 @@
 import { Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
-import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
-import { JwtStrategy } from '@/modules/auth/strategies/jwt.strategy';
+import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
+import { JwtAccessStrategy } from '@/modules/auth/strategies/jwt-access.strategy';
+import { LocalStrategy } from '@/modules/auth/strategies/local.strategy';
 import { UserModule } from '@/modules/user/user.module';
 
 import { AuthController } from './controllers/auth.controller';
 import { AuthService } from './services/auth.service';
 
 @Module({
-  imports: [
-    UserModule,
-    PassportModule,
-    JwtModule.registerAsync({
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) =>
-        configService.getOrThrow<JwtModuleOptions>('jwt'),
-    }),
-  ],
+  imports: [UserModule, PassportModule, JwtModule.register({})],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, JwtAuthGuard],
+  providers: [AuthService, LocalStrategy, JwtAccessStrategy, JwtAccessGuard],
 })
 export class AuthModule {}
