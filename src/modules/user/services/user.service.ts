@@ -8,6 +8,7 @@ import {
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { UserDto } from '@/modules/user/dto/user.dto';
+import { User } from '@/modules/user/entities/user.entity';
 import { UserRepository } from '@/modules/user/repositories/user.repository';
 
 import { CreateUserDto } from '../dto/create-user.dto';
@@ -62,6 +63,10 @@ export class UserService {
     return {
       data: UserDto.fromUser(user),
     };
+  }
+
+  async findUserByEmail(email: string): Promise<User> {
+    return this.userRepository.findByEmail(email);
   }
 
   async update(
