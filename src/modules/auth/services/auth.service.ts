@@ -45,6 +45,9 @@ export class AuthService {
   }
 
   async refresh({ id, role }: User, accessToken: string, refreshToken: string) {
+    if ((await this.redis.get(id)) !== refreshToken)
+      throw new UnauthorizedException('Refresh token does not exist.');
+
     if (await this.isTokenBlacklisted(refreshToken)) {
       throw new UnauthorizedException('Refresh token is blacklisted.');
     }
