@@ -66,6 +66,13 @@ export class AuthService {
     };
   }
 
+  async logout({ id }: User, accessToken: string) {
+    const refreshToken = await this.redis.getdel(id);
+
+    await this.blacklistToken(accessToken);
+    await this.blacklistToken(refreshToken);
+  }
+
   async getTokens(userId: string, role: Role) {
     const { accessSecret, accessExpiration, refreshSecret, refreshExpiration } =
       this.configService.getOrThrow<JwtConfigOptions>('jwt');
