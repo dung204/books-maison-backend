@@ -1,4 +1,12 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 
 import { CustomRequest } from '@/base/common/types/custom-request.type';
 import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
@@ -23,5 +31,13 @@ export class AuthController {
   ) {
     const accessToken = req.headers.authorization.replaceAll('Bearer ', '');
     return this.authService.refresh(req.user, accessToken, refreshToken);
+  }
+
+  @UseGuards(JwtAccessGuard)
+  @Post('/logout')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async logout(@Request() req: CustomRequest) {
+    const accessToken = req.headers.authorization.replaceAll('Bearer ', '');
+    await this.authService.logout(req.user, accessToken);
   }
 }
