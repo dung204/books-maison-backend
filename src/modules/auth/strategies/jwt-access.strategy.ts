@@ -1,25 +1,36 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy } from 'passport-jwt';
+import { Request } from 'express';
+import { ExtractJwt, SecretOrKeyProvider, Strategy } from 'passport-jwt';
 
+import { AuthService } from '@/modules/auth/services/auth.service';
 import { JwtPayload } from '@/modules/auth/types/jwt-payload.type';
 
 @Injectable()
 export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor() {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly authService: AuthService,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_ACCESS_SECRET,
+      secretOrKeyProvider: (async (_, rawJwtToken, done) => {
+        if (await authService.isTokenBlacklisted(rawJwtToken)) {
+          done(new UnauthorizedException('Access token is blacklisted.'));
+          return;
+        }
+
+        done(null, configService.get<string>('JWT_ACCESS_SECRET'));
+      }) satisfies SecretOrKeyProvider<Request>,
     });
   }
 
   validate(payload: JwtPayload) {
-    const result = {
+    return {
       id: payload.sub,
-      email: payload.email,
+      role: payload.role,
     };
-
-    return result;
   }
 }
