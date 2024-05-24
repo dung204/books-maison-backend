@@ -10,6 +10,7 @@ export function configSwagger(app: INestApplication) {
     )
     .setVersion('1.0')
     .addBearerAuth()
+    .addTag('auth', 'Operations about authentication & authorization')
     .addTag('users', 'Operations about users')
     .addTag('books', 'Operations about books')
     .addTag('authors', 'Operations about authors')
