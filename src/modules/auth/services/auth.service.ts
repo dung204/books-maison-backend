@@ -10,6 +10,8 @@ import { Redis } from 'ioredis';
 
 import { Role } from '@/base/common/enum/role.enum';
 import { JwtConfigOptions } from '@/base/config/jwt.config';
+import { LoginSuccessResponse } from '@/modules/auth/responses/login-success.response';
+import { RefreshSuccessResponse } from '@/modules/auth/responses/refresh-success.response';
 import { JwtPayload } from '@/modules/auth/types/jwt-payload.type';
 import { User } from '@/modules/user/entities/user.entity';
 import { UserService } from '@/modules/user/services/user.service';
@@ -36,15 +38,21 @@ export class AuthService {
     return null;
   }
 
-  async login({ id, role }: User) {
+  async login({ id, role }: User): Promise<LoginSuccessResponse> {
     return {
-      id,
-      role,
-      ...(await this.getTokens(id, role)),
+      data: {
+        id,
+        role,
+        ...(await this.getTokens(id, role)),
+      },
     };
   }
 
-  async refresh({ id, role }: User, accessToken: string, refreshToken: string) {
+  async refresh(
+    { id, role }: User,
+    accessToken: string,
+    refreshToken: string,
+  ): Promise<RefreshSuccessResponse> {
     if ((await this.redis.get(id)) !== refreshToken)
       throw new UnauthorizedException('Refresh token does not exist.');
 
@@ -63,9 +71,11 @@ export class AuthService {
     await this.blacklistToken(refreshToken);
 
     return {
-      id,
-      role,
-      ...(await this.getTokens(id, role)),
+      data: {
+        id,
+        role,
+        ...(await this.getTokens(id, role)),
+      },
     };
   }
 

@@ -11,18 +11,19 @@ import {
   ApiBody,
   ApiInternalServerErrorResponse,
   ApiNoContentResponse,
-  ApiOkResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
+import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
 import { CustomRequest } from '@/base/common/types/custom-request.type';
 import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
 import { LocalAuthGuard } from '@/modules/auth/guards/local-auth.guard';
 import { LoginRequest } from '@/modules/auth/requests/login.request';
 import { RefreshRequest } from '@/modules/auth/requests/refresh.request';
-import { LoginSuccessResponse } from '@/modules/auth/responses/login-success.response';
+import { LoginSuccessPayload } from '@/modules/auth/responses/login-success.response';
+import { RefreshSuccessPayload } from '@/modules/auth/responses/refresh-success.response';
 import { AuthService } from '@/modules/auth/services/auth.service';
 
 @ApiTags('auth')
@@ -34,9 +35,11 @@ export class AuthController {
   @ApiBody({
     type: LoginRequest,
   })
-  @ApiOkResponse({
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
     description: 'Successful login',
-    type: LoginSuccessResponse,
+    schema: LoginSuccessPayload,
+    isArray: false,
   })
   @ApiUnauthorizedResponse({
     description: 'The email or password is invalid.',
@@ -55,7 +58,12 @@ export class AuthController {
   @ApiBody({
     type: RefreshRequest,
   })
-  @ApiOkResponse({ description: 'New tokens returned' })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    description: 'New tokens returned',
+    schema: RefreshSuccessPayload,
+    isArray: false,
+  })
   @ApiUnauthorizedResponse({
     description:
       'Refresh token does not belong to the current user or the user did not log in',
