@@ -1,8 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import { Role } from '@/base/common/enum/role.enum';
+import { SuccessResponse } from '@/base/common/responses/success.response';
 
-export class LoginSuccessResponse {
+export class LoginSuccessPayload {
   @ApiProperty({
     description: 'The UUID of the user',
     example: '1e0f70d1-c901-5b64-8a61-496cb071f56e',
@@ -31,3 +32,5 @@ export class LoginSuccessResponse {
   })
   refreshToken: string;
 }
+
+export type LoginSuccessResponse = SuccessResponse<LoginSuccessPayload>;
