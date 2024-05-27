@@ -1,16 +1,6 @@
+import { Body, Controller, Get, Param, Patch, Query } from '@nestjs/common';
 import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-} from '@nestjs/common';
-import {
-  ApiBadRequestResponse,
   ApiBody,
-  ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -22,7 +12,6 @@ import { ApiOkPaginatedResponse } from '@/base/common/decorators/api-ok-paginate
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { UserDto } from '@/modules/user/dto/user.dto';
 
-import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UserService } from '../services/user.service';
 
@@ -30,25 +19,6 @@ import { UserService } from '../services/user.service';
 @Controller('/users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
-  @ApiOperation({ summary: 'Create a user' })
-  @ApiBody({
-    type: CreateUserDto,
-  })
-  @ApiCreatedResponse({
-    type: UserDto,
-    description: 'Created a user successfully.',
-  })
-  @ApiBadRequestResponse({
-    description: 'Invalid request body.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
-  })
-  @Post('/')
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
-  }
 
   @ApiOperation({ summary: 'Get all users' })
   @ApiOkPaginatedResponse({

@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBody,
+  ApiConflictResponse,
   ApiInternalServerErrorResponse,
   ApiNoContentResponse,
   ApiOperation,
@@ -22,14 +23,37 @@ import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
 import { LocalAuthGuard } from '@/modules/auth/guards/local-auth.guard';
 import { LoginRequest } from '@/modules/auth/requests/login.request';
 import { RefreshRequest } from '@/modules/auth/requests/refresh.request';
+import { RegisterRequest } from '@/modules/auth/requests/register.request';
 import { LoginSuccessPayload } from '@/modules/auth/responses/login-success.response';
 import { RefreshSuccessPayload } from '@/modules/auth/responses/refresh-success.response';
 import { AuthService } from '@/modules/auth/services/auth.service';
+import { UserDto } from '@/modules/user/dto/user.dto';
 
 @ApiTags('auth')
 @Controller('/auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
+
+  @ApiOperation({ summary: 'Register a new account' })
+  @ApiBody({
+    type: RegisterRequest,
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.CREATED,
+    description: 'Successful register',
+    schema: UserDto,
+    isArray: false,
+  })
+  @ApiConflictResponse({
+    description: 'Email already taken',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error',
+  })
+  @Post('/register')
+  async register(@Body() registerRequest: RegisterRequest) {
+    return this.authService.register(registerRequest);
+  }
 
   @ApiOperation({ summary: 'Login to the system' })
   @ApiBody({
