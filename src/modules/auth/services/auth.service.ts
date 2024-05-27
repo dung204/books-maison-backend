@@ -52,14 +52,14 @@ export class AuthService {
     };
   }
 
-  async validateUser(email: string, password: string): Promise<UserDto> {
+  async validateUser(email: string, password: string): Promise<User> {
     const user = await this.userRepository.findByEmail(email);
 
     if (
       user &&
       (await PasswordUtils.isPasswordMatched(password, user.password))
     )
-      return UserDto.fromUser(user);
+      return user;
 
     return null;
   }

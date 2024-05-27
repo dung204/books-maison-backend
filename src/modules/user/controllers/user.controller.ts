@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Patch, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  Patch,
+  Query,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -7,10 +17,15 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
 import { ApiOkPaginatedResponse } from '@/base/common/decorators/api-ok-paginated-response.decorator';
+import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
+import { SuccessResponse } from '@/base/common/responses/success.response';
+import { CustomRequest } from '@/base/common/types/custom-request.type';
+import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
 import { UserDto } from '@/modules/user/dto/user.dto';
 
 import { UpdateUserDto } from '../dto/update-user.dto';
@@ -21,6 +36,28 @@ import { UserService } from '../services/user.service';
 @Controller('/users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @ApiOperation({ summary: 'Get profile of current user' })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: UserDto,
+    isArray: false,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'The user is not logged in',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error.',
+  })
+  @UseGuards(JwtAccessGuard)
+  @Get('/profile')
+  async getCurrentUserProfile(
+    @Request() req: CustomRequest,
+  ): Promise<SuccessResponse<UserDto>> {
+    return {
+      data: UserDto.fromUser(req.user),
+    };
+  }
 
   @ApiOperation({ summary: 'Get all users' })
   @ApiOkPaginatedResponse({

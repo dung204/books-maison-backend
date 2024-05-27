@@ -6,12 +6,15 @@ import { ExtractJwt, SecretOrKeyProvider, Strategy } from 'passport-jwt';
 
 import { AuthService } from '@/modules/auth/services/auth.service';
 import { JwtPayload } from '@/modules/auth/types/jwt-payload.type';
+import { User } from '@/modules/user/entities/user.entity';
+import { UserRepository } from '@/modules/user/repositories/user.repository';
 
 @Injectable()
 export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     private readonly configService: ConfigService,
     private readonly authService: AuthService,
+    private readonly userRepository: UserRepository,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -27,10 +30,10 @@ export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  validate(payload: JwtPayload) {
-    return {
-      id: payload.sub,
-      role: payload.role,
-    };
+  async validate(payload: JwtPayload): Promise<User> {
+    const id = payload.sub;
+    const user = await this.userRepository.findById(id);
+    if (!user) throw new UnauthorizedException();
+    return user;
   }
 }
