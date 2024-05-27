@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Patch, Query } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
@@ -15,6 +16,7 @@ import { UserDto } from '@/modules/user/dto/user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UserService } from '../services/user.service';
 
+@ApiBearerAuth('JWT')
 @ApiTags('users')
 @Controller('/users')
 export class UserController {

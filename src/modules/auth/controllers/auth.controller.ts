@@ -9,6 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiConflictResponse,
   ApiInternalServerErrorResponse,
@@ -79,6 +80,7 @@ export class AuthController {
     return this.authService.login(req.user);
   }
 
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Create new (refresh) tokens' })
   @ApiBody({
     type: RefreshRequest,
@@ -107,6 +109,7 @@ export class AuthController {
     return this.authService.refresh(req.user, accessToken, refreshToken);
   }
 
+  @ApiBearerAuth('JWT')
   @ApiOperation({
     summary: 'Logout to the system',
   })
