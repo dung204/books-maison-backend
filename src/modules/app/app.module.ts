@@ -1,8 +1,12 @@
+import { RedisModule, RedisModuleOptions } from '@liaoliaots/nestjs-redis';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import databaseConfig from '@/base/config/database.config';
+import jwtConfig from '@/base/config/jwt.config';
+import redisConfig from '@/base/config/redis.config';
 import { DatabaseModule } from '@/base/database/database.module';
+import { AuthModule } from '@/modules/auth/auth.module';
 import { AuthorModule } from '@/modules/author/author.module';
 import { BookModule } from '@/modules/book/book.module';
 import { CategoryModule } from '@/modules/category/category.module';
@@ -15,8 +19,20 @@ import { AppService } from './app.service';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, load: [databaseConfig] }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [databaseConfig, redisConfig, jwtConfig],
+    }),
+    RedisModule.forRootAsync(
+      {
+        inject: [ConfigService],
+        useFactory: (configService: ConfigService) =>
+          configService.getOrThrow<RedisModuleOptions>('redis'),
+      },
+      true,
+    ),
     DatabaseModule,
+    AuthModule,
     UserModule,
     BookModule,
     AuthorModule,

@@ -9,7 +9,18 @@ export function configSwagger(app: INestApplication) {
       'The API for Books Maison - an online library web application',
     )
     .setVersion('1.0')
-    .addBearerAuth()
+    .addBearerAuth(
+      {
+        description: 'Enter JWT authentication (access) token',
+        name: 'Authorization',
+        bearerFormat: 'Bearer',
+        scheme: 'Bearer',
+        type: 'http',
+        in: 'Header',
+      },
+      'JWT',
+    )
+    .addTag('auth', 'Operations about authentication & authorization')
     .addTag('users', 'Operations about users')
     .addTag('books', 'Operations about books')
     .addTag('authors', 'Operations about authors')
