@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   HttpCode,
   HttpStatus,
   Post,
@@ -119,7 +120,7 @@ export class AuthController {
     description: 'Internal Server Error',
   })
   @UseGuards(JwtAccessGuard)
-  @Post('/logout')
+  @Delete('/logout')
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@Request() req: CustomRequest) {
     const accessToken = req.headers.authorization.replaceAll('Bearer ', '');
