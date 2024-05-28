@@ -29,6 +29,7 @@ export class RegisterRequest {
     description: 'The first name of the user',
     example: 'John',
   })
+
   @IsNotEmpty({ message: 'Last name must not be empty' })
   @IsString({ message: 'First name must be a string' })
   @MaxLength(128)
@@ -38,6 +39,7 @@ export class RegisterRequest {
     description: 'The last name of the user',
     example: 'Doe',
   })
+
   @IsNotEmpty({ message: 'Last name must not be empty' })
   @IsString({ message: 'Last name must be a string' })
   @MaxLength(128)
@@ -49,6 +51,7 @@ export class RegisterRequest {
   })
   @IsString({ message: 'Address must be a string' })
   @IsOptional()
+
   @MaxLength(256)
   address?: string;
 }
