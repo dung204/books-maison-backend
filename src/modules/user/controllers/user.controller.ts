@@ -2,16 +2,17 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   HttpStatus,
   Param,
-  Patch,
+  Post,
   Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
-  ApiBody,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -27,8 +28,8 @@ import { SuccessResponse } from '@/base/common/responses/success.response';
 import { CustomRequest } from '@/base/common/types/custom-request.type';
 import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
 import { UserDto } from '@/modules/user/dto/user.dto';
+import { UpdateProfileRequest } from '@/modules/user/requests/update-profile.request';
 
-import { UpdateUserDto } from '../dto/update-user.dto';
 import { UserService } from '../services/user.service';
 
 @ApiBearerAuth('JWT')
@@ -59,6 +60,32 @@ export class UserController {
     };
   }
 
+  @ApiOperation({ summary: 'Update profile of current user' })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: UserDto,
+    isArray: false,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'The user is not logged in',
+  })
+  @ApiBadRequestResponse({
+    description: 'Update information is invalid',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error.',
+  })
+  @UseGuards(JwtAccessGuard)
+  @Post('/profile')
+  @HttpCode(HttpStatus.OK)
+  async updateCurrentUserProfile(
+    @Request() req: CustomRequest,
+    @Body() updateProfileRequest: UpdateProfileRequest,
+  ) {
+    const currentUser = req.user;
+    return this.userService.update(currentUser.id, updateProfileRequest);
+  }
+
   @ApiOperation({ summary: 'Get all users' })
   @ApiOkPaginatedResponse({
     schema: UserDto,
@@ -87,25 +114,5 @@ export class UserController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.userService.findUserById(id);
-  }
-
-  @ApiOperation({ summary: 'Update a user' })
-  @ApiBody({
-    type: UpdateUserDto,
-    required: false,
-  })
-  @ApiOkResponse({
-    type: UserDto,
-    description: 'User is updated successfully.',
-  })
-  @ApiNotFoundResponse({
-    description: 'User is not found.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
-  })
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(id, updateUserDto);
   }
 }
