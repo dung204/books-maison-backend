@@ -30,6 +30,10 @@ export class UserRepository extends Repository<User> {
     return this.existsBy({ id });
   }
 
+  isExistedByEmail(email: string) {
+    return this.existsBy({ email });
+  }
+
   async updateUserById(id: string, updateUserDto: UpdateUserDto) {
     const updateResult = await this.update({ id }, updateUserDto);
 

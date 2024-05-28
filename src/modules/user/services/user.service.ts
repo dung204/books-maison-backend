@@ -7,6 +7,7 @@ import {
 
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { SuccessResponse } from '@/base/common/responses/success.response';
+import { PasswordUtils } from '@/base/utils/password.utils';
 import { UserDto } from '@/modules/user/dto/user.dto';
 import { User } from '@/modules/user/entities/user.entity';
 import { UserRepository } from '@/modules/user/repositories/user.repository';
@@ -71,15 +72,21 @@ export class UserService {
 
   async update(
     id: string,
-    updateUserDto: UpdateUserDto,
+    { password, ...updateUserDto }: UpdateUserDto,
   ): Promise<SuccessResponse<UserDto>> {
     if (!this.userRepository.isExistedById(id))
       throw new NotFoundException('User not found.');
 
-    const updateStatus = await this.userRepository.updateUserById(
-      id,
-      updateUserDto,
+    const existedUserByEmail = await this.userRepository.findByEmail(
+      updateUserDto.email,
     );
+    if (existedUserByEmail?.id !== id)
+      throw new ConflictException('Email already taken');
+
+    const updateStatus = await this.userRepository.updateUserById(id, {
+      ...updateUserDto,
+      ...(password && { password: await PasswordUtils.hashPassword(password) }),
+    });
     if (updateStatus != 1)
       throw new ConflictException('Conflicted! Cannot update user.');
 
