@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
@@ -51,9 +52,24 @@ export class CategoryController {
     return this.categoryService.findAll(paginationQueryDto);
   }
 
+  @ApiOperation({
+    summary: 'Get a category by ID',
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: Category,
+    isArray: false,
+    description: 'Category is retrieved successfully',
+  })
+  @ApiNotFoundResponse({
+    description: 'Category is not found.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error.',
+  })
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.categoryService.findOne(+id);
+    return this.categoryService.findCategoryById(id);
   }
 
   @Patch(':id')

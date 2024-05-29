@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { SuccessResponse } from '@/base/common/responses/success.response';
@@ -43,8 +43,14 @@ export class CategoryService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} category`;
+  async findCategoryById(id: string): Promise<SuccessResponse<Category>> {
+    const category = await this.categoryRepository.findById(id);
+
+    if (!category) throw new NotFoundException('Category not found.');
+
+    return {
+      data: category,
+    };
   }
 
   update(id: number, updateCategoryDto: UpdateCategoryDto) {

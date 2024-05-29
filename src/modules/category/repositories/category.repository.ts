@@ -8,4 +8,8 @@ export class CategoryRepository extends Repository<Category> {
   constructor(private dataSource: DataSource) {
     super(Category, dataSource.createEntityManager());
   }
+
+  findById(id: string) {
+    return this.findOneBy({ id });
+  }
 }
