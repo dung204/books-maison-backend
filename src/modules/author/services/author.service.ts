@@ -14,9 +14,14 @@ export class AuthorService {
     @Inject(AuthorRepository) private authorRepository: AuthorRepository,
   ) {}
 
-  create(createAuthorDto: CreateAuthorDto) {
-    createAuthorDto;
-    return 'This action adds a new author';
+  async create(
+    createAuthorDto: CreateAuthorDto,
+  ): Promise<SuccessResponse<Author>> {
+    const author = await this.authorRepository.createAuthor(createAuthorDto);
+
+    return {
+      data: author,
+    };
   }
 
   async findAll(
@@ -50,9 +55,5 @@ export class AuthorService {
   update(id: number, updateAuthorDto: UpdateAuthorDto) {
     updateAuthorDto;
     return `This action updates a #${id} author`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} author`;
   }
 }
