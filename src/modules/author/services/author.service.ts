@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { SuccessResponse } from '@/base/common/responses/success.response';
@@ -58,8 +63,22 @@ export class AuthorService {
     };
   }
 
-  update(id: number, updateAuthorDto: UpdateAuthorDto) {
-    updateAuthorDto;
-    return `This action updates a #${id} author`;
+  async update(
+    id: string,
+    updateAuthorDto: UpdateAuthorDto,
+  ): Promise<SuccessResponse<Author>> {
+    if (!this.authorRepository.isExistedById(id))
+      throw new NotFoundException('Author not found.');
+
+    const updateStatus = await this.authorRepository.updateAuthorById(
+      id,
+      updateAuthorDto,
+    );
+    if (updateStatus !== 1)
+      throw new ConflictException('Conflicted! Cannot update author.');
+
+    return {
+      data: await this.authorRepository.findById(id),
+    };
   }
 }

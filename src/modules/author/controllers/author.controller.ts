@@ -102,8 +102,31 @@ export class AuthorController {
     return this.authorService.findOne(id);
   }
 
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Update an author by ID (for ADMIN only)',
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: Author,
+    isArray: false,
+    description: 'Successful author update',
+  })
+  @ApiBadRequestResponse({
+    description: 'Author information is invalid',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User login is required',
+  })
+  @ApiForbiddenResponse({
+    description: 'The current authenticated user is not an ADMIN.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error.',
+  })
+  @UseGuards(JwtAccessGuard, AdminGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAuthorDto: UpdateAuthorDto) {
-    return this.authorService.update(+id, updateAuthorDto);
+    return this.authorService.update(id, updateAuthorDto);
   }
 }
