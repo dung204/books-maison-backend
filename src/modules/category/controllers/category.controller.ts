@@ -7,16 +7,23 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOperation,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
+import { AdminGuard } from '@/modules/auth/guards/admin.guard';
+import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
 import { Category } from '@/modules/category/entities/category.entity';
 
 import { CreateCategoryDto } from '../dto/create-category.dto';
@@ -28,7 +35,30 @@ import { CategoryService } from '../services/category.service';
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  @Post()
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Create a new categories (for ADMIN only)',
+  })
+  @ApiBody({
+    type: CreateCategoryDto,
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.CREATED,
+    schema: Category,
+    isArray: false,
+    description: 'Successful category creation',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User login is required',
+  })
+  @ApiForbiddenResponse({
+    description: 'The current authenticated user is not an ADMIN.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error.',
+  })
+  @UseGuards(JwtAccessGuard, AdminGuard)
+  @Post('/')
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoryService.create(createCategoryDto);
   }

@@ -14,9 +14,15 @@ export class CategoryService {
     @Inject(CategoryRepository) private categoryRepository: CategoryRepository,
   ) {}
 
-  create(createCategoryDto: CreateCategoryDto) {
-    createCategoryDto;
-    return 'This action adds a new category';
+  async create(
+    createCategoryDto: CreateCategoryDto,
+  ): Promise<SuccessResponse<Category>> {
+    const category =
+      await this.categoryRepository.createCategory(createCategoryDto);
+
+    return {
+      data: category,
+    };
   }
 
   async findAll(
