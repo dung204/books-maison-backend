@@ -32,6 +32,6 @@ export function configSwagger(app: INestApplication) {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('/api-docs', app, document, {
     customSiteTitle: 'Books Maison API Documentation',
-    customfavIcon: 'static/images/favicon.ico',
+    customfavIcon: '/images/favicon.ico',
   });
 }
