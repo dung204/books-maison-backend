@@ -16,13 +16,11 @@ import {
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
-  ApiOkResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
-import { ApiOkPaginatedResponse } from '@/base/common/decorators/api-ok-paginated-response.decorator';
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { SuccessResponse } from '@/base/common/responses/success.response';
@@ -89,8 +87,11 @@ export class UserController {
   }
 
   @ApiOperation({ summary: 'Get all users (for ADMIN only)' })
-  @ApiOkPaginatedResponse({
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
     schema: UserDto,
+    isArray: true,
+    pagination: true,
     description:
       'Get all users information successfully (with pagination metadata).',
   })
@@ -110,8 +111,10 @@ export class UserController {
   }
 
   @ApiOperation({ summary: 'Get a user by id (for ADMIN only)' })
-  @ApiOkResponse({
-    type: UserDto,
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: UserDto,
+    isArray: false,
     description: 'User is retrieved successfully.',
   })
   @ApiUnauthorizedResponse({

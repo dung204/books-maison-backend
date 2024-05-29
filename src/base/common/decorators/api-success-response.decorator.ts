@@ -6,6 +6,8 @@ import {
   getSchemaPath,
 } from '@nestjs/swagger';
 
+import { Pagination } from '@/base/common/types/pagination.type';
+
 type ApiSuccessResponseOptions<DataDto extends Type<unknown>> = Omit<
   ApiResponseSchemaHost,
   'schema'
@@ -22,7 +24,7 @@ export const ApiSuccessResponse = <DataDto extends Type<unknown>>({
   ...options
 }: ApiSuccessResponseOptions<DataDto>) => {
   return applyDecorators(
-    ApiExtraModels(schema),
+    ApiExtraModels(Pagination, schema),
     ApiResponse({
       ...options,
       schema: {
@@ -37,12 +39,12 @@ export const ApiSuccessResponse = <DataDto extends Type<unknown>>({
                   $ref: getSchemaPath(schema),
                 }),
           },
+          ...(pagination && {
+            pagination: {
+              $ref: getSchemaPath(Pagination),
+            },
+          }),
         },
-        ...(pagination && {
-          pagination: {
-            $ref: getSchemaPath(schema),
-          },
-        }),
       },
     }),
   );
