@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { SuccessResponse } from '@/base/common/responses/success.response';
@@ -59,12 +64,22 @@ export class CategoryService {
     };
   }
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    updateCategoryDto;
-    return `This action updates a #${id} category`;
-  }
+  async update(
+    id: string,
+    updateCategoryDto: UpdateCategoryDto,
+  ): Promise<SuccessResponse<Category>> {
+    if (!this.categoryRepository.isExistedById(id))
+      throw new NotFoundException('Category not found.');
 
-  remove(id: number) {
-    return `This action removes a #${id} category`;
+    const updateStatus = await this.categoryRepository.updateCategoryById(
+      id,
+      updateCategoryDto,
+    );
+    if (updateStatus !== 1)
+      throw new ConflictException('Conflicted! Cannot update category.');
+
+    return {
+      data: await this.categoryRepository.findById(id),
+    };
   }
 }
