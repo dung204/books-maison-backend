@@ -13,19 +13,19 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
-  ApiOkResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
-import { ApiOkPaginatedResponse } from '@/base/common/decorators/api-ok-paginated-response.decorator';
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { CustomRequest } from '@/base/common/types/custom-request.type';
+import { AdminGuard } from '@/modules/auth/guards/admin.guard';
 import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
 import { UserDto } from '@/modules/user/dto/user.dto';
 import { UpdateProfileRequest } from '@/modules/user/requests/update-profile.request';
@@ -86,24 +86,42 @@ export class UserController {
     return this.userService.update(currentUser.id, updateProfileRequest);
   }
 
-  @ApiOperation({ summary: 'Get all users' })
-  @ApiOkPaginatedResponse({
+  @ApiOperation({ summary: 'Get all users (for ADMIN only)' })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
     schema: UserDto,
+    isArray: true,
+    pagination: true,
     description:
       'Get all users information successfully (with pagination metadata).',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User login is required',
+  })
+  @ApiForbiddenResponse({
+    description: 'The current authenticated user is not an ADMIN.',
   })
   @ApiInternalServerErrorResponse({
     description: 'Internal Server Error.',
   })
+  @UseGuards(JwtAccessGuard, AdminGuard)
   @Get('/')
   findAll(@Query() paginationQueryDto: PaginationQueryDto) {
     return this.userService.findAll(paginationQueryDto);
   }
 
-  @ApiOperation({ summary: 'Get a user by id' })
-  @ApiOkResponse({
-    type: UserDto,
+  @ApiOperation({ summary: 'Get a user by id (for ADMIN only)' })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: UserDto,
+    isArray: false,
     description: 'User is retrieved successfully.',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User login is required',
+  })
+  @ApiForbiddenResponse({
+    description: 'The current authenticated user is not an ADMIN.',
   })
   @ApiNotFoundResponse({
     description: 'User is not found.',
@@ -111,6 +129,7 @@ export class UserController {
   @ApiInternalServerErrorResponse({
     description: 'Internal Server Error.',
   })
+  @UseGuards(JwtAccessGuard, AdminGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.userService.findUserById(id);
