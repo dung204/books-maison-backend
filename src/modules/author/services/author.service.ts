@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { SuccessResponse } from '@/base/common/responses/success.response';
@@ -48,8 +48,14 @@ export class AuthorService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} author`;
+  async findOne(id: string): Promise<SuccessResponse<Author>> {
+    const author = await this.authorRepository.findById(id);
+
+    if (!author) throw new NotFoundException('Author not found!');
+
+    return {
+      data: author,
+    };
   }
 
   update(id: number, updateAuthorDto: UpdateAuthorDto) {

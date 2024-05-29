@@ -14,6 +14,7 @@ import {
   ApiBearerAuth,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -81,9 +82,24 @@ export class AuthorController {
     return this.authorService.findAll(paginationQueryDto);
   }
 
+  @ApiOperation({
+    summary: 'Get an author by ID',
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: Author,
+    isArray: false,
+    description: 'Author is retrieved successfully',
+  })
+  @ApiNotFoundResponse({
+    description: 'Author is not found',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error.',
+  })
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.authorService.findOne(+id);
+    return this.authorService.findOne(id);
   }
 
   @Patch(':id')
