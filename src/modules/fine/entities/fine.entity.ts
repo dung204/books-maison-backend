@@ -7,7 +7,7 @@ export class Fine {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToOne(() => Checkout, { cascade: true })
+  @OneToOne(() => Checkout)
   @JoinColumn()
   checkout: Checkout;
 
