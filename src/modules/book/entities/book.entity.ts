@@ -20,11 +20,11 @@ export class Book {
   @Column('character varying', { length: 256, nullable: true })
   title: string;
 
-  @ManyToMany(() => Category, { cascade: true })
+  @ManyToMany(() => Category)
   @JoinTable()
   categories: Category[];
 
-  @ManyToMany(() => Author, { cascade: true })
+  @ManyToMany(() => Author)
   @JoinTable()
   authors: Author[];
 
