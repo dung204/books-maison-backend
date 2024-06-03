@@ -8,15 +8,22 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiOperation,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
+import { AdminGuard } from '@/modules/auth/guards/admin.guard';
+import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
 import { Book } from '@/modules/book/entities/book.entity';
 import { BookService } from '@/modules/book/services/book.service';
 
@@ -28,7 +35,30 @@ import { UpdateBookDto } from '../dto/update-book.dto';
 export class BookController {
   constructor(private readonly bookService: BookService) {}
 
-  @Post()
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Create a new book (for ADMIN only)',
+  })
+  @ApiBody({
+    type: CreateBookDto,
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.CREATED,
+    schema: Book,
+    isArray: false,
+    description: 'Successful book creation',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User login is required',
+  })
+  @ApiForbiddenResponse({
+    description: 'The current authenticated user is not an ADMIN.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error.',
+  })
+  @UseGuards(JwtAccessGuard, AdminGuard)
+  @Post('/')
   create(@Body() createBookDto: CreateBookDto) {
     return this.bookService.create(createBookDto);
   }
@@ -47,7 +77,7 @@ export class BookController {
   @ApiInternalServerErrorResponse({
     description: 'Internal Server Error.',
   })
-  @Get()
+  @Get('/')
   findAll(@Query() paginationQueryDto: PaginationQueryDto) {
     return this.bookService.findAll(paginationQueryDto);
   }
