@@ -17,7 +17,7 @@ export class Book {
   @Column('character varying', { length: 20, nullable: true })
   isbn: string;
 
-  @Column('character varying', { length: 256, nullable: true })
+  @Column('character varying', { length: 256 })
   title: string;
 
   @ManyToMany(() => Category)
@@ -46,6 +46,6 @@ export class Book {
   @Column('text', { nullable: true })
   description: string;
 
-  @Column('integer')
+  @Column('integer', { default: 0 })
   quantity: number;
 }
