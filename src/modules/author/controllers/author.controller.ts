@@ -22,6 +22,7 @@ import {
 
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
+import { SuccessResponse } from '@/base/common/responses/success.response';
 import { AdminGuard } from '@/modules/auth/guards/admin.guard';
 import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
 import { Author } from '@/modules/author/entities/author.entity';
@@ -98,8 +99,10 @@ export class AuthorController {
     description: 'Internal Server Error.',
   })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authorService.findOne(id);
+  async findOne(@Param('id') id: string): Promise<SuccessResponse<Author>> {
+    return {
+      data: await this.authorService.findAuthorById(id),
+    };
   }
 
   @ApiBearerAuth('JWT')
@@ -126,7 +129,12 @@ export class AuthorController {
   })
   @UseGuards(JwtAccessGuard, AdminGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthorDto: UpdateAuthorDto) {
-    return this.authorService.update(id, updateAuthorDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateAuthorDto: UpdateAuthorDto,
+  ): Promise<SuccessResponse<Author>> {
+    return {
+      data: await this.authorService.update(id, updateAuthorDto),
+    };
   }
 }
