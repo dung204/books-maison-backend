@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DeepPartial } from 'typeorm';
 
-import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { AuthorService } from '@/modules/author/services/author.service';
+import { BookSearchDto } from '@/modules/book/dto/book-search.dto';
 import { Book } from '@/modules/book/entities/book.entity';
 import { BookRepository } from '@/modules/book/repositories/book.repository';
 import { CategoryService } from '@/modules/category/services/category.service';
@@ -48,15 +48,11 @@ export class BookService {
   }
 
   async findAll(
-    paginationQueryDto: PaginationQueryDto,
+    bookSearchDto: BookSearchDto,
   ): Promise<SuccessResponse<Book[]>> {
-    const { page, pageSize } = paginationQueryDto;
-    const skip = (page - 1) * pageSize;
-    const [books, total] = await this.bookRepository.findAndCount({
-      skip,
-      take: pageSize,
-      relations: ['authors', 'categories'],
-    });
+    const { page, pageSize } = bookSearchDto;
+    const [books, total] =
+      await this.bookRepository.findAllAndCount(bookSearchDto);
     const totalPage = Math.ceil(total / pageSize);
 
     return {
