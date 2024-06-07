@@ -21,9 +21,9 @@ import {
 } from '@nestjs/swagger';
 
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
-import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { AdminGuard } from '@/modules/auth/guards/admin.guard';
 import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
+import { BookSearchDto } from '@/modules/book/dto/book-search.dto';
 import { Book } from '@/modules/book/entities/book.entity';
 import { BookService } from '@/modules/book/services/book.service';
 
@@ -78,8 +78,8 @@ export class BookController {
     description: 'Internal Server Error.',
   })
   @Get('/')
-  findAll(@Query() paginationQueryDto: PaginationQueryDto) {
-    return this.bookService.findAll(paginationQueryDto);
+  findAll(@Query() bookSearchDto: BookSearchDto) {
+    return this.bookService.findAll(bookSearchDto);
   }
 
   @Get(':id')
