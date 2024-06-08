@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { DeepPartial } from 'typeorm';
 
 import { SuccessResponse } from '@/base/common/responses/success.response';
@@ -68,8 +68,12 @@ export class BookService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} book`;
+  async findOne(id: string) {
+    const book = await this.bookRepository.findById(id);
+
+    if (!book) throw new NotFoundException('Book not found.');
+
+    return book;
   }
 
   update(id: number, updateBookDto: UpdateBookDto) {
