@@ -1,8 +1,8 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
+  HttpCode,
   HttpStatus,
   Param,
   Patch,
@@ -103,13 +103,28 @@ export class BookController {
     return this.bookService.findOne(id);
   }
 
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Update a book by ID (for ADMIN only)',
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: Book,
+    isArray: false,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User login is required',
+  })
+  @ApiForbiddenResponse({
+    description: 'The current authenticated user is not an ADMIN.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error.',
+  })
+  @UseGuards(JwtAccessGuard, AdminGuard)
   @Patch(':id')
+  @HttpCode(HttpStatus.OK)
   update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
-    return this.bookService.update(+id, updateBookDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.bookService.remove(+id);
+    return this.bookService.update(id, updateBookDto);
   }
 }

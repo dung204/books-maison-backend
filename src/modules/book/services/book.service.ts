@@ -76,12 +76,33 @@ export class BookService {
     return book;
   }
 
-  update(id: number, updateBookDto: UpdateBookDto) {
-    updateBookDto;
-    return `This action updates a #${id} book`;
-  }
+  async update(
+    id: string,
+    { authorIds, categoryIds, ...updateBookDto }: UpdateBookDto,
+  ) {
+    const book = await this.findOne(id);
 
-  remove(id: number) {
-    return `This action removes a #${id} book`;
+    const categories =
+      !categoryIds || categoryIds.length === 0
+        ? book.categories
+        : await Promise.all(
+            categoryIds.map((id) => this.categoryService.findCategoryById(id)),
+          );
+    const authors =
+      !authorIds || authorIds.length === 0
+        ? book.authors
+        : await Promise.all(
+            authorIds.map((id) => this.authorService.findAuthorById(id)),
+          );
+
+    Object.assign<Book, DeepPartial<Book>>(book, {
+      authors,
+      categories,
+      ...updateBookDto,
+    });
+
+    return {
+      data: await this.bookRepository.save(book),
+    };
   }
 }
