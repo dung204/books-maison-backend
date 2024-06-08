@@ -15,6 +15,7 @@ import {
   ApiBody,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -82,9 +83,24 @@ export class BookController {
     return this.bookService.findAll(bookSearchDto);
   }
 
+  @ApiOperation({
+    summary: 'Get a book by ID',
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: Book,
+    isArray: false,
+    description: 'Book is retrieved successfully',
+  })
+  @ApiNotFoundResponse({
+    description: 'Book is not found.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error.',
+  })
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.bookService.findOne(+id);
+    return this.bookService.findOne(id);
   }
 
   @Patch(':id')

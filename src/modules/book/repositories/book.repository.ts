@@ -10,6 +10,15 @@ export class BookRepository extends Repository<Book> {
     super(Book, dataSource.createEntityManager());
   }
 
+  async findById(id: string) {
+    const query = this.createQueryBuilder('book')
+      .leftJoinAndSelect('book.authors', 'author')
+      .leftJoinAndSelect('book.categories', 'category')
+      .where('book.id = :id', { id });
+
+    return query.getOne();
+  }
+
   async findAllAndCount({
     page,
     pageSize,
@@ -18,8 +27,8 @@ export class BookRepository extends Repository<Book> {
   }: BookSearchDto) {
     const skip = (page - 1) * pageSize;
     const query = this.createQueryBuilder('book')
-      .leftJoinAndSelect('book.authors', 'authors')
-      .leftJoinAndSelect('book.categories', 'categories')
+      .leftJoinAndSelect('book.authors', 'author')
+      .leftJoinAndSelect('book.categories', 'category')
       .skip(skip)
       .take(pageSize);
 
