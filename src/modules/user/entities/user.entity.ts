@@ -1,13 +1,6 @@
-import {
-  Column,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Role } from '@/base/common/enum/role.enum';
-import { Book } from '@/modules/book/entities/book.entity';
 
 @Entity({ schema: 'public', name: 'users' })
 export class User {
@@ -31,10 +24,6 @@ export class User {
 
   @Column('enum', { enum: Role, default: Role.USER })
   role: Role;
-
-  @ManyToMany(() => Book)
-  @JoinTable({ name: 'user_favourite_books' })
-  favouriteBooks: Book[];
 
   @Column('timestamp with time zone', { default: () => 'CURRENT_TIMESTAMP' })
   createdTimestamp: Date;
