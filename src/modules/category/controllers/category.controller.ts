@@ -23,6 +23,7 @@ import {
 
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
+import { SuccessResponse } from '@/base/common/responses/success.response';
 import { AdminGuard } from '@/modules/auth/guards/admin.guard';
 import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
 import { Category } from '@/modules/category/entities/category.entity';
@@ -99,8 +100,10 @@ export class CategoryController {
     description: 'Internal Server Error.',
   })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.categoryService.findCategoryById(id);
+  async findOne(@Param('id') id: string): Promise<SuccessResponse<Category>> {
+    return {
+      data: await this.categoryService.findCategoryById(id),
+    };
   }
 
   @ApiBearerAuth('JWT')
@@ -124,10 +127,12 @@ export class CategoryController {
   @UseGuards(JwtAccessGuard, AdminGuard)
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
-  ) {
-    return this.categoryService.update(id, updateCategoryDto);
+  ): Promise<SuccessResponse<Category>> {
+    return {
+      data: await this.categoryService.update(id, updateCategoryDto),
+    };
   }
 }

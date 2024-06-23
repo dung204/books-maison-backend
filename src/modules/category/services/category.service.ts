@@ -54,20 +54,15 @@ export class CategoryService {
     };
   }
 
-  async findCategoryById(id: string): Promise<SuccessResponse<Category>> {
+  async findCategoryById(id: string) {
     const category = await this.categoryRepository.findById(id);
 
     if (!category) throw new NotFoundException('Category not found.');
 
-    return {
-      data: category,
-    };
+    return category;
   }
 
-  async update(
-    id: string,
-    updateCategoryDto: UpdateCategoryDto,
-  ): Promise<SuccessResponse<Category>> {
+  async update(id: string, updateCategoryDto: UpdateCategoryDto) {
     if (!this.categoryRepository.isExistedById(id))
       throw new NotFoundException('Category not found.');
 
@@ -78,8 +73,6 @@ export class CategoryService {
     if (updateStatus !== 1)
       throw new ConflictException('Conflicted! Cannot update category.');
 
-    return {
-      data: await this.categoryRepository.findById(id),
-    };
+    return this.categoryRepository.findById(id);
   }
 }

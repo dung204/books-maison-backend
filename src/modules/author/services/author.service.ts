@@ -53,20 +53,15 @@ export class AuthorService {
     };
   }
 
-  async findOne(id: string): Promise<SuccessResponse<Author>> {
+  async findAuthorById(id: string) {
     const author = await this.authorRepository.findById(id);
 
     if (!author) throw new NotFoundException('Author not found!');
 
-    return {
-      data: author,
-    };
+    return author;
   }
 
-  async update(
-    id: string,
-    updateAuthorDto: UpdateAuthorDto,
-  ): Promise<SuccessResponse<Author>> {
+  async update(id: string, updateAuthorDto: UpdateAuthorDto) {
     if (!this.authorRepository.isExistedById(id))
       throw new NotFoundException('Author not found.');
 
@@ -77,8 +72,6 @@ export class AuthorService {
     if (updateStatus !== 1)
       throw new ConflictException('Conflicted! Cannot update author.');
 
-    return {
-      data: await this.authorRepository.findById(id),
-    };
+    return this.authorRepository.findById(id);
   }
 }
