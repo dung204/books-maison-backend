@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   HttpStatus,
   Param,
   Patch,
@@ -10,8 +11,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
-  ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiBody,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
@@ -21,33 +22,32 @@ import {
 } from '@nestjs/swagger';
 
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
-import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
-import { SuccessResponse } from '@/base/common/responses/success.response';
 import { AdminGuard } from '@/modules/auth/guards/admin.guard';
 import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
-import { Author } from '@/modules/author/entities/author.entity';
-import { AuthorService } from '@/modules/author/services/author.service';
+import { BookSearchDto } from '@/modules/book/dto/book-search.dto';
+import { Book } from '@/modules/book/entities/book.entity';
+import { BookService } from '@/modules/book/services/book.service';
 
-import { CreateAuthorDto } from '../dto/create-author.dto';
-import { UpdateAuthorDto } from '../dto/update-author.dto';
+import { CreateBookDto } from '../dto/create-book.dto';
+import { UpdateBookDto } from '../dto/update-book.dto';
 
-@ApiTags('authors')
-@Controller('author')
-export class AuthorController {
-  constructor(private readonly authorService: AuthorService) {}
+@ApiTags('books')
+@Controller('book')
+export class BookController {
+  constructor(private readonly bookService: BookService) {}
 
   @ApiBearerAuth('JWT')
   @ApiOperation({
-    summary: 'Create a new author (for ADMIN only)',
+    summary: 'Create a new book (for ADMIN only)',
+  })
+  @ApiBody({
+    type: CreateBookDto,
   })
   @ApiSuccessResponse({
     status: HttpStatus.CREATED,
-    schema: Author,
+    schema: Book,
     isArray: false,
-    description: 'Successful author creation',
-  })
-  @ApiBadRequestResponse({
-    description: 'Author information is invalid',
+    description: 'Successful book creation',
   })
   @ApiUnauthorizedResponse({
     description: 'User login is required',
@@ -60,63 +60,57 @@ export class AuthorController {
   })
   @UseGuards(JwtAccessGuard, AdminGuard)
   @Post('/')
-  create(@Body() createAuthorDto: CreateAuthorDto) {
-    return this.authorService.create(createAuthorDto);
+  create(@Body() createBookDto: CreateBookDto) {
+    return this.bookService.create(createBookDto);
   }
 
   @ApiOperation({
-    summary: 'Get all authors',
+    summary: 'Get all books',
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
-    schema: Author,
+    schema: Book,
     isArray: true,
     pagination: true,
     description:
-      'Get all authors information successfully (with pagination metadata).',
+      'Get all books information successfully (with pagination metadata).',
   })
   @ApiInternalServerErrorResponse({
     description: 'Internal Server Error.',
   })
   @Get('/')
-  findAll(@Query() paginationQueryDto: PaginationQueryDto) {
-    return this.authorService.findAll(paginationQueryDto);
+  findAll(@Query() bookSearchDto: BookSearchDto) {
+    return this.bookService.findAll(bookSearchDto);
   }
 
   @ApiOperation({
-    summary: 'Get an author by ID',
+    summary: 'Get a book by ID',
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
-    schema: Author,
+    schema: Book,
     isArray: false,
-    description: 'Author is retrieved successfully',
+    description: 'Book is retrieved successfully',
   })
   @ApiNotFoundResponse({
-    description: 'Author is not found',
+    description: 'Book is not found.',
   })
   @ApiInternalServerErrorResponse({
     description: 'Internal Server Error.',
   })
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<SuccessResponse<Author>> {
-    return {
-      data: await this.authorService.findAuthorById(id),
-    };
+  findOne(@Param('id') id: string) {
+    return this.bookService.findOne(id);
   }
 
   @ApiBearerAuth('JWT')
   @ApiOperation({
-    summary: 'Update an author by ID (for ADMIN only)',
+    summary: 'Update a book by ID (for ADMIN only)',
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
-    schema: Author,
+    schema: Book,
     isArray: false,
-    description: 'Successful author update',
-  })
-  @ApiBadRequestResponse({
-    description: 'Author information is invalid',
   })
   @ApiUnauthorizedResponse({
     description: 'User login is required',
@@ -129,12 +123,8 @@ export class AuthorController {
   })
   @UseGuards(JwtAccessGuard, AdminGuard)
   @Patch(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateAuthorDto: UpdateAuthorDto,
-  ): Promise<SuccessResponse<Author>> {
-    return {
-      data: await this.authorService.update(id, updateAuthorDto),
-    };
+  @HttpCode(HttpStatus.OK)
+  update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
+    return this.bookService.update(id, updateBookDto);
   }
 }
