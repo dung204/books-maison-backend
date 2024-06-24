@@ -1,6 +1,9 @@
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
 
+import { SuccessResponse } from '@/base/common/responses/success.response';
+import { Book } from '@/modules/book/entities/book.entity';
 import { BookService } from '@/modules/book/services/book.service';
+import { FavouriteBookSearchDto } from '@/modules/favourite-book/dto/favourite-book-search.dto';
 import { FavouriteBook } from '@/modules/favourite-book/entities/favourite-book.entity';
 import { FavouriteBookRepository } from '@/modules/favourite-book/repositories/favourite-book.repository';
 import { User } from '@/modules/user/entities/user.entity';
@@ -36,5 +39,30 @@ export class FavouriteBookService {
     favouriteBook.book = book;
 
     await this.favouriteBookRepository.save(favouriteBook);
+  }
+
+  async getAllFavouriteBooks(
+    user: User,
+    favourtieBookSearchDto: FavouriteBookSearchDto,
+  ): Promise<SuccessResponse<Book[]>> {
+    const { page, pageSize } = favourtieBookSearchDto;
+    const [books, total] =
+      await this.favouriteBookRepository.findAllByUserIdAndCount(
+        user.id,
+        favourtieBookSearchDto,
+      );
+    const totalPage = Math.ceil(total / pageSize);
+
+    return {
+      data: books,
+      pagination: {
+        total,
+        page,
+        pageSize,
+        totalPage,
+        hasNextPage: page < totalPage,
+        hasPreviousPage: page > 1,
+      },
+    };
   }
 }
