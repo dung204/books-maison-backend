@@ -119,7 +119,9 @@ export class BookRepository extends Repository<Book> {
     const query = this.createQueryBuilder('book');
 
     if (title) {
-      query.where('LOWER(book.title) LIKE LOWER(:title)', { title });
+      query.where('LOWER(book.title) LIKE LOWER(:title)', {
+        title: `%${title}%`,
+      });
     }
 
     return (await query.getMany()).map((book) => book.id);
@@ -130,7 +132,7 @@ export class BookRepository extends Repository<Book> {
 
     if (publisher) {
       query.where('LOWER(book.publisher) LIKE LOWER(:publisher)', {
-        publisher,
+        publisher: `%${publisher}%`,
       });
     }
 
