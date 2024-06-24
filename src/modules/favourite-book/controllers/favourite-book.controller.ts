@@ -1,5 +1,6 @@
 import {
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -90,5 +91,30 @@ export class FavouriteBookController {
       currentUser,
       favouriteBookSearchDto,
     );
+  }
+
+  @ApiOperation({
+    summary: 'Delete a favourite book',
+    description:
+      'Delete a book from favourite list of the current authenticated user',
+  })
+  @ApiNoContentResponse({
+    description: 'Favourite book added successfully.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Book not found in the favourite list.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error.',
+  })
+  @UseGuards(JwtAccessGuard)
+  @Delete('/delete/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  deleteFavouriteBook(
+    @Request() req: CustomRequest,
+    @Param('id') bookId: string,
+  ) {
+    const currentUser = req.user;
+    return this.favouriteBookService.deleteFavouriteBook(currentUser, bookId);
   }
 }
