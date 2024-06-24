@@ -17,6 +17,15 @@ export class FavouriteBookRepository extends Repository<FavouriteBook> {
     });
   }
 
+  async deleteByUserIdAndBookId(userId: string, bookId: string) {
+    const result = await this.delete({
+      userId,
+      bookId,
+    });
+
+    return result.affected !== 0;
+  }
+
   async findAllByUserIdAndCount(
     userId: string,
     {

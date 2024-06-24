@@ -1,4 +1,9 @@
-import { ConflictException, Inject, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { Book } from '@/modules/book/entities/book.entity';
@@ -43,13 +48,13 @@ export class FavouriteBookService {
 
   async getAllFavouriteBooks(
     user: User,
-    favourtieBookSearchDto: FavouriteBookSearchDto,
+    favouriteBookSearchDto: FavouriteBookSearchDto,
   ): Promise<SuccessResponse<Book[]>> {
-    const { page, pageSize } = favourtieBookSearchDto;
+    const { page, pageSize } = favouriteBookSearchDto;
     const [books, total] =
       await this.favouriteBookRepository.findAllByUserIdAndCount(
         user.id,
-        favourtieBookSearchDto,
+        favouriteBookSearchDto,
       );
     const totalPage = Math.ceil(total / pageSize);
 
@@ -64,5 +69,17 @@ export class FavouriteBookService {
         hasPreviousPage: page > 1,
       },
     };
+  }
+
+  async deleteFavouriteBook(user: User, bookId: string) {
+    const deletedSuccessfully =
+      await this.favouriteBookRepository.deleteByUserIdAndBookId(
+        user.id,
+        bookId,
+      );
+
+    if (!deletedSuccessfully) {
+      throw new NotFoundException('Book is not the favourite list.');
+    }
   }
 }
