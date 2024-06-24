@@ -13,6 +13,7 @@ import { AuthorModule } from '@/modules/author/author.module';
 import { BookModule } from '@/modules/book/book.module';
 import { CategoryModule } from '@/modules/category/category.module';
 import { CheckoutModule } from '@/modules/checkout/checkout.module';
+import { FavouriteBookModule } from '@/modules/favourite-book/favourite-book.module';
 import { FineModule } from '@/modules/fine/fine.module';
 import { UserModule } from '@/modules/user/user.module';
 
@@ -40,6 +41,7 @@ import { AppService } from './app.service';
     AuthModule,
     UserModule,
     BookModule,
+    FavouriteBookModule,
     AuthorModule,
     CategoryModule,
     CheckoutModule,
