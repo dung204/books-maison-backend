@@ -8,12 +8,14 @@ import {
   Patch,
   Post,
   Query,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -21,6 +23,8 @@ import {
 
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
+import { SuccessResponse } from '@/base/common/responses/success.response';
+import { CustomRequest } from '@/base/common/types/custom-request.type';
 import { AdminGuard } from '@/modules/auth/guards/admin.guard';
 import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
@@ -66,9 +70,41 @@ export class CheckoutController {
     return this.checkoutService.findAll(paginationQueryDto);
   }
 
+  @ApiOperation({
+    summary: 'Get a checkout by ID',
+    description:
+      'Only ADMIN users and the owner of the checkout are accessible to the checkout',
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: Checkout,
+    isArray: false,
+    description: 'Checkout is retrieved successfully.',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User login is required.',
+  })
+  @ApiForbiddenResponse({
+    description:
+      'The current authenticated user is not an ADMIN nor the owner of the checkout.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Checkout not found.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error.',
+  })
+  @UseGuards(JwtAccessGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.checkoutService.findOne(+id);
+  async findOne(
+    @Request() req: CustomRequest,
+    @Param('id') id: string,
+  ): Promise<SuccessResponse<Checkout>> {
+    const currentUser = req.user;
+
+    return {
+      data: await this.checkoutService.findOne(currentUser, id),
+    };
   }
 
   @Patch(':id')
