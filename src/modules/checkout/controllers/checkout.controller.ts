@@ -1,18 +1,18 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   HttpStatus,
   Param,
-  Patch,
   Post,
   Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiConflictResponse,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
@@ -31,7 +31,6 @@ import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 import { CheckoutService } from '@/modules/checkout/services/checkout.service';
 
 import { CreateCheckoutDto } from '../dto/create-checkout.dto';
-import { UpdateCheckoutDto } from '../dto/update-checkout.dto';
 
 @ApiBearerAuth('JWT')
 @ApiTags('checkouts')
@@ -39,9 +38,35 @@ import { UpdateCheckoutDto } from '../dto/update-checkout.dto';
 export class CheckoutController {
   constructor(private readonly checkoutService: CheckoutService) {}
 
-  @Post()
-  create(@Body() createCheckoutDto: CreateCheckoutDto) {
-    return this.checkoutService.create(createCheckoutDto);
+  @ApiOperation({
+    summary: 'Create a checkout',
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.CREATED,
+    schema: Checkout,
+    isArray: false,
+    description: 'Successful checkout creation.',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User login is required.',
+  })
+  @ApiBadRequestResponse({
+    description: 'Book ID is invalid or the book is out of stock.',
+  })
+  @ApiConflictResponse({
+    description: 'User has already rented this book.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error.',
+  })
+  @UseGuards(JwtAccessGuard)
+  @Post('/')
+  create(
+    @Request() req: CustomRequest,
+    @Body() createCheckoutDto: CreateCheckoutDto,
+  ) {
+    const currentUser = req.user;
+    return this.checkoutService.create(currentUser, createCheckoutDto);
   }
 
   @ApiOperation({
@@ -105,18 +130,5 @@ export class CheckoutController {
     return {
       data: await this.checkoutService.findOne(currentUser, id),
     };
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateCheckoutDto: UpdateCheckoutDto,
-  ) {
-    return this.checkoutService.update(+id, updateCheckoutDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.checkoutService.remove(+id);
   }
 }

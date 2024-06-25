@@ -52,6 +52,6 @@ export class Checkout {
     enum: CheckoutStatus,
     enumName: 'CheckoutStatus',
   })
-  @Column('enum', { enum: CheckoutStatus })
+  @Column('enum', { enum: CheckoutStatus, default: CheckoutStatus.RENTING })
   status: CheckoutStatus;
 }

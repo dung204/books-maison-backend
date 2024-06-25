@@ -1,4 +1,6 @@
 import {
+  BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -7,19 +9,55 @@ import {
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { Role } from '@/base/common/enum/role.enum';
 import { SuccessResponse } from '@/base/common/responses/success.response';
+import { BookService } from '@/modules/book/services/book.service';
 import { CreateCheckoutDto } from '@/modules/checkout/dto/create-checkout.dto';
-import { UpdateCheckoutDto } from '@/modules/checkout/dto/update-checkout.dto';
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 import { CheckoutRepository } from '@/modules/checkout/repositories/checkout.repository';
 import { User } from '@/modules/user/entities/user.entity';
 
 @Injectable()
 export class CheckoutService {
-  constructor(private readonly checkoutRepository: CheckoutRepository) {}
+  private readonly TWO_WEEKS_AS_MS = 1_209_600_000;
 
-  create(createCheckoutDto: CreateCheckoutDto) {
-    createCheckoutDto;
-    return 'This action adds a new checkout';
+  constructor(
+    private readonly checkoutRepository: CheckoutRepository,
+    private readonly bookService: BookService,
+  ) {}
+
+  async create(
+    user: User,
+    { bookId }: CreateCheckoutDto,
+  ): Promise<SuccessResponse<Checkout>> {
+    const rentingCheckout =
+      await this.checkoutRepository.findRentingCheckoutByUserIdAndBookId(
+        user.id,
+        bookId,
+      );
+
+    if (!rentingCheckout)
+      throw new ConflictException('User has already rented this book.');
+
+    const book = await this.bookService.findOne(bookId);
+
+    if (book.quantity === 0)
+      throw new BadRequestException('This book is currently out of stock.');
+
+    const checkout = new Checkout();
+    const checkoutTimestamp = new Date();
+    const dueTimestamp = new Date(
+      checkoutTimestamp.getTime() + this.TWO_WEEKS_AS_MS,
+    );
+
+    checkout.user = user;
+    checkout.book = book;
+    checkout.checkoutTimestamp = checkoutTimestamp;
+    checkout.dueTimestamp = dueTimestamp;
+
+    await this.bookService.update(bookId, { quantity: book.quantity - 1 });
+
+    return {
+      data: await this.checkoutRepository.save(checkout),
+    };
   }
 
   async findAll(
@@ -56,14 +94,5 @@ export class CheckoutService {
       throw new ForbiddenException();
 
     return checkout;
-  }
-
-  update(id: number, updateCheckoutDto: UpdateCheckoutDto) {
-    updateCheckoutDto;
-    return `This action updates a #${id} checkout`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} checkout`;
   }
 }
