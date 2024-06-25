@@ -78,7 +78,7 @@ export class CheckoutController {
     isArray: true,
     pagination: true,
     description:
-      'Get all books information successfully (with pagination metadata).',
+      'Get all checkouts information successfully (with pagination metadata).',
   })
   @ApiUnauthorizedResponse({
     description: 'User login is required',
@@ -93,6 +93,36 @@ export class CheckoutController {
   @Get('/')
   findAll(@Query() paginationQueryDto: PaginationQueryDto) {
     return this.checkoutService.findAll(paginationQueryDto);
+  }
+
+  @ApiOperation({
+    summary: 'Get all checkouts of the current authenticated user',
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: Checkout,
+    isArray: true,
+    pagination: true,
+    description:
+      'Get all checkouts information successfully (with pagination metadata).',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User login is required.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error.',
+  })
+  @UseGuards(JwtAccessGuard)
+  @Get('/me')
+  findAllCheckoutsOfCurrentUser(
+    @Request() req: CustomRequest,
+    @Query() paginationQueryDto: PaginationQueryDto,
+  ) {
+    const currentUser = req.user;
+    return this.checkoutService.findAllCheckoutsOfCurrentUser(
+      currentUser,
+      paginationQueryDto,
+    );
   }
 
   @ApiOperation({

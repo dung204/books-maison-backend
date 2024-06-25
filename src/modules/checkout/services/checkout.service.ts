@@ -6,11 +6,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { Role } from '@/base/common/enum/role.enum';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { BookService } from '@/modules/book/services/book.service';
+import { CheckoutSearchDto } from '@/modules/checkout/dto/checkout-search.dto';
 import { CreateCheckoutDto } from '@/modules/checkout/dto/create-checkout.dto';
+import { UserCheckoutSearchDto } from '@/modules/checkout/dto/user-checkout-search.dto';
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 import { CheckoutRepository } from '@/modules/checkout/repositories/checkout.repository';
 import { User } from '@/modules/user/entities/user.entity';
@@ -34,7 +35,7 @@ export class CheckoutService {
         bookId,
       );
 
-    if (!rentingCheckout)
+    if (rentingCheckout)
       throw new ConflictException('User has already rented this book.');
 
     const book = await this.bookService.findOne(bookId);
@@ -61,14 +62,11 @@ export class CheckoutService {
   }
 
   async findAll(
-    paginationQueryDto: PaginationQueryDto,
+    checkoutSearchDto: CheckoutSearchDto,
   ): Promise<SuccessResponse<Checkout[]>> {
-    const { page, pageSize } = paginationQueryDto;
-    const skip = (page - 1) * pageSize;
-    const [checkouts, total] = await this.checkoutRepository.findAndCount({
-      skip,
-      take: pageSize,
-    });
+    const { page, pageSize } = checkoutSearchDto;
+    const [checkouts, total] =
+      await this.checkoutRepository.findAllAndCount(checkoutSearchDto);
     const totalPage = Math.ceil(total / pageSize);
 
     return {
@@ -94,5 +92,29 @@ export class CheckoutService {
       throw new ForbiddenException();
 
     return checkout;
+  }
+
+  async findAllCheckoutsOfCurrentUser(
+    user: User,
+    userCheckoutSearchDto: UserCheckoutSearchDto,
+  ) {
+    const { page, pageSize } = userCheckoutSearchDto;
+    const [checkouts, total] = await this.checkoutRepository.findAllAndCount({
+      userId: user.id,
+      ...userCheckoutSearchDto,
+    });
+    const totalPage = Math.ceil(total / pageSize);
+
+    return {
+      data: checkouts,
+      pagination: {
+        total,
+        page,
+        pageSize,
+        totalPage,
+        hasNextPage: page < totalPage,
+        hasPreviousPage: page > 1,
+      },
+    };
   }
 }
