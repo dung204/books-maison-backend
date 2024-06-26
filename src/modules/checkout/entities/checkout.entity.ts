@@ -54,4 +54,11 @@ export class Checkout {
   })
   @Column('enum', { enum: CheckoutStatus, default: CheckoutStatus.RENTING })
   status: CheckoutStatus;
+
+  @ApiProperty({
+    description: 'Additional note for the checkout',
+    required: false,
+  })
+  @Column('text', { nullable: true })
+  note?: string;
 }
