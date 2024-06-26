@@ -1,6 +1,7 @@
 import { RedisModule, RedisModuleOptions } from '@liaoliaots/nestjs-redis';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 
@@ -37,6 +38,7 @@ import { AppService } from './app.service';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', '..', 'static'),
     }),
+    ScheduleModule.forRoot(),
     DatabaseModule,
     AuthModule,
     UserModule,
