@@ -13,8 +13,8 @@ import { Role } from '@/base/common/enum/role.enum';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { BookService } from '@/modules/book/services/book.service';
 import { CheckoutSearchDto } from '@/modules/checkout/dto/checkout-search.dto';
-import { CreateCheckoutDto } from '@/modules/checkout/dto/create-checkout.dto';
 import { UserCheckoutSearchDto } from '@/modules/checkout/dto/user-checkout-search.dto';
+import { UserCreateCheckoutDto } from '@/modules/checkout/dto/user-create-checkout.dto';
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 import { CheckoutRepository } from '@/modules/checkout/repositories/checkout.repository';
 import { UserDto } from '@/modules/user/dto/user.dto';
@@ -30,9 +30,9 @@ export class CheckoutService {
     private readonly bookService: BookService,
   ) {}
 
-  async create(
+  async createCheckoutUsingCurrentUser(
     user: User,
-    { bookId }: CreateCheckoutDto,
+    { bookId }: UserCreateCheckoutDto,
   ): Promise<SuccessResponse<Checkout>> {
     const rentingCheckout =
       await this.checkoutRepository.findRentingCheckoutByUserIdAndBookId(

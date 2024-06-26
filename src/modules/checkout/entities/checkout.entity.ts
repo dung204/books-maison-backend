@@ -58,6 +58,7 @@ export class Checkout {
   @ApiProperty({
     description: 'Additional note for the checkout',
     required: false,
+    nullable: true,
   })
   @Column('text', { nullable: true })
   note?: string;
