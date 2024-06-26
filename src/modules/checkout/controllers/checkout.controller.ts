@@ -31,7 +31,7 @@ import { UserCheckoutSearchDto } from '@/modules/checkout/dto/user-checkout-sear
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 import { CheckoutService } from '@/modules/checkout/services/checkout.service';
 
-import { CreateCheckoutDto } from '../dto/create-checkout.dto';
+import { UserCreateCheckoutDto } from '../dto/user-create-checkout.dto';
 
 @ApiBearerAuth('JWT')
 @ApiTags('checkouts')
@@ -61,13 +61,16 @@ export class CheckoutController {
     description: 'Internal Server Error.',
   })
   @UseGuards(JwtAccessGuard)
-  @Post('/')
-  create(
+  @Post('/me')
+  createCheckoutUsingCurrentUser(
     @Request() req: CustomRequest,
-    @Body() createCheckoutDto: CreateCheckoutDto,
+    @Body() userCreateCheckoutDto: UserCreateCheckoutDto,
   ) {
     const currentUser = req.user;
-    return this.checkoutService.create(currentUser, createCheckoutDto);
+    return this.checkoutService.createCheckoutUsingCurrentUser(
+      currentUser,
+      userCreateCheckoutDto,
+    );
   }
 
   @ApiOperation({
