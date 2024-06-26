@@ -26,6 +26,7 @@ import { SuccessResponse } from '@/base/common/responses/success.response';
 import { CustomRequest } from '@/base/common/types/custom-request.type';
 import { AdminGuard } from '@/modules/auth/guards/admin.guard';
 import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
+import { AdminCreateCheckoutDto } from '@/modules/checkout/dto/admin-create-checkout.dto';
 import { CheckoutSearchDto } from '@/modules/checkout/dto/checkout-search.dto';
 import { UserCheckoutSearchDto } from '@/modules/checkout/dto/user-checkout-search.dto';
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
@@ -40,7 +41,41 @@ export class CheckoutController {
   constructor(private readonly checkoutService: CheckoutService) {}
 
   @ApiOperation({
-    summary: 'Create a checkout',
+    summary: 'Create a checkout (for ADMIN only)',
+  })
+  @UseGuards(JwtAccessGuard, AdminGuard)
+  @ApiSuccessResponse({
+    status: HttpStatus.CREATED,
+    schema: Checkout,
+    isArray: false,
+    description: 'Successful checkout creation.',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User login is required.',
+  })
+  @ApiForbiddenResponse({
+    description: 'The current authenticated user is not an ADMIN.',
+  })
+  @ApiBadRequestResponse({
+    description: 'Book ID is invalid or the book is out of stock.',
+  })
+  @ApiConflictResponse({
+    description: 'User has already rented this book.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error.',
+  })
+  @Post('/')
+  createCheckoutUsingAdminUser(
+    @Body() adminCreateCheckoutDto: AdminCreateCheckoutDto,
+  ) {
+    return this.checkoutService.createCheckoutUsingAdminUser(
+      adminCreateCheckoutDto,
+    );
+  }
+
+  @ApiOperation({
+    summary: 'Create a checkout (for current authenticated user)',
   })
   @ApiSuccessResponse({
     status: HttpStatus.CREATED,
