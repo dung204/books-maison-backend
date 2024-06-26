@@ -12,6 +12,7 @@ import { CheckoutStatus } from '@/base/common/enum/checkout-status.enum';
 import { Role } from '@/base/common/enum/role.enum';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { BookService } from '@/modules/book/services/book.service';
+import { AdminCreateCheckoutDto } from '@/modules/checkout/dto/admin-create-checkout.dto';
 import { CheckoutSearchDto } from '@/modules/checkout/dto/checkout-search.dto';
 import { UserCheckoutSearchDto } from '@/modules/checkout/dto/user-checkout-search.dto';
 import { UserCreateCheckoutDto } from '@/modules/checkout/dto/user-create-checkout.dto';
@@ -19,6 +20,7 @@ import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 import { CheckoutRepository } from '@/modules/checkout/repositories/checkout.repository';
 import { UserDto } from '@/modules/user/dto/user.dto';
 import { User } from '@/modules/user/entities/user.entity';
+import { UserService } from '@/modules/user/services/user.service';
 
 @Injectable()
 export class CheckoutService {
@@ -28,6 +30,7 @@ export class CheckoutService {
   constructor(
     private readonly checkoutRepository: CheckoutRepository,
     private readonly bookService: BookService,
+    private readonly userService: UserService,
   ) {}
 
   async createCheckoutUsingCurrentUser(
@@ -43,6 +46,43 @@ export class CheckoutService {
     if (rentingCheckout)
       throw new ConflictException('User has already rented this book.');
 
+    const book = await this.bookService.findOne(bookId);
+
+    if (book.quantity === 0)
+      throw new BadRequestException('This book is currently out of stock.');
+
+    const checkout = new Checkout();
+    const checkoutTimestamp = new Date();
+    const dueTimestamp = new Date(
+      checkoutTimestamp.getTime() + this.TWO_WEEKS_AS_MS,
+    );
+
+    checkout.user = UserDto.fromUser(user);
+    checkout.book = book;
+    checkout.checkoutTimestamp = checkoutTimestamp;
+    checkout.dueTimestamp = dueTimestamp;
+
+    await this.bookService.update(bookId, { quantity: book.quantity - 1 });
+
+    return {
+      data: await this.checkoutRepository.save(checkout),
+    };
+  }
+
+  async createCheckoutUsingAdminUser({
+    userId,
+    bookId,
+  }: AdminCreateCheckoutDto) {
+    const rentingCheckout =
+      await this.checkoutRepository.findRentingCheckoutByUserIdAndBookId(
+        userId,
+        bookId,
+      );
+
+    if (rentingCheckout)
+      throw new ConflictException('User has already rented this book.');
+
+    const user = await this.userService.findUserById(userId);
     const book = await this.bookService.findOne(bookId);
 
     if (book.quantity === 0)

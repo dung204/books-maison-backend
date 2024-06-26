@@ -131,7 +131,11 @@ export class UserController {
   })
   @UseGuards(JwtAccessGuard, AdminGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findUserById(id);
+  async findOne(@Param('id') id: string): Promise<SuccessResponse<UserDto>> {
+    const user = await this.userService.findUserById(id);
+
+    return {
+      data: UserDto.fromUser(user),
+    };
   }
 }
