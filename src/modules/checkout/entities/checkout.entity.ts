@@ -20,7 +20,7 @@ export class Checkout {
     type: UserDto,
   })
   @ManyToOne(() => User)
-  user: User;
+  user: UserDto;
 
   @ApiProperty({
     description: 'The book checked out by the user',
