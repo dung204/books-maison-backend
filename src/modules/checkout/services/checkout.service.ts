@@ -3,9 +3,12 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
+import { CheckoutStatus } from '@/base/common/enum/checkout-status.enum';
 import { Role } from '@/base/common/enum/role.enum';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { BookService } from '@/modules/book/services/book.service';
@@ -20,6 +23,7 @@ import { User } from '@/modules/user/entities/user.entity';
 @Injectable()
 export class CheckoutService {
   private readonly TWO_WEEKS_AS_MS = 1_209_600_000;
+  private readonly logger: Logger = new Logger(CheckoutService.name);
 
   constructor(
     private readonly checkoutRepository: CheckoutRepository,
@@ -117,5 +121,15 @@ export class CheckoutService {
         hasPreviousPage: page > 1,
       },
     };
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async setOverdueCheckouts() {
+    const checkouts: Checkout[] = (
+      await this.checkoutRepository.getRentingCheckoutsDueBeforeToday()
+    ).map((checkout) => ({ ...checkout, status: CheckoutStatus.OVERDUE }));
+
+    await this.checkoutRepository.save(checkouts);
+    this.logger.log(`${checkouts.length} checkouts have been set as overdue.`);
   }
 }

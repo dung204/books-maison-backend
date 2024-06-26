@@ -87,4 +87,11 @@ export class CheckoutRepository extends Repository<Checkout> {
 
     return query.getManyAndCount();
   }
+
+  getRentingCheckoutsDueBeforeToday() {
+    return this.createQueryBuilder('checkout')
+      .where('checkout.status = :status', { status: CheckoutStatus.RENTING })
+      .andWhere('checkout.dueTimestamp < CURRENT_TIMESTAMP')
+      .getMany();
+  }
 }
