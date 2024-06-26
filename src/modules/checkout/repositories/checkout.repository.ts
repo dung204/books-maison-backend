@@ -29,16 +29,60 @@ export class CheckoutRepository extends Repository<Checkout> {
       .getOne();
   }
 
-  findAllAndCount({ userId, page, pageSize }: CheckoutSearchDto) {
+  findAllAndCount({
+    page,
+    pageSize,
+    userId,
+    bookId,
+    fromCheckoutTimestamp,
+    toCheckoutTimestamp,
+    fromDueTimestamp,
+    toDueTimestamp,
+    status,
+  }: CheckoutSearchDto) {
     const skip = (page - 1) * pageSize;
     const query = this.createQueryBuilder('checkout')
       .leftJoinAndSelect('checkout.user', 'user')
       .leftJoinAndSelect('checkout.book', 'book')
+      .leftJoinAndSelect('book.authors', 'author')
+      .leftJoinAndSelect('book.categories', 'category')
       .skip(skip)
       .take(pageSize);
 
     if (userId) {
       query.andWhere('checkout.user.id = :userId', { userId });
+    }
+
+    if (bookId) {
+      query.andWhere('checkout.book.id = :bookId', { bookId });
+    }
+
+    if (fromCheckoutTimestamp) {
+      query.andWhere('checkout.checkoutTimestamp >= :fromCheckoutTimestamp', {
+        fromCheckoutTimestamp,
+      });
+    }
+
+    if (toCheckoutTimestamp) {
+      query.andWhere('checkout.checkoutTimestamp <= :toCheckoutTimestamp', {
+        toCheckoutTimestamp,
+      });
+    }
+
+    if (fromDueTimestamp) {
+      query.andWhere('checkout.dueTimestamp >= :fromDueTimestamp', {
+        fromDueTimestamp,
+      });
+    }
+
+    if (toDueTimestamp) {
+      query.andWhere('checkout.dueTimestamp <= :toDueTimestamp', {
+        toDueTimestamp,
+      });
+    }
+
+    if (status) {
+      query.andWhere('checkout.status = :status', { status });
     }
 
     return query.getManyAndCount();
