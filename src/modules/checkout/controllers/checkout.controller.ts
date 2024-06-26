@@ -22,11 +22,12 @@ import {
 } from '@nestjs/swagger';
 
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
-import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { CustomRequest } from '@/base/common/types/custom-request.type';
 import { AdminGuard } from '@/modules/auth/guards/admin.guard';
 import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
+import { CheckoutSearchDto } from '@/modules/checkout/dto/checkout-search.dto';
+import { UserCheckoutSearchDto } from '@/modules/checkout/dto/user-checkout-search.dto';
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 import { CheckoutService } from '@/modules/checkout/services/checkout.service';
 
@@ -91,8 +92,8 @@ export class CheckoutController {
   })
   @UseGuards(JwtAccessGuard, AdminGuard)
   @Get('/')
-  findAll(@Query() paginationQueryDto: PaginationQueryDto) {
-    return this.checkoutService.findAll(paginationQueryDto);
+  findAll(@Query() checkoutSearchDto: CheckoutSearchDto) {
+    return this.checkoutService.findAll(checkoutSearchDto);
   }
 
   @ApiOperation({
@@ -116,12 +117,12 @@ export class CheckoutController {
   @Get('/me')
   findAllCheckoutsOfCurrentUser(
     @Request() req: CustomRequest,
-    @Query() paginationQueryDto: PaginationQueryDto,
+    @Query() userCheckoutSearchDto: UserCheckoutSearchDto,
   ) {
     const currentUser = req.user;
     return this.checkoutService.findAllCheckoutsOfCurrentUser(
       currentUser,
-      paginationQueryDto,
+      userCheckoutSearchDto,
     );
   }
 
