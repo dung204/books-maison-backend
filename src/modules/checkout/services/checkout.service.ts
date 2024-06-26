@@ -14,6 +14,7 @@ import { CreateCheckoutDto } from '@/modules/checkout/dto/create-checkout.dto';
 import { UserCheckoutSearchDto } from '@/modules/checkout/dto/user-checkout-search.dto';
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 import { CheckoutRepository } from '@/modules/checkout/repositories/checkout.repository';
+import { UserDto } from '@/modules/user/dto/user.dto';
 import { User } from '@/modules/user/entities/user.entity';
 
 @Injectable()
@@ -49,7 +50,7 @@ export class CheckoutService {
       checkoutTimestamp.getTime() + this.TWO_WEEKS_AS_MS,
     );
 
-    checkout.user = user;
+    checkout.user = UserDto.fromUser(user);
     checkout.book = book;
     checkout.checkoutTimestamp = checkoutTimestamp;
     checkout.dueTimestamp = dueTimestamp;
