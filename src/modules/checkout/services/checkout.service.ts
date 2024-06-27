@@ -14,6 +14,7 @@ import { BookService } from '@/modules/book/services/book.service';
 import { AdminCreateCheckoutDto } from '@/modules/checkout/dto/admin-create-checkout.dto';
 import { CheckoutSearchDto } from '@/modules/checkout/dto/checkout-search.dto';
 import { MarkReturnedCheckoutDto } from '@/modules/checkout/dto/mark-returned-checkout.dto';
+import { UpdateCheckoutNoteDto } from '@/modules/checkout/dto/update-checkout-note.dto';
 import { UserCheckoutSearchDto } from '@/modules/checkout/dto/user-checkout-search.dto';
 import { UserCreateCheckoutDto } from '@/modules/checkout/dto/user-create-checkout.dto';
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
@@ -189,6 +190,20 @@ export class CheckoutService {
     checkout.note = markReturnedCheckoutDto.note;
     checkout.returnedTimestamp = new Date();
 
+    return {
+      data: await this.checkoutRepository.save(checkout),
+    };
+  }
+
+  async updateCheckoutNote(
+    checkoutId: string,
+    { note }: UpdateCheckoutNoteDto,
+  ) {
+    const checkout = await this.checkoutRepository.findById(checkoutId);
+
+    if (!checkout) throw new NotFoundException('Checkout not found.');
+
+    checkout.note = note;
     return {
       data: await this.checkoutRepository.save(checkout),
     };
