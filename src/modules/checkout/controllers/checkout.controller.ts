@@ -30,6 +30,7 @@ import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
 import { AdminCreateCheckoutDto } from '@/modules/checkout/dto/admin-create-checkout.dto';
 import { CheckoutSearchDto } from '@/modules/checkout/dto/checkout-search.dto';
 import { MarkReturnedCheckoutDto } from '@/modules/checkout/dto/mark-returned-checkout.dto';
+import { UpdateCheckoutNoteDto } from '@/modules/checkout/dto/update-checkout-note.dto';
 import { UserCheckoutSearchDto } from '@/modules/checkout/dto/user-checkout-search.dto';
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 import { CheckoutService } from '@/modules/checkout/services/checkout.service';
@@ -109,6 +110,39 @@ export class CheckoutController {
     return this.checkoutService.markCheckoutAsReturned(
       checkoutId,
       markReturnedCheckoutDto,
+    );
+  }
+
+  @ApiOperation({
+    summary: 'Update note of a checkout (for ADMIN only)',
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.CREATED,
+    schema: Checkout,
+    isArray: false,
+    description: 'Checkout note updated successfully.',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User login is required.',
+  })
+  @ApiForbiddenResponse({
+    description: 'The current authenticated user is not an ADMIN.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Checkout not found.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error.',
+  })
+  @UseGuards(JwtAccessGuard, AdminGuard)
+  @Patch('/note/:id')
+  updateCheckoutNote(
+    @Param('id') checkoutId: string,
+    @Body() updateCheckoutNoteDto: UpdateCheckoutNoteDto,
+  ) {
+    return this.checkoutService.updateCheckoutNote(
+      checkoutId,
+      updateCheckoutNoteDto,
     );
   }
 
