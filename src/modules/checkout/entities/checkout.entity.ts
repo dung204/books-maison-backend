@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
-import { CheckoutStatus } from '@/base/common/enum/checkout-status.enum';
 import { Book } from '@/modules/book/entities/book.entity';
+import { CheckoutStatus } from '@/modules/checkout/enum/checkout-status.enum';
 import { UserDto } from '@/modules/user/dto/user.dto';
 import { User } from '@/modules/user/entities/user.entity';
 
