@@ -30,6 +30,14 @@ export class Checkout {
   book: Book;
 
   @ApiProperty({
+    description: 'The status of the checkout',
+    enum: CheckoutStatus,
+    enumName: 'CheckoutStatus',
+  })
+  @Column('enum', { enum: CheckoutStatus, default: CheckoutStatus.RENTING })
+  status: CheckoutStatus;
+
+  @ApiProperty({
     description: 'The timestamp indicating when the checkout is created',
     example: '2024-06-24T16:34:45.109Z',
   })
@@ -48,12 +56,13 @@ export class Checkout {
   dueTimestamp: Date;
 
   @ApiProperty({
-    description: 'The status of the checkout',
-    enum: CheckoutStatus,
-    enumName: 'CheckoutStatus',
+    description: 'The timestamp indicating when the user returned the book',
+    example: '2024-07-10T16:34:45.109Z',
+    required: false,
+    nullable: false,
   })
-  @Column('enum', { enum: CheckoutStatus, default: CheckoutStatus.RENTING })
-  status: CheckoutStatus;
+  @Column('timestamp with time zone', { nullable: true })
+  returnedTimestamp?: Date;
 
   @ApiProperty({
     description: 'Additional note for the checkout',
