@@ -14,6 +14,7 @@ import { SuccessResponse } from '@/base/common/responses/success.response';
 import { BookService } from '@/modules/book/services/book.service';
 import { AdminCreateCheckoutDto } from '@/modules/checkout/dto/admin-create-checkout.dto';
 import { CheckoutSearchDto } from '@/modules/checkout/dto/checkout-search.dto';
+import { MarkReturnedCheckoutDto } from '@/modules/checkout/dto/mark-returned-checkout.dto';
 import { UserCheckoutSearchDto } from '@/modules/checkout/dto/user-checkout-search.dto';
 import { UserCreateCheckoutDto } from '@/modules/checkout/dto/user-create-checkout.dto';
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
@@ -160,6 +161,34 @@ export class CheckoutService {
         hasNextPage: page < totalPage,
         hasPreviousPage: page > 1,
       },
+    };
+  }
+
+  async markCheckoutAsReturned(
+    checkoutId: string,
+    markReturnedCheckoutDto: MarkReturnedCheckoutDto,
+  ): Promise<SuccessResponse<Checkout>> {
+    const checkout = await this.checkoutRepository.findById(checkoutId);
+
+    if (!checkout) throw new NotFoundException('Checkout not found.');
+
+    if (checkout.status === CheckoutStatus.RETURNED)
+      throw new ConflictException(
+        'This checkout is already marked as RETURNED.',
+      );
+
+    const book = checkout.book;
+    await this.bookService.update(book.id, {
+      ...book,
+      quantity: book.quantity + 1,
+    });
+
+    checkout.status = CheckoutStatus.RETURNED;
+    checkout.note = markReturnedCheckoutDto.note;
+    checkout.returnedTimestamp = new Date();
+
+    return {
+      data: await this.checkoutRepository.save(checkout),
     };
   }
 
