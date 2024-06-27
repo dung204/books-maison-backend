@@ -4,6 +4,7 @@ import {
   Get,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Query,
   Request,
@@ -28,6 +29,7 @@ import { AdminGuard } from '@/modules/auth/guards/admin.guard';
 import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
 import { AdminCreateCheckoutDto } from '@/modules/checkout/dto/admin-create-checkout.dto';
 import { CheckoutSearchDto } from '@/modules/checkout/dto/checkout-search.dto';
+import { MarkReturnedCheckoutDto } from '@/modules/checkout/dto/mark-returned-checkout.dto';
 import { UserCheckoutSearchDto } from '@/modules/checkout/dto/user-checkout-search.dto';
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 import { CheckoutService } from '@/modules/checkout/services/checkout.service';
@@ -43,7 +45,6 @@ export class CheckoutController {
   @ApiOperation({
     summary: 'Create a checkout (for ADMIN only)',
   })
-  @UseGuards(JwtAccessGuard, AdminGuard)
   @ApiSuccessResponse({
     status: HttpStatus.CREATED,
     schema: Checkout,
@@ -65,12 +66,49 @@ export class CheckoutController {
   @ApiInternalServerErrorResponse({
     description: 'Internal Server Error.',
   })
+  @UseGuards(JwtAccessGuard, AdminGuard)
   @Post('/')
   createCheckoutUsingAdminUser(
     @Body() adminCreateCheckoutDto: AdminCreateCheckoutDto,
   ) {
     return this.checkoutService.createCheckoutUsingAdminUser(
       adminCreateCheckoutDto,
+    );
+  }
+
+  @ApiOperation({
+    summary: 'Mark a checkout as returned (for ADMIN only)',
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.CREATED,
+    schema: Checkout,
+    isArray: false,
+    description: 'Checkout is marked as returned successfully.',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User login is required.',
+  })
+  @ApiForbiddenResponse({
+    description: 'The current authenticated user is not an ADMIN.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Checkout not found.',
+  })
+  @ApiConflictResponse({
+    description: 'The checkout has already been marked as RETURNED.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error.',
+  })
+  @UseGuards(JwtAccessGuard, AdminGuard)
+  @Patch('/return/:id')
+  markCheckoutAsReturned(
+    @Body() markReturnedCheckoutDto: MarkReturnedCheckoutDto,
+    @Param('id') checkoutId: string,
+  ) {
+    return this.checkoutService.markCheckoutAsReturned(
+      checkoutId,
+      markReturnedCheckoutDto,
     );
   }
 
