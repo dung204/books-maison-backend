@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
-import { CheckoutStatus } from '@/base/common/enum/checkout-status.enum';
 import { Role } from '@/base/common/enum/role.enum';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { BookService } from '@/modules/book/services/book.service';
@@ -18,6 +17,7 @@ import { MarkReturnedCheckoutDto } from '@/modules/checkout/dto/mark-returned-ch
 import { UserCheckoutSearchDto } from '@/modules/checkout/dto/user-checkout-search.dto';
 import { UserCreateCheckoutDto } from '@/modules/checkout/dto/user-create-checkout.dto';
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
+import { CheckoutStatus } from '@/modules/checkout/enum/checkout-status.enum';
 import { CheckoutRepository } from '@/modules/checkout/repositories/checkout.repository';
 import { UserDto } from '@/modules/user/dto/user.dto';
 import { User } from '@/modules/user/entities/user.entity';

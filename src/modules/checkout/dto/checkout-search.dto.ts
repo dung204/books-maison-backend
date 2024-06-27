@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsDateString, IsEnum, IsOptional, IsUUID } from 'class-validator';
 
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
-import { CheckoutStatus } from '@/base/common/enum/checkout-status.enum';
+import { CheckoutStatus } from '@/modules/checkout/enum/checkout-status.enum';
 
 export class CheckoutSearchDto extends PaginationQueryDto {
   @ApiProperty({
