@@ -22,6 +22,7 @@ import {
 } from '@nestjs/swagger';
 
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
+import { SuccessResponse } from '@/base/common/responses/success.response';
 import { AdminGuard } from '@/modules/auth/guards/admin.guard';
 import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
 import { BookSearchDto } from '@/modules/book/dto/book-search.dto';
@@ -124,7 +125,12 @@ export class BookController {
   @UseGuards(JwtAccessGuard, AdminGuard)
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
-  update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
-    return this.bookService.update(id, updateBookDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateBookDto: UpdateBookDto,
+  ): Promise<SuccessResponse<Book>> {
+    return {
+      data: await this.bookService.update(id, updateBookDto),
+    };
   }
 }

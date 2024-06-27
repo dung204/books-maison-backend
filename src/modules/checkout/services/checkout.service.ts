@@ -59,11 +59,11 @@ export class CheckoutService {
     );
 
     checkout.user = UserDto.fromUser(user);
-    checkout.book = book;
+    checkout.book = await this.bookService.update(bookId, {
+      quantity: book.quantity - 1,
+    });
     checkout.checkoutTimestamp = checkoutTimestamp;
     checkout.dueTimestamp = dueTimestamp;
-
-    await this.bookService.update(bookId, { quantity: book.quantity - 1 });
 
     return {
       data: await this.checkoutRepository.save(checkout),
@@ -96,7 +96,9 @@ export class CheckoutService {
     );
 
     checkout.user = UserDto.fromUser(user);
-    checkout.book = book;
+    checkout.book = await this.bookService.update(bookId, {
+      quantity: book.quantity - 1,
+    });
     checkout.checkoutTimestamp = checkoutTimestamp;
     checkout.dueTimestamp = dueTimestamp;
 
@@ -178,7 +180,7 @@ export class CheckoutService {
       );
 
     const book = checkout.book;
-    await this.bookService.update(book.id, {
+    checkout.book = await this.bookService.update(book.id, {
       ...book,
       quantity: book.quantity + 1,
     });
