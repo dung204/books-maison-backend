@@ -34,11 +34,13 @@ export class CheckoutRepository extends Repository<Checkout> {
     pageSize,
     userId,
     bookId,
+    status,
     fromCheckoutTimestamp,
     toCheckoutTimestamp,
     fromDueTimestamp,
     toDueTimestamp,
-    status,
+    fromReturnedTimestamp,
+    toReturnedTimestamp,
   }: CheckoutSearchDto) {
     const skip = (page - 1) * pageSize;
     const query = this.createQueryBuilder('checkout')
@@ -78,6 +80,18 @@ export class CheckoutRepository extends Repository<Checkout> {
     if (toDueTimestamp) {
       query.andWhere('checkout.dueTimestamp <= :toDueTimestamp', {
         toDueTimestamp,
+      });
+    }
+
+    if (fromReturnedTimestamp) {
+      query.andWhere('checkout.returnedTimestamp >= :fromReturnedTimestamp', {
+        fromReturnedTimestamp,
+      });
+    }
+
+    if (toReturnedTimestamp) {
+      query.andWhere('checkout.returnedTimestamp <= :toReturnedTimestamp', {
+        toReturnedTimestamp,
       });
     }
 
