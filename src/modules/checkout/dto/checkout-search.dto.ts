@@ -78,4 +78,28 @@ export class CheckoutSearchDto extends PaginationQueryDto {
     { message: 'To due timestamp must follow this pattern: YYYY-MM-DD' },
   )
   toDueTimestamp?: string;
+
+  @ApiProperty({
+    description:
+      'Every checkouts with returned timestamp after this timestamp will be returned',
+    required: false,
+  })
+  @IsOptional()
+  @IsDateString(
+    { strict: true },
+    { message: 'From returned timestamp must follow this pattern: YYYY-MM-DD' },
+  )
+  fromReturnedTimestamp?: string;
+
+  @ApiProperty({
+    description:
+      'Every checkouts with returned timestamp before this timestamp will be returned',
+    required: false,
+  })
+  @IsOptional()
+  @IsDateString(
+    { strict: true },
+    { message: 'To returned timestamp must follow this pattern: YYYY-MM-DD' },
+  )
+  toReturnedTimestamp?: string;
 }
