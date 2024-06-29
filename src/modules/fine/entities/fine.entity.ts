@@ -1,6 +1,13 @@
-import { Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
+import { FineStatus } from '@/modules/fine/enums/fine-status.enum';
 
 @Entity({ schema: 'public', name: 'fines' })
 export class Fine {
@@ -11,7 +18,6 @@ export class Fine {
   @JoinColumn()
   checkout: Checkout;
 
-  overdueDays: number;
-
-  fineAmount: number;
+  @Column({ enum: FineStatus, default: FineStatus.ISSUED })
+  status: FineStatus;
 }
