@@ -56,14 +56,12 @@ export class UserService {
     };
   }
 
-  async findUserById(id: string): Promise<SuccessResponse<UserDto>> {
+  async findUserById(id: string) {
     const user = await this.userRepository.findById(id);
 
     if (!user) throw new NotFoundException('User not found.');
 
-    return {
-      data: UserDto.fromUser(user),
-    };
+    return user;
   }
 
   async findUserByEmail(email: string): Promise<User> {

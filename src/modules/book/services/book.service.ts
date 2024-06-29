@@ -101,8 +101,6 @@ export class BookService {
       ...updateBookDto,
     });
 
-    return {
-      data: await this.bookRepository.save(book),
-    };
+    return this.bookRepository.save(book);
   }
 }
