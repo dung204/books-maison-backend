@@ -20,6 +20,7 @@ import { UserCreateCheckoutDto } from '@/modules/checkout/dto/user-create-checko
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 import { CheckoutStatus } from '@/modules/checkout/enum/checkout-status.enum';
 import { CheckoutRepository } from '@/modules/checkout/repositories/checkout.repository';
+import { FineService } from '@/modules/fine/services/fine.service';
 import { UserDto } from '@/modules/user/dto/user.dto';
 import { User } from '@/modules/user/entities/user.entity';
 import { UserService } from '@/modules/user/services/user.service';
@@ -33,6 +34,7 @@ export class CheckoutService {
     private readonly checkoutRepository: CheckoutRepository,
     private readonly bookService: BookService,
     private readonly userService: UserService,
+    private readonly fineService: FineService,
   ) {}
 
   async createCheckoutUsingCurrentUser(
@@ -210,12 +212,20 @@ export class CheckoutService {
   }
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-  async setOverdueCheckouts() {
+  async setOverdueCheckoutsAndCreateFines() {
     const checkouts: Checkout[] = (
       await this.checkoutRepository.getRentingCheckoutsDueBeforeToday()
     ).map((checkout) => ({ ...checkout, status: CheckoutStatus.OVERDUE }));
 
     await this.checkoutRepository.save(checkouts);
     this.logger.log(`${checkouts.length} checkouts have been set as overdue.`);
+
+    const createFineResults = await Promise.allSettled(
+      checkouts.map(this.fineService.create),
+    );
+    const successCount = createFineResults.filter(
+      (result) => result.status === 'fulfilled',
+    ).length;
+    this.logger.log(`${successCount} fines have been created.`);
   }
 }
