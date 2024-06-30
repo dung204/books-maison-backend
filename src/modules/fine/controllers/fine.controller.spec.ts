@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { FineService } from '@/modules/fine/services/fine.service';
+
 import { FineController } from './fine.controller';
-import { FineService } from './fine.service';
 
 describe('FineController', () => {
   let controller: FineController;
