@@ -25,4 +25,11 @@ export class FineRepository extends Repository<Fine> {
       .where('fine.id = :id', { id })
       .getOne();
   }
+
+  isExistedByCheckoutId(checkoutId: string) {
+    return this.createQueryBuilder('fine')
+      .leftJoinAndSelect('fine.checkout', 'checkout')
+      .where('checkout.id = :checkoutId', { checkoutId })
+      .getExists();
+  }
 }

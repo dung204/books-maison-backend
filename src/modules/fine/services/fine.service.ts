@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   ForbiddenException,
   Inject,
   Injectable,
@@ -8,11 +9,10 @@ import {
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { Role } from '@/base/common/enum/role.enum';
 import { SuccessResponse } from '@/base/common/responses/success.response';
+import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 import { Fine } from '@/modules/fine/entities/fine.entity';
 import { FineRepository } from '@/modules/fine/repositories/fine.repository';
 import { User } from '@/modules/user/entities/user.entity';
-
-import { CreateFineDto } from '../dto/create-fine.dto';
 
 @Injectable()
 export class FineService {
@@ -20,9 +20,19 @@ export class FineService {
     @Inject(FineRepository) private readonly fineRepository: FineRepository,
   ) {}
 
-  create(createFineDto: CreateFineDto) {
-    createFineDto;
-    return 'This action adds a new fine';
+  async create(checkout: Checkout) {
+    const existedFineByCheckoutId =
+      await this.fineRepository.isExistedByCheckoutId(checkout.id);
+
+    if (existedFineByCheckoutId)
+      throw new ConflictException(
+        'A fine for this checkout is already created.',
+      );
+
+    const fine = new Fine();
+    fine.checkout = checkout;
+
+    await this.fineRepository.save(fine);
   }
 
   async findAll(
