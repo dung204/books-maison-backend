@@ -18,4 +18,11 @@ export class FineRepository extends Repository<Fine> {
       .take(pageSize)
       .getManyAndCount();
   }
+
+  findById(id: string) {
+    return this.createQueryBuilder('fine')
+      .leftJoinAndSelect('fine.checkout', 'checkout')
+      .where('fine.id = :id', { id })
+      .getOne();
+  }
 }
