@@ -210,15 +210,19 @@ export class CheckoutService {
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async setOverdueCheckoutsAndCreateFines() {
-    const checkouts: Checkout[] = (
-      await this.checkoutRepository.getRentingCheckoutsDueBeforeToday()
-    ).map((checkout) => ({ ...checkout, status: CheckoutStatus.OVERDUE }));
+    const checkouts: Checkout[] =
+      await this.checkoutRepository.getRentingCheckoutsDueBeforeToday();
 
-    await this.checkoutRepository.save(checkouts);
+    await this.checkoutRepository.save(
+      checkouts.map((checkout) => ({
+        ...checkout,
+        status: CheckoutStatus.OVERDUE,
+      })),
+    );
     this.logger.log(`${checkouts.length} checkouts have been set as overdue.`);
 
     const createFineResults = await Promise.allSettled(
-      checkouts.map(this.fineService.create),
+      checkouts.map((checkout) => this.fineService.create(checkout)),
     );
     const successCount = createFineResults.filter(
       (result) => result.status === 'fulfilled',
