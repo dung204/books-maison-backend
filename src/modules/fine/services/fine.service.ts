@@ -1,12 +1,18 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
+import { Role } from '@/base/common/enum/role.enum';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { Fine } from '@/modules/fine/entities/fine.entity';
 import { FineRepository } from '@/modules/fine/repositories/fine.repository';
+import { User } from '@/modules/user/entities/user.entity';
 
 import { CreateFineDto } from '../dto/create-fine.dto';
-import { UpdateFineDto } from '../dto/update-fine.dto';
 
 @Injectable()
 export class FineService {
@@ -40,12 +46,15 @@ export class FineService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} fine`;
-  }
+  async findOne(user: User, id: string) {
+    const fine = await this.fineRepository.findById(id);
 
-  update(id: number, updateFineDto: UpdateFineDto) {
-    updateFineDto;
-    return `This action updates a #${id} fine`;
+    if (!fine) throw new NotFoundException();
+
+    // Only ADMIN users and the owner of the corresponding checkout are accessible to this
+    if (user.role !== Role.ADMIN && fine.checkout.user.id !== user.id)
+      throw new ForbiddenException();
+
+    return fine;
   }
 }
