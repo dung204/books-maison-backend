@@ -7,6 +7,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { addWeeks } from 'date-fns';
 
 import { Role } from '@/base/common/enum/role.enum';
 import { SuccessResponse } from '@/base/common/responses/success.response';
@@ -27,7 +28,7 @@ import { UserService } from '@/modules/user/services/user.service';
 
 @Injectable()
 export class CheckoutService {
-  private readonly TWO_WEEKS_AS_MS = 1_209_600_000;
+  private readonly RENTING_WEEKS = 2;
   private readonly logger: Logger = new Logger(CheckoutService.name);
 
   constructor(
@@ -57,9 +58,7 @@ export class CheckoutService {
 
     const checkout = new Checkout();
     const checkoutTimestamp = new Date();
-    const dueTimestamp = new Date(
-      checkoutTimestamp.getTime() + this.TWO_WEEKS_AS_MS,
-    );
+    const dueTimestamp = addWeeks(checkoutTimestamp, this.RENTING_WEEKS);
 
     checkout.user = UserDto.fromUser(user);
     checkout.book = await this.bookService.update(bookId, {
@@ -94,9 +93,7 @@ export class CheckoutService {
 
     const checkout = new Checkout();
     const checkoutTimestamp = new Date();
-    const dueTimestamp = new Date(
-      checkoutTimestamp.getTime() + this.TWO_WEEKS_AS_MS,
-    );
+    const dueTimestamp = addWeeks(checkoutTimestamp, this.RENTING_WEEKS);
 
     checkout.user = UserDto.fromUser(user);
     checkout.book = await this.bookService.update(bookId, {
