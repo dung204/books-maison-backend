@@ -10,6 +10,7 @@ import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { Role } from '@/base/common/enum/role.enum';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
+import { FineDto } from '@/modules/fine/dto/fine.dto';
 import { Fine } from '@/modules/fine/entities/fine.entity';
 import { FineRepository } from '@/modules/fine/repositories/fine.repository';
 import { User } from '@/modules/user/entities/user.entity';
@@ -37,14 +38,14 @@ export class FineService {
 
   async findAll(
     paginationQueryDto: PaginationQueryDto,
-  ): Promise<SuccessResponse<Fine[]>> {
+  ): Promise<SuccessResponse<FineDto[]>> {
     const { page, pageSize } = paginationQueryDto;
     const [fines, total] =
       await this.fineRepository.findAllAndCount(paginationQueryDto);
     const totalPage = Math.ceil(total / pageSize);
 
     return {
-      data: fines,
+      data: fines.map(FineDto.fromFine),
       pagination: {
         total,
         page,
@@ -65,6 +66,6 @@ export class FineService {
     if (user.role !== Role.ADMIN && fine.checkout.user.id !== user.id)
       throw new ForbiddenException();
 
-    return fine;
+    return FineDto.fromFine(fine);
   }
 }

@@ -32,7 +32,7 @@ export class FineController {
   constructor(private readonly fineService: FineService) {}
 
   @ApiOperation({
-    summary: 'Get all fines',
+    summary: 'Get all fines (for ADMIN only)',
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
