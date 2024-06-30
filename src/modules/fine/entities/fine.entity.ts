@@ -35,4 +35,14 @@ export class Fine {
   })
   @Column({ enum: FineStatus, default: FineStatus.ISSUED })
   status: FineStatus;
+
+  @ApiProperty({
+    description: 'The created timestamp of the fine',
+    example: '2024-06-30T13:46:54.405Z',
+  })
+  @Column('timestamp with time zone', {
+    default: () => 'CURRENT_TIMESTAMP',
+    nullable: true,
+  })
+  createdTimestamp: Date;
 }
