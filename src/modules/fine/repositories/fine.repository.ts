@@ -15,6 +15,8 @@ export class FineRepository extends Repository<Fine> {
     return this.createQueryBuilder('fine')
       .leftJoinAndSelect('fine.checkout', 'checkout')
       .leftJoinAndSelect('fine.transaction', 'transaction')
+      .leftJoinAndSelect('checkout.user', 'checkoutUser')
+      .leftJoinAndSelect('transaction.user', 'transactionUser')
       .skip(skip)
       .take(pageSize)
       .getManyAndCount();
@@ -24,6 +26,8 @@ export class FineRepository extends Repository<Fine> {
     return this.createQueryBuilder('fine')
       .leftJoinAndSelect('fine.checkout', 'checkout')
       .leftJoinAndSelect('fine.transaction', 'transaction')
+      .leftJoinAndSelect('checkout.user', 'checkoutUser')
+      .leftJoinAndSelect('transaction.user', 'transactionUser')
       .where('fine.id = :id', { id })
       .getOne();
   }
@@ -32,6 +36,8 @@ export class FineRepository extends Repository<Fine> {
     return this.createQueryBuilder('fine')
       .leftJoinAndSelect('fine.checkout', 'checkout')
       .leftJoinAndSelect('fine.transaction', 'transaction')
+      .leftJoinAndSelect('checkout.user', 'checkoutUser')
+      .leftJoinAndSelect('transaction.user', 'transactionUser')
       .where('checkout.id = :checkoutId', { checkoutId })
       .getExists();
   }

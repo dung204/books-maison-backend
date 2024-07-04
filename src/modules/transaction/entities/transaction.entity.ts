@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 
 import { TransactionMethod } from '@/modules/transaction/enums/transaction-method.enum';
 import { UserDto } from '@/modules/user/dto/user.dto';
@@ -11,7 +11,7 @@ export class Transaction {
     description: 'The ID of the transaction',
     example: 'af119453-910b-5d5a-9c21-706cb677539d',
   })
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('character varying')
   id: string;
 
   @ApiProperty({
@@ -37,7 +37,7 @@ export class Transaction {
     enum: TransactionMethod,
     enumName: 'TransactionMethod',
   })
-  paymentMethod: TransactionMethod;
+  transactionMethod: TransactionMethod;
 
   @ApiProperty({
     description: 'The created timestamp of the transaction',
