@@ -3,12 +3,14 @@ import {
   Get,
   HttpStatus,
   Param,
+  Patch,
   Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiConflictResponse,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
@@ -22,6 +24,7 @@ import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { CustomRequest } from '@/base/common/types/custom-request.type';
 import { AdminGuard } from '@/modules/auth/guards/admin.guard';
 import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
+import { CheckoutStatus } from '@/modules/checkout/enum/checkout-status.enum';
 import { Fine } from '@/modules/fine/entities/fine.entity';
 import { FineService } from '@/modules/fine/services/fine.service';
 
@@ -86,5 +89,35 @@ export class FineController {
   findOne(@Request() req: CustomRequest, @Param('id') id: string) {
     const currentUser = req.user;
     return this.fineService.findOne(currentUser, id);
+  }
+
+  @ApiOperation({
+    summary: 'Confirm a fine is successfully paid by cash (for ADMIN only)',
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: Fine,
+    isArray: false,
+    description: 'Fine is confirmed paid successfully.',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User login is required.',
+  })
+  @ApiForbiddenResponse({
+    description: 'The current authenticated user is not an ADMIN.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Fine not found.',
+  })
+  @ApiConflictResponse({
+    description: `
+      - The checkout corresponding to this fine is not marked ${CheckoutStatus.RETURNED}.
+      - Fine is already paid or cancelled.
+    `,
+  })
+  @UseGuards(JwtAccessGuard, AdminGuard)
+  @Patch('/pay-by-cash/:id')
+  confirmPaidByCash(@Param('id') fineId: string) {
+    return this.fineService.confirmPaidByCash(fineId);
   }
 }
