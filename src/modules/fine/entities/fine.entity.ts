@@ -9,6 +9,7 @@ import {
 
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 import { FineStatus } from '@/modules/fine/enums/fine-status.enum';
+import { Transaction } from '@/modules/transaction/entities/transaction.entity';
 
 @Entity({ schema: 'public', name: 'fines' })
 export class Fine {
@@ -35,6 +36,15 @@ export class Fine {
   })
   @Column({ enum: FineStatus, default: FineStatus.ISSUED })
   status: FineStatus;
+
+  @ApiProperty({
+    description: 'The corresponding transaction of the fine',
+    type: Transaction,
+    nullable: true,
+  })
+  @OneToOne(() => Transaction)
+  @JoinColumn()
+  transaction: Transaction;
 
   @ApiProperty({
     description: 'The created timestamp of the fine',
