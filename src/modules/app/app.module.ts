@@ -16,6 +16,7 @@ import { CategoryModule } from '@/modules/category/category.module';
 import { CheckoutModule } from '@/modules/checkout/checkout.module';
 import { FavouriteBookModule } from '@/modules/favourite-book/favourite-book.module';
 import { FineModule } from '@/modules/fine/fine.module';
+import { TransactionModule } from '@/modules/transaction/transaction.module';
 import { UserModule } from '@/modules/user/user.module';
 
 import { AppController } from './app.controller';
@@ -48,6 +49,7 @@ import { AppService } from './app.service';
     CategoryModule,
     CheckoutModule,
     FineModule,
+    TransactionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

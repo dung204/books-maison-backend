@@ -14,6 +14,7 @@ export class FineRepository extends Repository<Fine> {
     const skip = (page - 1) * pageSize;
     return this.createQueryBuilder('fine')
       .leftJoinAndSelect('fine.checkout', 'checkout')
+      .leftJoinAndSelect('fine.transaction', 'transaction')
       .skip(skip)
       .take(pageSize)
       .getManyAndCount();
@@ -22,6 +23,7 @@ export class FineRepository extends Repository<Fine> {
   findById(id: string) {
     return this.createQueryBuilder('fine')
       .leftJoinAndSelect('fine.checkout', 'checkout')
+      .leftJoinAndSelect('fine.transaction', 'transaction')
       .where('fine.id = :id', { id })
       .getOne();
   }
@@ -29,6 +31,7 @@ export class FineRepository extends Repository<Fine> {
   isExistedByCheckoutId(checkoutId: string) {
     return this.createQueryBuilder('fine')
       .leftJoinAndSelect('fine.checkout', 'checkout')
+      .leftJoinAndSelect('fine.transaction', 'transaction')
       .where('checkout.id = :checkoutId', { checkoutId })
       .getExists();
   }
