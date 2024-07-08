@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   HttpStatus,
@@ -24,7 +25,7 @@ import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { CustomRequest } from '@/base/common/types/custom-request.type';
 import { AdminGuard } from '@/modules/auth/guards/admin.guard';
 import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
-import { CheckoutStatus } from '@/modules/checkout/enum/checkout-status.enum';
+import { PayFineDto } from '@/modules/fine/dto/pay-fine.dto';
 import { Fine } from '@/modules/fine/entities/fine.entity';
 import { FineService } from '@/modules/fine/services/fine.service';
 
@@ -61,9 +62,9 @@ export class FineController {
   }
 
   @ApiOperation({
-    summary: 'Get a checkout by ID',
+    summary: 'Get a fine by ID',
     description:
-      'Only ADMIN users and the owner of the fine are accessible to the checkout',
+      'Only ADMIN users and the owner of the fine are accessible to the fine',
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
@@ -92,39 +93,41 @@ export class FineController {
   }
 
   @ApiOperation({
-    summary: 'Confirm a fine is successfully paid by cash (for ADMIN only)',
+    summary: 'Pay fine',
+    description:
+      '- This route only creates a money transaction to pay the fine. The fine will **NOT** be marked as `PAID` immediately (since money transactions might fail), but it definitely will when the corresponding money transaction is saved to the database successfully.\n\n- If using `CASH` method, the current authenticated user must be an `ADMIN`.',
   })
   @ApiSuccessResponse({
-    status: HttpStatus.OK,
+    status: HttpStatus.CREATED,
     schema: Fine,
     isArray: false,
-    description: 'Fine is confirmed paid successfully.',
+    description: 'A money transaction to pay the fine is created successfully.',
   })
   @ApiUnauthorizedResponse({
     description: 'User login is required.',
   })
   @ApiForbiddenResponse({
-    description: 'The current authenticated user is not an ADMIN.',
+    description:
+      'The purchase method is `CASH` and the current authenticated user is not an `ADMIN`.',
   })
   @ApiNotFoundResponse({
     description: 'Fine not found.',
   })
   @ApiConflictResponse({
-    description: `
-      - The checkout corresponding to this fine is not marked ${CheckoutStatus.RETURNED}.
-      - Fine is already paid or cancelled.
-    `,
+    description:
+      '- The checkout corresponding to this fine is not marked `RETURNED`.\n\n- Fine is already paid or cancelled.',
   })
   @ApiInternalServerErrorResponse({
     description: 'Internal Server Error.',
   })
-  @UseGuards(JwtAccessGuard, AdminGuard)
-  @Patch('/pay-by-cash/:id')
-  confirmPaidByCash(
+  @UseGuards(JwtAccessGuard)
+  @Patch('/pay/:id')
+  payFine(
     @Request() req: CustomRequest,
     @Param('id') fineId: string,
+    @Body() payFineDto: PayFineDto,
   ) {
     const currentUser = req.user;
-    return this.fineService.confirmPaidByCash(currentUser, fineId);
+    return this.fineService.handlePayFine(currentUser, fineId, payFineDto);
   }
 }

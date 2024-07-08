@@ -5,9 +5,11 @@ import {
   ForbiddenException,
   Inject,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import * as crypto from 'crypto';
 import { minutesToSeconds } from 'date-fns';
 import { Redis } from 'ioredis';
@@ -15,8 +17,10 @@ import { Redis } from 'ioredis';
 import { Role } from '@/base/common/enum/role.enum';
 import { CreateTransactionDto } from '@/modules/transaction/dto/create-transaction.dto';
 import { MomoNotifyDto } from '@/modules/transaction/dto/momo-notify.dto';
+import { SavedTransactionEventDto } from '@/modules/transaction/dto/saved-transaction-event.dto';
 import { TransactionDto } from '@/modules/transaction/dto/transaction.dto';
 import { Transaction } from '@/modules/transaction/entities/transaction.entity';
+import { TransactionEvents } from '@/modules/transaction/enums/transaction-events.enum';
 import { TransactionMethod } from '@/modules/transaction/enums/transaction-method.enum';
 import { TransactionRepository } from '@/modules/transaction/repositories/transaction.repository';
 import { CreateMomoLinkSuccessResponse } from '@/modules/transaction/responses/create-momo-link-success.response';
@@ -26,6 +30,7 @@ import { UserService } from '@/modules/user/services/user.service';
 
 @Injectable()
 export class TransactionService {
+  private readonly logger: Logger = new Logger(TransactionService.name);
   private readonly MOMO_RESULT_CODE_SUCCESS = 0;
 
   constructor(
@@ -35,12 +40,14 @@ export class TransactionService {
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
     @InjectRedis() private readonly redis: Redis,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async createTransaction(
     currentUser: User,
-    { amount, userId, transactionMethod }: CreateTransactionDto,
+    { amount, userId, transactionMethod, extraData }: CreateTransactionDto,
   ): Promise<TransactionDto> {
+    this.logger.log(extraData);
     if (
       currentUser.role !== Role.ADMIN &&
       transactionMethod === TransactionMethod.CASH
@@ -64,8 +71,15 @@ export class TransactionService {
     transaction.amount = amount;
     transaction.transactionMethod = transactionMethod;
 
-    if (transactionMethod === TransactionMethod.CASH)
-      return this.transactionRepository.save(transaction);
+    if (transactionMethod === TransactionMethod.CASH) {
+      const savedTransaction =
+        await this.transactionRepository.save(transaction);
+      await this.eventEmitter.emitAsync(
+        TransactionEvents.SAVED,
+        new SavedTransactionEventDto(savedTransaction, extraData),
+      );
+      return savedTransaction;
+    }
 
     transaction.createdTimestamp = new Date();
     if (transactionMethod === TransactionMethod.MOMO) {
@@ -73,6 +87,7 @@ export class TransactionService {
         transaction.id,
         user,
         amount,
+        extraData,
       );
 
       this.redis.set(
@@ -92,6 +107,7 @@ export class TransactionService {
 
   async handleMomoTransactionNotify({
     resultCode,
+    extraData,
     orderId: transactionId,
   }: MomoNotifyDto) {
     const transactionStr = await this.redis.get(transactionId);
@@ -102,14 +118,24 @@ export class TransactionService {
       throw new BadRequestException('Transaction method is not MOMO.');
 
     await this.redis.del(transactionId);
-    if (resultCode === this.MOMO_RESULT_CODE_SUCCESS)
-      await this.transactionRepository.save(transaction);
+    if (resultCode === this.MOMO_RESULT_CODE_SUCCESS) {
+      const savedTransaction =
+        await this.transactionRepository.save(transaction);
+      await this.eventEmitter.emitAsync(
+        TransactionEvents.SAVED,
+        new SavedTransactionEventDto(
+          savedTransaction,
+          JSON.parse(Buffer.from(extraData, 'base64').toString('utf-8')),
+        ),
+      );
+    }
   }
 
   private async generateMomoPurchaseLink(
     transactionId: string,
     user: User,
     amount: number,
+    additionalData?: Record<string, any>,
   ) {
     const partnerCode =
       this.configService.getOrThrow<string>('MOMO_PARTNER_CODE');
@@ -125,7 +151,9 @@ export class TransactionService {
       'MOMO_EXPIRE_TIME_MINUTES',
     );
     const requestType = 'captureWallet';
-    const extraData = '';
+    const extraData = !additionalData
+      ? ''
+      : Buffer.from(JSON.stringify(additionalData)).toString('base64');
 
     const rawSignature = `accessKey=${accessKey}&amount=${amount}&extraData=${extraData}&ipnUrl=${ipnUrl}&orderId=${orderId}&orderInfo=${orderInfo}&partnerCode=${partnerCode}&redirectUrl=${redirectUrl}&requestId=${requestId}&requestType=${requestType}`;
     const signature = crypto
