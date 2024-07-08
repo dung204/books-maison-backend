@@ -3,6 +3,7 @@ import {
   IsEnum,
   IsInt,
   IsNotEmpty,
+  IsObject,
   IsOptional,
   IsPositive,
   IsUUID,
@@ -40,4 +41,16 @@ export class CreateTransactionDto {
     message: `Transaction method must be one these values: ${Object.values(TransactionMethod).join(', ')}`,
   })
   transactionMethod: TransactionMethod;
+
+  @ApiProperty({
+    description: 'The extra data for the transaction',
+    example: {
+      key1: 'value1',
+      key2: 'value2',
+    },
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  extraData?: Record<string, any>;
 }

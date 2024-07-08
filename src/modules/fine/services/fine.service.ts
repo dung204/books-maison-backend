@@ -5,6 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
 
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { Role } from '@/base/common/enum/role.enum';
@@ -12,10 +13,12 @@ import { SuccessResponse } from '@/base/common/responses/success.response';
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 import { CheckoutStatus } from '@/modules/checkout/enum/checkout-status.enum';
 import { FineDto } from '@/modules/fine/dto/fine.dto';
+import { PayFineDto } from '@/modules/fine/dto/pay-fine.dto';
 import { Fine } from '@/modules/fine/entities/fine.entity';
 import { FineStatus } from '@/modules/fine/enums/fine-status.enum';
 import { FineRepository } from '@/modules/fine/repositories/fine.repository';
-import { TransactionMethod } from '@/modules/transaction/enums/transaction-method.enum';
+import { SavedTransactionEventDto } from '@/modules/transaction/dto/saved-transaction-event.dto';
+import { TransactionDto } from '@/modules/transaction/dto/transaction.dto';
 import { TransactionService } from '@/modules/transaction/services/transaction.service';
 import { User } from '@/modules/user/entities/user.entity';
 
@@ -74,10 +77,11 @@ export class FineService {
     return FineDto.fromFine(fine);
   }
 
-  async confirmPaidByCash(
+  async handlePayFine(
     user: User,
     fineId: string,
-  ): Promise<SuccessResponse<FineDto>> {
+    { transactionMethod }: PayFineDto,
+  ): Promise<SuccessResponse<TransactionDto>> {
     const fine = await this.fineRepository.findById(fineId);
 
     if (!fine) throw new NotFoundException('Fine not found.');
@@ -94,17 +98,34 @@ export class FineService {
       );
 
     const fineDto = FineDto.fromFine(fine);
-    const transaction = await this.transactionService.createTransaction(user, {
-      userId: fineDto.checkout.user.id,
-      amount: fineDto.amount,
-      transactionMethod: TransactionMethod.CASH,
-    });
+    return {
+      data: await this.transactionService.createTransaction(user, {
+        userId: fineDto.checkout.user.id,
+        amount: fineDto.amount,
+        transactionMethod,
+        extraData: {
+          fine,
+        },
+      }),
+    };
+  }
 
+  @OnEvent('transaction.saved')
+  async handleSetFineAsPaid({
+    transaction,
+    extraData,
+  }: SavedTransactionEventDto) {
+    if (
+      !extraData ||
+      !extraData.fine ||
+      !extraData.fine.id ||
+      !this.fineRepository.existsBy({ id: extraData.fine.id })
+    )
+      return;
+
+    const fine: Fine = extraData.fine;
     fine.transaction = transaction;
     fine.status = FineStatus.PAID;
-
-    return {
-      data: FineDto.fromFine(await this.fineRepository.save(fine)),
-    };
+    await this.fineRepository.save(fine);
   }
 }
