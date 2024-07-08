@@ -1,5 +1,12 @@
-import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import {
+  HttpException,
+  Logger,
+  ValidationPipe,
+  VersioningType,
+} from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { AxiosError } from 'axios';
 import {
   StorageDriver,
   initializeTransactionalContext,
@@ -12,6 +19,7 @@ import { AppModule } from './modules/app/app.module';
 async function bootstrap() {
   const logger = new Logger(bootstrap.name);
   const app = await NestFactory.create(AppModule);
+  const httpService = new HttpService();
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
@@ -24,6 +32,14 @@ async function bootstrap() {
   configSwagger(app);
 
   app.enableCors();
+
+  httpService.axiosRef.interceptors.response.use(
+    (response) => response,
+    (error: AxiosError) => {
+      const response = error.response;
+      throw new HttpException(error.response.data, response.status);
+    },
+  );
 
   initializeTransactionalContext({ storageDriver: StorageDriver.AUTO });
 
