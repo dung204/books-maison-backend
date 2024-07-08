@@ -1,6 +1,7 @@
 import { RedisModule, RedisModuleOptions } from '@liaoliaots/nestjs-redis';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
@@ -40,6 +41,9 @@ import { AppService } from './app.service';
       rootPath: join(__dirname, '..', '..', '..', 'static'),
     }),
     ScheduleModule.forRoot(),
+    EventEmitterModule.forRoot({
+      global: true,
+    }),
     DatabaseModule,
     AuthModule,
     UserModule,
