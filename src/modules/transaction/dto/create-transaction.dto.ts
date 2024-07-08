@@ -1,16 +1,25 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsInt, IsNotEmpty, IsPositive, IsUUID } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsPositive,
+  IsUUID,
+} from 'class-validator';
 
 import { TransactionMethod } from '@/modules/transaction/enums/transaction-method.enum';
 
 export class CreateTransactionDto {
   @ApiProperty({
-    description: 'The UUID of the user who performed the transaction',
+    description:
+      'The UUID of the user who performed the transaction, required only for cash transaction',
     example: '79c66ac2-8f21-593c-b08b-359e75fac41e',
+    required: false,
   })
-  @IsNotEmpty({ message: 'User ID is required.' })
+  @IsOptional()
   @IsUUID(4, { message: 'User ID must be a valid UUID v4' })
-  userId: string;
+  userId?: string;
 
   @ApiProperty({
     description: 'The money amount of the transaction',

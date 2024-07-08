@@ -115,9 +115,16 @@ export class FineController {
       - Fine is already paid or cancelled.
     `,
   })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error.',
+  })
   @UseGuards(JwtAccessGuard, AdminGuard)
   @Patch('/pay-by-cash/:id')
-  confirmPaidByCash(@Param('id') fineId: string) {
-    return this.fineService.confirmPaidByCash(fineId);
+  confirmPaidByCash(
+    @Request() req: CustomRequest,
+    @Param('id') fineId: string,
+  ) {
+    const currentUser = req.user;
+    return this.fineService.confirmPaidByCash(currentUser, fineId);
   }
 }

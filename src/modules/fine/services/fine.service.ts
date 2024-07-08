@@ -15,6 +15,7 @@ import { FineDto } from '@/modules/fine/dto/fine.dto';
 import { Fine } from '@/modules/fine/entities/fine.entity';
 import { FineStatus } from '@/modules/fine/enums/fine-status.enum';
 import { FineRepository } from '@/modules/fine/repositories/fine.repository';
+import { TransactionMethod } from '@/modules/transaction/enums/transaction-method.enum';
 import { TransactionService } from '@/modules/transaction/services/transaction.service';
 import { User } from '@/modules/user/entities/user.entity';
 
@@ -73,7 +74,10 @@ export class FineService {
     return FineDto.fromFine(fine);
   }
 
-  async confirmPaidByCash(fineId: string): Promise<SuccessResponse<FineDto>> {
+  async confirmPaidByCash(
+    user: User,
+    fineId: string,
+  ): Promise<SuccessResponse<FineDto>> {
     const fine = await this.fineRepository.findById(fineId);
 
     if (!fine) throw new NotFoundException('Fine not found.');
@@ -90,9 +94,10 @@ export class FineService {
       );
 
     const fineDto = FineDto.fromFine(fine);
-    const transaction = await this.transactionService.createCashTransaction({
+    const transaction = await this.transactionService.createTransaction(user, {
       userId: fineDto.checkout.user.id,
       amount: fineDto.amount,
+      transactionMethod: TransactionMethod.CASH,
     });
 
     fine.transaction = transaction;
