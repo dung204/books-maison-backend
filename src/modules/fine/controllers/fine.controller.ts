@@ -4,7 +4,7 @@ import {
   Get,
   HttpStatus,
   Param,
-  Patch,
+  Post,
   Query,
   Request,
   UseGuards,
@@ -151,7 +151,7 @@ export class FineController {
     description: 'Internal Server Error.',
   })
   @UseGuards(JwtAccessGuard)
-  @Patch('/pay/:id')
+  @Post('/pay/:id')
   payFine(
     @Request() req: CustomRequest,
     @Param('id') fineId: string,
