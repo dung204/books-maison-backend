@@ -36,7 +36,7 @@ import { TransactionService } from '@/modules/transaction/services/transaction.s
 
 @ApiBearerAuth('JWT')
 @ApiTags('transactions')
-@Controller('transaction')
+@Controller('transactions')
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
 
