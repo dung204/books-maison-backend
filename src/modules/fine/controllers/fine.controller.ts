@@ -36,7 +36,7 @@ import { TransactionMethod } from '@/modules/transaction/enums/transaction-metho
 
 @ApiBearerAuth('JWT')
 @ApiTags('fines')
-@Controller('fine')
+@Controller('fines')
 export class FineController {
   constructor(private readonly fineService: FineService) {}
 

@@ -39,7 +39,7 @@ import { UserCreateCheckoutDto } from '../dto/user-create-checkout.dto';
 
 @ApiBearerAuth('JWT')
 @ApiTags('checkouts')
-@Controller('checkout')
+@Controller('checkouts')
 export class CheckoutController {
   constructor(private readonly checkoutService: CheckoutService) {}
 

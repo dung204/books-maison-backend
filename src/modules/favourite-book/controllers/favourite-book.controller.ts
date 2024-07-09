@@ -30,7 +30,7 @@ import { FavouriteBookService } from '@/modules/favourite-book/services/favourit
 
 @ApiBearerAuth('JWT')
 @ApiTags('favourite-books')
-@Controller('favourite-book')
+@Controller('favourite-books')
 export class FavouriteBookController {
   constructor(private readonly favouriteBookService: FavouriteBookService) {}
 
