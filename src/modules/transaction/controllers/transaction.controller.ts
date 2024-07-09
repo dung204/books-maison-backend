@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpStatus,
+  Param,
   Post,
   Query,
   Request,
@@ -73,7 +74,8 @@ export class TransactionController {
     schema: Transaction,
     isArray: false,
     pagination: true,
-    description: 'Get all fines successfully (with pagination metadata).',
+    description:
+      'Get all transactions successfully (with pagination metadata).',
   })
   @ApiUnauthorizedResponse({
     description: 'User login is required.',
@@ -92,6 +94,37 @@ export class TransactionController {
       userId: currentUser.id,
       ...userTransactionSearchDto,
     });
+  }
+
+  @ApiOperation({
+    summary: 'Get a transaction by ID',
+    description:
+      'Only ADMIN users and the owner of the transaction are accessible to the transaction',
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: Transaction,
+    isArray: false,
+    description: 'Transaction is retrieved successfully.',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User login is required.',
+  })
+  @ApiForbiddenResponse({
+    description:
+      'The current authenticated user is not an ADMIN nor the owner of the transaction.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Transaction not found.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error.',
+  })
+  @UseGuards(JwtAccessGuard)
+  @Get(':id')
+  async findById(@Request() req: CustomRequest, @Param('id') id: string) {
+    const currentUser = req.user;
+    return this.transactionService.findById(currentUser, id);
   }
 
   @ApiOperation({

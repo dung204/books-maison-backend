@@ -32,4 +32,11 @@ export class TransactionRepository extends Repository<Transaction> {
 
     return query.getManyAndCount();
   }
+
+  async findById(id: string) {
+    return this.createQueryBuilder('transaction')
+      .leftJoinAndSelect('transaction.user', 'user')
+      .where('transaction.id = :id', { id })
+      .getOne();
+  }
 }

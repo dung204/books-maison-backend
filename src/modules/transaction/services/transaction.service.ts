@@ -66,6 +66,23 @@ export class TransactionService {
     };
   }
 
+  async findById(
+    user: User,
+    id: string,
+  ): Promise<SuccessResponse<Transaction>> {
+    const transaction = await this.transactionRepository.findById(id);
+
+    if (!transaction) throw new NotFoundException('Fine not found.');
+
+    // Only ADMIN users and the owner of the transaction are accessible to this
+    if (user.role !== Role.ADMIN && transaction.user.id !== user.id)
+      throw new ForbiddenException();
+
+    return {
+      data: transaction,
+    };
+  }
+
   async createTransaction(
     currentUser: User,
     {
