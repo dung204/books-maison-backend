@@ -63,8 +63,7 @@ export class FavouriteBookController {
   }
 
   @ApiOperation({
-    summary: 'Get all favourite books',
-    description: 'Get all favourite books of the current authenticated user',
+    summary: 'Get all favourite books of the current authenticated user',
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
@@ -81,7 +80,7 @@ export class FavouriteBookController {
     description: 'Internal Server Error.',
   })
   @UseGuards(JwtAccessGuard)
-  @Get('/all')
+  @Get('/me')
   getAllFavouriteBooks(
     @Request() req: CustomRequest,
     @Query() favouriteBookSearchDto: FavouriteBookSearchDto,
