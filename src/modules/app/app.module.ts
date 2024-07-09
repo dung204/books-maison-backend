@@ -20,9 +20,6 @@ import { FineModule } from '@/modules/fine/fine.module';
 import { TransactionModule } from '@/modules/transaction/transaction.module';
 import { UserModule } from '@/modules/user/user.module';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -55,7 +52,5 @@ import { AppService } from './app.service';
     FineModule,
     TransactionModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
