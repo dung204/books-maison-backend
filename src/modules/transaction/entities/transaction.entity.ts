@@ -12,7 +12,7 @@ export class Transaction {
   @ManyToOne(() => User)
   user: UserDto;
 
-  @Column('money')
+  @Column('integer')
   amount: number;
 
   @Column({
