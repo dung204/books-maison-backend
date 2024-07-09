@@ -5,7 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
-  Post,
+  Patch,
   Query,
   Request,
   UseGuards,
@@ -51,7 +51,7 @@ export class UserController {
     description: 'Internal Server Error.',
   })
   @UseGuards(JwtAccessGuard)
-  @Get('/profile')
+  @Get('/me')
   async getCurrentUserProfile(
     @Request() req: CustomRequest,
   ): Promise<SuccessResponse<UserDto>> {
@@ -76,7 +76,7 @@ export class UserController {
     description: 'Internal Server Error.',
   })
   @UseGuards(JwtAccessGuard)
-  @Post('/profile')
+  @Patch('/me')
   @HttpCode(HttpStatus.OK)
   async updateCurrentUserProfile(
     @Request() req: CustomRequest,
