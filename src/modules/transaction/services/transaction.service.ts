@@ -14,7 +14,9 @@ import * as crypto from 'crypto';
 import { minutesToSeconds } from 'date-fns';
 import { Redis } from 'ioredis';
 
+import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { Role } from '@/base/common/enum/role.enum';
+import { SuccessResponse } from '@/base/common/responses/success.response';
 import { CreateTransactionDto } from '@/modules/transaction/dto/create-transaction.dto';
 import { MomoNotifyDto } from '@/modules/transaction/dto/momo-notify.dto';
 import { SavedTransactionEventDto } from '@/modules/transaction/dto/saved-transaction-event.dto';
@@ -42,6 +44,27 @@ export class TransactionService {
     @InjectRedis() private readonly redis: Redis,
     private readonly eventEmitter: EventEmitter2,
   ) {}
+
+  async findAll(
+    paginationQueryDto: PaginationQueryDto,
+  ): Promise<SuccessResponse<Transaction[]>> {
+    const { page, pageSize } = paginationQueryDto;
+    const [transactions, total] =
+      await this.transactionRepository.findAllAndCount(paginationQueryDto);
+    const totalPage = Math.ceil(total / pageSize);
+
+    return {
+      data: transactions,
+      pagination: {
+        total,
+        page,
+        pageSize,
+        totalPage,
+        hasNextPage: page < totalPage,
+        hasPreviousPage: page > 1,
+      },
+    };
+  }
 
   async createTransaction(
     currentUser: User,

@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Get,
   HttpStatus,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -19,8 +21,10 @@ import {
 } from '@nestjs/swagger';
 
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
+import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { CustomRequest } from '@/base/common/types/custom-request.type';
+import { AdminGuard } from '@/modules/auth/guards/admin.guard';
 import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
 import { CreateTransactionDto } from '@/modules/transaction/dto/create-transaction.dto';
 import { MomoNotifyDto } from '@/modules/transaction/dto/momo-notify.dto';
@@ -33,6 +37,32 @@ import { TransactionService } from '@/modules/transaction/services/transaction.s
 @Controller('transaction')
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
+
+  @ApiOperation({
+    summary: 'Get all transaction (for ADMIN only)',
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: Transaction,
+    isArray: false,
+    pagination: true,
+    description:
+      'Get all transactions information successfully (with pagination metadata).',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User login is required.',
+  })
+  @ApiForbiddenResponse({
+    description: 'The current authenticated user is not an ADMIN.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error.',
+  })
+  @UseGuards(JwtAccessGuard, AdminGuard)
+  @Get('/')
+  async findAll(@Query() paginationQueryDto: PaginationQueryDto) {
+    return this.transactionService.findAll(paginationQueryDto);
+  }
 
   @ApiOperation({
     summary: 'Create a transaction',
