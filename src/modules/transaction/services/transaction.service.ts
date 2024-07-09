@@ -68,7 +68,12 @@ export class TransactionService {
 
   async createTransaction(
     currentUser: User,
-    { amount, userId, transactionMethod, extraData }: CreateTransactionDto,
+    {
+      amount,
+      userId,
+      method: transactionMethod,
+      extraData,
+    }: CreateTransactionDto,
   ): Promise<TransactionDto> {
     this.logger.log(extraData);
     if (
@@ -92,7 +97,7 @@ export class TransactionService {
     transaction.id = `BM_${Date.now()}`;
     transaction.user = UserDto.fromUser(user);
     transaction.amount = amount;
-    transaction.transactionMethod = transactionMethod;
+    transaction.method = transactionMethod;
 
     if (transactionMethod === TransactionMethod.CASH) {
       const savedTransaction =
@@ -137,7 +142,7 @@ export class TransactionService {
     if (!transactionStr) throw new NotFoundException('Transaction not found');
 
     const transaction: Transaction = JSON.parse(transactionStr);
-    if (transaction.transactionMethod !== TransactionMethod.MOMO)
+    if (transaction.method !== TransactionMethod.MOMO)
       throw new BadRequestException('Transaction method is not MOMO.');
 
     await this.redis.del(transactionId);

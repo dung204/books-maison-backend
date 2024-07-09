@@ -40,7 +40,7 @@ export class CreateTransactionDto {
   @IsEnum(TransactionMethod, {
     message: `Transaction method must be one these values: ${Object.values(TransactionMethod).join(', ')}`,
   })
-  transactionMethod: TransactionMethod;
+  method: TransactionMethod;
 
   @ApiProperty({
     description: 'The extra data for the transaction',
