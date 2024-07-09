@@ -7,13 +7,14 @@ import {
 } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 
-import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { Role } from '@/base/common/enum/role.enum';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 import { CheckoutStatus } from '@/modules/checkout/enum/checkout-status.enum';
+import { FineSearchDto } from '@/modules/fine/dto/fine-search.dto';
 import { FineDto } from '@/modules/fine/dto/fine.dto';
 import { PayFineDto } from '@/modules/fine/dto/pay-fine.dto';
+import UserFineSearchDto from '@/modules/fine/dto/user-fine-search.dto';
 import { Fine } from '@/modules/fine/entities/fine.entity';
 import { FineStatus } from '@/modules/fine/enums/fine-status.enum';
 import { FineRepository } from '@/modules/fine/repositories/fine.repository';
@@ -45,11 +46,35 @@ export class FineService {
   }
 
   async findAll(
-    paginationQueryDto: PaginationQueryDto,
+    fineSearchDto: FineSearchDto,
   ): Promise<SuccessResponse<FineDto[]>> {
-    const { page, pageSize } = paginationQueryDto;
+    const { page, pageSize } = fineSearchDto;
     const [fines, total] =
-      await this.fineRepository.findAllAndCount(paginationQueryDto);
+      await this.fineRepository.findAllAndCount(fineSearchDto);
+    const totalPage = Math.ceil(total / pageSize);
+
+    return {
+      data: fines.map(FineDto.fromFine),
+      pagination: {
+        total,
+        page,
+        pageSize,
+        totalPage,
+        hasNextPage: page < totalPage,
+        hasPreviousPage: page > 1,
+      },
+    };
+  }
+
+  async findAllFinesOfCurrentUser(
+    user: User,
+    userFineSearchDto: UserFineSearchDto,
+  ): Promise<SuccessResponse<FineDto[]>> {
+    const { page, pageSize } = userFineSearchDto;
+    const [fines, total] = await this.fineRepository.findAllAndCount({
+      userId: user.id,
+      ...userFineSearchDto,
+    });
     const totalPage = Math.ceil(total / pageSize);
 
     return {
