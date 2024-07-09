@@ -7,6 +7,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { addWeeks } from 'date-fns';
 
 import { Role } from '@/base/common/enum/role.enum';
 import { SuccessResponse } from '@/base/common/responses/success.response';
@@ -20,19 +21,21 @@ import { UserCreateCheckoutDto } from '@/modules/checkout/dto/user-create-checko
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 import { CheckoutStatus } from '@/modules/checkout/enum/checkout-status.enum';
 import { CheckoutRepository } from '@/modules/checkout/repositories/checkout.repository';
+import { FineService } from '@/modules/fine/services/fine.service';
 import { UserDto } from '@/modules/user/dto/user.dto';
 import { User } from '@/modules/user/entities/user.entity';
 import { UserService } from '@/modules/user/services/user.service';
 
 @Injectable()
 export class CheckoutService {
-  private readonly TWO_WEEKS_AS_MS = 1_209_600_000;
+  private readonly RENTING_WEEKS = 2;
   private readonly logger: Logger = new Logger(CheckoutService.name);
 
   constructor(
     private readonly checkoutRepository: CheckoutRepository,
     private readonly bookService: BookService,
     private readonly userService: UserService,
+    private readonly fineService: FineService,
   ) {}
 
   async createCheckoutUsingCurrentUser(
@@ -55,9 +58,7 @@ export class CheckoutService {
 
     const checkout = new Checkout();
     const checkoutTimestamp = new Date();
-    const dueTimestamp = new Date(
-      checkoutTimestamp.getTime() + this.TWO_WEEKS_AS_MS,
-    );
+    const dueTimestamp = addWeeks(checkoutTimestamp, this.RENTING_WEEKS);
 
     checkout.user = UserDto.fromUser(user);
     checkout.book = await this.bookService.update(bookId, {
@@ -92,9 +93,7 @@ export class CheckoutService {
 
     const checkout = new Checkout();
     const checkoutTimestamp = new Date();
-    const dueTimestamp = new Date(
-      checkoutTimestamp.getTime() + this.TWO_WEEKS_AS_MS,
-    );
+    const dueTimestamp = addWeeks(checkoutTimestamp, this.RENTING_WEEKS);
 
     checkout.user = UserDto.fromUser(user);
     checkout.book = await this.bookService.update(bookId, {
@@ -210,12 +209,24 @@ export class CheckoutService {
   }
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-  async setOverdueCheckouts() {
-    const checkouts: Checkout[] = (
-      await this.checkoutRepository.getRentingCheckoutsDueBeforeToday()
-    ).map((checkout) => ({ ...checkout, status: CheckoutStatus.OVERDUE }));
+  async setOverdueCheckoutsAndCreateFines() {
+    const checkouts: Checkout[] =
+      await this.checkoutRepository.getRentingCheckoutsDueBeforeToday();
 
-    await this.checkoutRepository.save(checkouts);
+    await this.checkoutRepository.save(
+      checkouts.map((checkout) => ({
+        ...checkout,
+        status: CheckoutStatus.OVERDUE,
+      })),
+    );
     this.logger.log(`${checkouts.length} checkouts have been set as overdue.`);
+
+    const createFineResults = await Promise.allSettled(
+      checkouts.map((checkout) => this.fineService.create(checkout)),
+    );
+    const successCount = createFineResults.filter(
+      (result) => result.status === 'fulfilled',
+    ).length;
+    this.logger.log(`${successCount} fines have been created.`);
   }
 }

@@ -28,6 +28,7 @@ export function configSwagger(app: INestApplication) {
     .addTag('categories', 'Operations about categories')
     .addTag('checkouts', 'Operations about checkouts')
     .addTag('fines', 'Operations about fines')
+    .addTag('transactions', 'Operations about money transactions')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

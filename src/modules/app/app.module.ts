@@ -1,6 +1,7 @@
 import { RedisModule, RedisModuleOptions } from '@liaoliaots/nestjs-redis';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
@@ -16,6 +17,7 @@ import { CategoryModule } from '@/modules/category/category.module';
 import { CheckoutModule } from '@/modules/checkout/checkout.module';
 import { FavouriteBookModule } from '@/modules/favourite-book/favourite-book.module';
 import { FineModule } from '@/modules/fine/fine.module';
+import { TransactionModule } from '@/modules/transaction/transaction.module';
 import { UserModule } from '@/modules/user/user.module';
 
 import { AppController } from './app.controller';
@@ -39,6 +41,9 @@ import { AppService } from './app.service';
       rootPath: join(__dirname, '..', '..', '..', 'static'),
     }),
     ScheduleModule.forRoot(),
+    EventEmitterModule.forRoot({
+      global: true,
+    }),
     DatabaseModule,
     AuthModule,
     UserModule,
@@ -48,6 +53,7 @@ import { AppService } from './app.service';
     CategoryModule,
     CheckoutModule,
     FineModule,
+    TransactionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
