@@ -14,12 +14,12 @@ import * as crypto from 'crypto';
 import { minutesToSeconds } from 'date-fns';
 import { Redis } from 'ioredis';
 
-import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { Role } from '@/base/common/enum/role.enum';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { CreateTransactionDto } from '@/modules/transaction/dto/create-transaction.dto';
 import { MomoNotifyDto } from '@/modules/transaction/dto/momo-notify.dto';
 import { SavedTransactionEventDto } from '@/modules/transaction/dto/saved-transaction-event.dto';
+import { TransactionSearchDto } from '@/modules/transaction/dto/transaction-search.dto';
 import { TransactionDto } from '@/modules/transaction/dto/transaction.dto';
 import { Transaction } from '@/modules/transaction/entities/transaction.entity';
 import { TransactionEvents } from '@/modules/transaction/enums/transaction-events.enum';
@@ -46,11 +46,11 @@ export class TransactionService {
   ) {}
 
   async findAll(
-    paginationQueryDto: PaginationQueryDto,
+    transactionSearchDto: TransactionSearchDto,
   ): Promise<SuccessResponse<Transaction[]>> {
-    const { page, pageSize } = paginationQueryDto;
+    const { page, pageSize } = transactionSearchDto;
     const [transactions, total] =
-      await this.transactionRepository.findAllAndCount(paginationQueryDto);
+      await this.transactionRepository.findAllAndCount(transactionSearchDto);
     const totalPage = Math.ceil(total / pageSize);
 
     return {

@@ -73,6 +73,7 @@ export class FineController {
     status: HttpStatus.OK,
     schema: FineDto,
     isArray: false,
+    pagination: true,
     description: 'Get all fines successfully (with pagination metadata).',
   })
   @ApiUnauthorizedResponse({

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
-import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
+import { TransactionSearchDto } from '@/modules/transaction/dto/transaction-search.dto';
 import { Transaction } from '@/modules/transaction/entities/transaction.entity';
 
 @Injectable()
@@ -10,12 +10,17 @@ export class TransactionRepository extends Repository<Transaction> {
     super(Transaction, dataSource.createEntityManager());
   }
 
-  async findAllAndCount({ page, pageSize }: PaginationQueryDto) {
+  async findAllAndCount({ userId, page, pageSize }: TransactionSearchDto) {
     const skip = (page - 1) * pageSize;
-    return this.createQueryBuilder('transaction')
+    const query = this.createQueryBuilder('transaction')
       .leftJoinAndSelect('transaction.user', 'user')
       .skip(skip)
-      .take(pageSize)
-      .getManyAndCount();
+      .take(pageSize);
+
+    if (userId) {
+      query.andWhere('transaction.user.id = :userId', { userId });
+    }
+
+    return query.getManyAndCount();
   }
 }
