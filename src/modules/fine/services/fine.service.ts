@@ -121,7 +121,7 @@ export class FineService {
   async handlePayFine(
     user: User,
     fineId: string,
-    { transactionMethod }: PayFineDto,
+    { method: transactionMethod }: PayFineDto,
   ): Promise<SuccessResponse<TransactionDto>> {
     const fine = await this.fineRepository.findById(fineId);
 
@@ -143,7 +143,7 @@ export class FineService {
       data: await this.transactionService.createTransaction(user, {
         userId: fineDto.checkout.user.id,
         amount: fineDto.amount,
-        transactionMethod,
+        method: transactionMethod,
         extraData: {
           fine,
         },

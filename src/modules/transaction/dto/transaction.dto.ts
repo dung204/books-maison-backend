@@ -27,7 +27,7 @@ export class TransactionDto {
     enum: TransactionMethod,
     enumName: 'TransactionMethod',
   })
-  transactionMethod: TransactionMethod;
+  method: TransactionMethod;
 
   @ApiProperty({
     description: 'The created timestamp of the transaction',
