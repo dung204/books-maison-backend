@@ -4,6 +4,7 @@ import {
   Get,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Query,
   Request,
@@ -29,7 +30,9 @@ import { FineDto } from '@/modules/fine/dto/fine.dto';
 import { PayFineDto } from '@/modules/fine/dto/pay-fine.dto';
 import UserFineSearchDto from '@/modules/fine/dto/user-fine-search.dto';
 import { Fine } from '@/modules/fine/entities/fine.entity';
+import { FineStatus } from '@/modules/fine/enums/fine-status.enum';
 import { FineService } from '@/modules/fine/services/fine.service';
+import { TransactionMethod } from '@/modules/transaction/enums/transaction-method.enum';
 
 @ApiBearerAuth('JWT')
 @ApiTags('fines')
@@ -124,8 +127,7 @@ export class FineController {
 
   @ApiOperation({
     summary: 'Pay fine',
-    description:
-      '- This route only creates a money transaction to pay the fine. The fine will **NOT** be marked as `PAID` immediately (since money transactions might fail), but it definitely will when the corresponding money transaction is saved to the database successfully.\n\n- If using `CASH` method, the current authenticated user must be an `ADMIN`.',
+    description: `- This route only creates a money transaction to pay the fine. The fine will **NOT** be marked as \`${FineStatus.PAID}\` immediately (since money transactions might fail). However, the fine will certainly be marked as \`${FineStatus.PAID}\` when the corresponding money transaction is saved to the database successfully.\n\n- If using \`${TransactionMethod.CASH}\` method, the current authenticated user must be an \`ADMIN\`.`,
   })
   @ApiSuccessResponse({
     status: HttpStatus.CREATED,
@@ -159,5 +161,36 @@ export class FineController {
   ) {
     const currentUser = req.user;
     return this.fineService.handlePayFine(currentUser, fineId, payFineDto);
+  }
+
+  @ApiOperation({
+    summary: 'Cancel a fine (for ADMIN only)',
+    description: `A fine will be marked as \`${FineStatus.CANCELLED}\` if the status of the fine is \`${FineStatus.ISSUED}\``,
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: FineDto,
+    isArray: false,
+    description: `Fine is marked as \`${FineStatus.CANCELLED}\` successfully.`,
+  })
+  @ApiNotFoundResponse({
+    description: 'Fine not found.',
+  })
+  @ApiConflictResponse({
+    description: `The fine status is not \`${FineStatus.ISSUED}\``,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User login is required.',
+  })
+  @ApiForbiddenResponse({
+    description: 'The current authenticated user is not an ADMIN.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error.',
+  })
+  @UseGuards(JwtAccessGuard, AdminGuard)
+  @Patch('/cancel/:id')
+  cancelFine(@Param('id') id: string) {
+    return this.fineService.cancelFine(id);
   }
 }

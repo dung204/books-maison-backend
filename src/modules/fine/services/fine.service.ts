@@ -102,6 +102,22 @@ export class FineService {
     return FineDto.fromFine(fine);
   }
 
+  async cancelFine(id: string): Promise<SuccessResponse<FineDto>> {
+    const fine = await this.fineRepository.findById(id);
+
+    if (!fine) throw new NotFoundException('Fine not found.');
+
+    if (fine.status !== FineStatus.ISSUED)
+      throw new ConflictException(
+        `A fine can only become cancelled if its status is ${FineStatus.ISSUED}`,
+      );
+
+    fine.status = FineStatus.CANCELLED;
+    return {
+      data: FineDto.fromFine(await this.fineRepository.save(fine)),
+    };
+  }
+
   async handlePayFine(
     user: User,
     fineId: string,
