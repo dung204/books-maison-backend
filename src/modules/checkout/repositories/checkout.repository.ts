@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
+import { CHECKOUT_ORDERABLE_FIELDS } from '@/modules/checkout/constants/checkout-orderable-fields.constant';
 import { CheckoutSearchDto } from '@/modules/checkout/dto/checkout-search.dto';
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 import { CheckoutStatus } from '@/modules/checkout/enum/checkout-status.enum';
@@ -32,6 +33,8 @@ export class CheckoutRepository extends Repository<Checkout> {
   findAllAndCount({
     page,
     pageSize,
+    orderBy,
+    order,
     userId,
     bookId,
     status,
@@ -43,11 +46,15 @@ export class CheckoutRepository extends Repository<Checkout> {
     toReturnedTimestamp,
   }: CheckoutSearchDto) {
     const skip = (page - 1) * pageSize;
+    orderBy = CHECKOUT_ORDERABLE_FIELDS.includes(orderBy)
+      ? orderBy
+      : 'createdTimestamp';
     const query = this.createQueryBuilder('checkout')
       .leftJoinAndSelect('checkout.user', 'user')
       .leftJoinAndSelect('checkout.book', 'book')
       .leftJoinAndSelect('book.authors', 'author')
       .leftJoinAndSelect('book.categories', 'category')
+      .orderBy(`checkout.${orderBy}`, order)
       .skip(skip)
       .take(pageSize);
 

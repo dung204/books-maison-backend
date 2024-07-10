@@ -7,6 +7,7 @@ import {
 
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { SuccessResponse } from '@/base/common/responses/success.response';
+import { CATEGORY_ORDERABLE_FIELDS } from '@/modules/category/constants/category-orderable-fields.constant';
 import { Category } from '@/modules/category/entities/category.entity';
 import { CategoryRepository } from '@/modules/category/repositories/category.repository';
 
@@ -30,14 +31,22 @@ export class CategoryService {
     };
   }
 
-  async findAll(
-    paginationQueryDto: PaginationQueryDto,
-  ): Promise<SuccessResponse<Category[]>> {
-    const { page, pageSize } = paginationQueryDto;
+  async findAll({
+    page,
+    pageSize,
+    orderBy,
+    order,
+  }: PaginationQueryDto): Promise<SuccessResponse<Category[]>> {
     const skip = (page - 1) * pageSize;
+    orderBy = CATEGORY_ORDERABLE_FIELDS.includes(orderBy)
+      ? orderBy
+      : 'createdTimestamp';
     const [categories, total] = await this.categoryRepository.findAndCount({
       skip,
       take: pageSize,
+      order: {
+        [orderBy]: order,
+      },
     });
     const totalPage = Math.ceil(total / pageSize);
 

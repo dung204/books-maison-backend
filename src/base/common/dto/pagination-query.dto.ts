@@ -1,11 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsInt, IsOptional, IsPositive } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsPositive,
+  IsString,
+} from 'class-validator';
+
+import { Order } from '@/base/common/enum/order.enum';
 
 export class PaginationQueryDto {
   @ApiProperty({
     description: 'The current page number',
-    example: 1,
+    default: 1,
     required: false,
   })
   @Transform(({ value }) => parseInt(value, 10))
@@ -16,7 +24,7 @@ export class PaginationQueryDto {
 
   @ApiProperty({
     description: 'The number of items in a page',
-    example: 10,
+    default: 10,
     required: false,
   })
   @Transform(({ value }) => parseInt(value, 10))
@@ -24,4 +32,27 @@ export class PaginationQueryDto {
   @IsPositive({ message: 'Page size must be a positive integer' })
   @IsOptional()
   pageSize?: number = 10;
+
+  @ApiProperty({
+    description: 'The field to order the results by',
+    default: 'createdTimestamp',
+    required: false,
+  })
+  @IsOptional()
+  @IsString({ message: 'Order by must be a string' })
+  orderBy?: string = 'createdTimestamp';
+
+  @ApiProperty({
+    description: 'The order to sort the results',
+    enum: Order,
+    enumName: 'Order',
+    default: Order.DESC,
+    required: false,
+  })
+  @Transform(({ value }) => value.toUpperCase())
+  @IsOptional()
+  @IsEnum(Order, {
+    message: `Order must be one of these values: ${Object.values(Order).join(', ')}`,
+  })
+  order?: Order = Order.DESC;
 }
