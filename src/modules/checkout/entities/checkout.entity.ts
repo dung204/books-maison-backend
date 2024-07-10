@@ -45,7 +45,7 @@ export class Checkout {
     default: () => 'CURRENT_TIMESTAMP',
     nullable: true,
   })
-  checkoutTimestamp: Date;
+  createdTimestamp: Date;
 
   @ApiProperty({
     description:

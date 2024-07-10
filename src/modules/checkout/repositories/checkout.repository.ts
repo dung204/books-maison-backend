@@ -35,8 +35,8 @@ export class CheckoutRepository extends Repository<Checkout> {
     userId,
     bookId,
     status,
-    fromCheckoutTimestamp,
-    toCheckoutTimestamp,
+    fromCreatedTimestamp,
+    toCreatedTimestamp,
     fromDueTimestamp,
     toDueTimestamp,
     fromReturnedTimestamp,
@@ -59,15 +59,15 @@ export class CheckoutRepository extends Repository<Checkout> {
       query.andWhere('checkout.book.id = :bookId', { bookId });
     }
 
-    if (fromCheckoutTimestamp) {
-      query.andWhere('checkout.checkoutTimestamp >= :fromCheckoutTimestamp', {
-        fromCheckoutTimestamp,
+    if (fromCreatedTimestamp) {
+      query.andWhere('checkout.checkoutTimestamp >= :fromCreatedTimestamp', {
+        fromCreatedTimestamp,
       });
     }
 
-    if (toCheckoutTimestamp) {
-      query.andWhere('checkout.checkoutTimestamp <= :toCheckoutTimestamp', {
-        toCheckoutTimestamp,
+    if (toCreatedTimestamp) {
+      query.andWhere('checkout.checkoutTimestamp <= :toCreatedTimestamp', {
+        toCreatedTimestamp,
       });
     }
 

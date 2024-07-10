@@ -39,9 +39,9 @@ export class CheckoutSearchDto extends PaginationQueryDto {
   @IsOptional()
   @IsDateString(
     { strict: true },
-    { message: 'From checkout timestamp must follow this pattern: YYYY-MM-DD' },
+    { message: 'From created timestamp must follow this pattern: YYYY-MM-DD' },
   )
-  fromCheckoutTimestamp?: string;
+  fromCreatedTimestamp?: string;
 
   @ApiProperty({
     description:
@@ -51,9 +51,9 @@ export class CheckoutSearchDto extends PaginationQueryDto {
   @IsOptional()
   @IsDateString(
     { strict: true },
-    { message: 'To checkout timestamp must follow this pattern: YYYY-MM-DD' },
+    { message: 'To created timestamp must follow this pattern: YYYY-MM-DD' },
   )
-  toCheckoutTimestamp?: string;
+  toCreatedTimestamp?: string;
 
   @ApiProperty({
     description:
