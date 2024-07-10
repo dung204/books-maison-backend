@@ -16,4 +16,11 @@ export class Category {
   })
   @Column('character varying', { length: 100, nullable: false })
   name: string;
+
+  @ApiProperty({
+    description: 'The timestamp indicating when the category is created',
+    example: '2024-05-12T07:47:36.958Z',
+  })
+  @Column('timestamp with time zone', { default: () => 'CURRENT_TIMESTAMP' })
+  createdTimestamp: Date;
 }

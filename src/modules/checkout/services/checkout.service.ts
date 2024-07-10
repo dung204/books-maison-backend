@@ -64,7 +64,7 @@ export class CheckoutService {
     checkout.book = await this.bookService.update(bookId, {
       quantity: book.quantity - 1,
     });
-    checkout.checkoutTimestamp = checkoutTimestamp;
+    checkout.createdTimestamp = checkoutTimestamp;
     checkout.dueTimestamp = dueTimestamp;
 
     return {
@@ -99,7 +99,7 @@ export class CheckoutService {
     checkout.book = await this.bookService.update(bookId, {
       quantity: book.quantity - 1,
     });
-    checkout.checkoutTimestamp = checkoutTimestamp;
+    checkout.createdTimestamp = checkoutTimestamp;
     checkout.dueTimestamp = dueTimestamp;
 
     await this.bookService.update(bookId, { quantity: book.quantity - 1 });

@@ -100,4 +100,11 @@ export class Book {
   })
   @Column('integer', { default: 0 })
   quantity: number;
+
+  @ApiProperty({
+    description: 'The timestamp indicating when the book is created',
+    example: '2024-05-12T07:47:36.958Z',
+  })
+  @Column('timestamp with time zone', { default: () => 'CURRENT_TIMESTAMP' })
+  createdTimestamp: Date;
 }

@@ -57,4 +57,11 @@ export class Author {
   })
   @Column('text', { nullable: true })
   biography: string;
+
+  @ApiProperty({
+    description: 'The timestamp indicating when the author is created',
+    example: '2024-05-12T07:47:36.958Z',
+  })
+  @Column('timestamp with time zone', { default: () => 'CURRENT_TIMESTAMP' })
+  createdTimestamp: Date;
 }
