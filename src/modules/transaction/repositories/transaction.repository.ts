@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
+import { TRANSACTION_ORDERABLE_FIELDS } from '@/modules/transaction/constants/transaction-orderable-fields.constant';
 import { TransactionSearchDto } from '@/modules/transaction/dto/transaction-search.dto';
 import { Transaction } from '@/modules/transaction/entities/transaction.entity';
 
@@ -15,10 +16,16 @@ export class TransactionRepository extends Repository<Transaction> {
     method: methods,
     page,
     pageSize,
+    orderBy,
+    order,
   }: TransactionSearchDto) {
     const skip = (page - 1) * pageSize;
+    orderBy = TRANSACTION_ORDERABLE_FIELDS.includes(orderBy)
+      ? orderBy
+      : 'createdTimestamp';
     const query = this.createQueryBuilder('transaction')
       .leftJoinAndSelect('transaction.user', 'user')
+      .orderBy(`transaction.${orderBy}`, order)
       .skip(skip)
       .take(pageSize);
 

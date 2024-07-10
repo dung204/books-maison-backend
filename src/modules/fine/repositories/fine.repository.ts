@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
+import { FINE_ORDERABLE_FIELDS } from '@/modules/fine/constants/fine-orderable-fields.constant';
 import { FineSearchDto } from '@/modules/fine/dto/fine-search.dto';
 import { Fine } from '@/modules/fine/entities/fine.entity';
 
@@ -17,13 +18,19 @@ export class FineRepository extends Repository<Fine> {
     toCreatedTimestamp,
     page,
     pageSize,
+    orderBy,
+    order,
   }: FineSearchDto) {
     const skip = (page - 1) * pageSize;
+    orderBy = FINE_ORDERABLE_FIELDS.includes(orderBy)
+      ? orderBy
+      : 'createdTimestamp';
     const query = this.createQueryBuilder('fine')
       .leftJoinAndSelect('fine.checkout', 'checkout')
       .leftJoinAndSelect('fine.transaction', 'transaction')
       .leftJoinAndSelect('checkout.user', 'checkoutUser')
       .leftJoinAndSelect('transaction.user', 'transactionUser')
+      .orderBy(`fine.${orderBy}`, order)
       .skip(skip)
       .take(pageSize);
 
