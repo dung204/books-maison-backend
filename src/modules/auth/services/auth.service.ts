@@ -1,7 +1,6 @@
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import {
   ConflictException,
-  ForbiddenException,
   Inject,
   Injectable,
   UnauthorizedException,
@@ -74,26 +73,14 @@ export class AuthService {
     };
   }
 
-  async refresh(
-    { id, role }: User,
-    accessToken: string,
-    refreshToken: string,
-  ): Promise<RefreshSuccessResponse> {
-    if ((await this.redis.get(id)) !== refreshToken)
-      throw new UnauthorizedException('Refresh token does not exist.');
-
+  async refresh(refreshToken: string): Promise<RefreshSuccessResponse> {
     if (await this.isTokenBlacklisted(refreshToken)) {
       throw new UnauthorizedException('Refresh token is blacklisted.');
     }
 
-    const { sub } = this.jwtService.decode<JwtPayload>(refreshToken);
-    if (id !== sub) {
-      throw new ForbiddenException(
-        'Refresh token and current user are mismatched.',
-      );
-    }
+    const { sub: userId } = this.jwtService.decode<JwtPayload>(refreshToken);
+    const { id, role } = await this.userRepository.findById(userId);
 
-    await this.blacklistToken(accessToken);
     await this.blacklistToken(refreshToken);
 
     return {

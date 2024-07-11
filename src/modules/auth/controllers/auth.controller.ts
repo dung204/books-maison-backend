@@ -80,7 +80,6 @@ export class AuthController {
     return this.authService.login(req.user);
   }
 
-  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Create new (refresh) tokens' })
   @ApiBody({
     type: RefreshRequest,
@@ -91,22 +90,13 @@ export class AuthController {
     schema: RefreshSuccessPayload,
     isArray: false,
   })
-  @ApiUnauthorizedResponse({
-    description:
-      'Refresh token does not belong to the current user or the user did not log in',
-  })
   @ApiInternalServerErrorResponse({
     description: 'Internal Server Error.',
   })
-  @UseGuards(JwtAccessGuard)
   @Post('/refresh')
   @HttpCode(HttpStatus.OK)
-  async refresh(
-    @Request() req: CustomRequest,
-    @Body() { refreshToken }: RefreshRequest,
-  ) {
-    const accessToken = req.headers.authorization.replaceAll('Bearer ', '');
-    return this.authService.refresh(req.user, accessToken, refreshToken);
+  async refresh(@Body() { refreshToken }: RefreshRequest) {
+    return this.authService.refresh(refreshToken);
   }
 
   @ApiBearerAuth('JWT')
