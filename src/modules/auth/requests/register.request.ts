@@ -4,8 +4,8 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsStrongPassword,
   MaxLength,
+  MinLength,
 } from 'class-validator';
 
 export class RegisterRequest {
@@ -21,15 +21,14 @@ export class RegisterRequest {
     description: 'The password of the user (requires strong password)',
     example: 'fVs))^vue{lbwIH',
   })
-  @IsStrongPassword({}, { message: 'Password is not a strong password' })
-  @MaxLength(32)
+  @MinLength(6, { message: 'Password must contain at least 6 characters' })
+  @MaxLength(100, { message: 'Password must not exceed 100 characters' })
   password: string;
 
   @ApiProperty({
     description: 'The first name of the user',
     example: 'John',
   })
-
   @IsNotEmpty({ message: 'Last name must not be empty' })
   @IsString({ message: 'First name must be a string' })
   @MaxLength(128)
@@ -39,7 +38,6 @@ export class RegisterRequest {
     description: 'The last name of the user',
     example: 'Doe',
   })
-
   @IsNotEmpty({ message: 'Last name must not be empty' })
   @IsString({ message: 'Last name must be a string' })
   @MaxLength(128)
@@ -51,7 +49,6 @@ export class RegisterRequest {
   })
   @IsString({ message: 'Address must be a string' })
   @IsOptional()
-
   @MaxLength(256)
   address?: string;
 }
