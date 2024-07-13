@@ -25,6 +25,7 @@ import { UserModule } from '@/modules/user/user.module';
     ConfigModule.forRoot({
       isGlobal: true,
       load: [databaseConfig, redisConfig, jwtConfig],
+      envFilePath: ['.env.local', '.env'],
     }),
     RedisModule.forRootAsync(
       {
