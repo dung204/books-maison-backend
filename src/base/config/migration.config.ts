@@ -12,8 +12,8 @@ export default new DataSource({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE_NAME,
   synchronize: false,
-  entities: ['src/modules/**/*.entity{.ts,.js}'],
-  migrations: ['src/base/database/migrations/*{.ts,.js}'],
+  entities: ['dist/**/*.entity.js'],
+  migrations: ['dist/**/database/migrations/*{.ts,.js}'],
   logging: true,
   namingStrategy: new SnakeNamingStrategy(),
 });
