@@ -1,0 +1,46 @@
+services:
+  api:
+    container_name: api
+    depends_on:
+      - postgres
+      - redis
+    restart: always
+    build: .
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+    networks:
+      - books-maison-network
+
+  postgres:
+    container_name: postgres
+    image: postgres:16-alpine
+    ports:
+      - '5432:${DB_PORT}'
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_DATABASE_NAME}
+      - TZ=posix/Asia/Ho_Chi_Minh
+    restart: unless-stopped
+    networks:
+      - books-maison-network
+
+  redis:
+    container_name: redis
+    image: redis:7.0-alpine
+    ports:
+      - '6379:${REDIS_PORT}'
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - books-maison-network
+
+networks:
+  books-maison-network:
+    driver: bridge
+
+volumes:
+  postgresql_data:
+  redis_data:
