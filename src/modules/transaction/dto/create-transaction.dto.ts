@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsEnum,
   IsInt,
@@ -7,6 +8,7 @@ import {
   IsOptional,
   IsPositive,
   IsUUID,
+  IsUrl,
 } from 'class-validator';
 
 import { TransactionMethod } from '@/modules/transaction/enums/transaction-method.enum';
@@ -41,6 +43,17 @@ export class CreateTransactionDto {
     message: `Transaction method must be one these values: ${Object.values(TransactionMethod).join(', ')}`,
   })
   method: TransactionMethod;
+
+  @ApiProperty({
+    description:
+      'The URL that redirects the user after the transaction is finished',
+    example: 'http://bamzuzpic.tl/agi',
+    required: false,
+  })
+  @Transform(({ value }) => value || '')
+  @IsOptional()
+  @IsUrl({}, { message: 'Redirect URL must be a valid URL.' })
+  redirectUrl: string;
 
   @ApiProperty({
     description: 'The extra data for the transaction',

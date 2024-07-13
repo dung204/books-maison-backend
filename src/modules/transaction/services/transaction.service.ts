@@ -89,6 +89,7 @@ export class TransactionService {
       amount,
       userId,
       method: transactionMethod,
+      redirectUrl,
       extraData,
     }: CreateTransactionDto,
   ): Promise<TransactionDto> {
@@ -132,6 +133,7 @@ export class TransactionService {
         transaction.id,
         user,
         amount,
+        redirectUrl,
         extraData,
       );
 
@@ -180,6 +182,7 @@ export class TransactionService {
     transactionId: string,
     user: User,
     amount: number,
+    redirectUrl: string,
     additionalData?: Record<string, any>,
   ) {
     const partnerCode =
@@ -189,8 +192,6 @@ export class TransactionService {
     const requestId = transactionId;
     const orderId = requestId;
     const orderInfo = `${user.firstName.toUpperCase()} ${user.lastName.toUpperCase()} performs a transaction to Books Maison`;
-    const redirectUrl =
-      this.configService.getOrThrow<string>('MOMO_REDIRECT_URL');
     const ipnUrl = this.configService.getOrThrow<string>('MOMO_IPN_URL');
     const orderExpireTime = this.configService.getOrThrow<string>(
       'MOMO_EXPIRE_TIME_MINUTES',
