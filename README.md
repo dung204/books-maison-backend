@@ -1,73 +1,121 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
+  <a href="http://api.books-maison.live/api-docs" target="blank"><img src="static/images/books-maison-logo-dark.svg" width="400" alt="Nest Logo" /></a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+<p align="center">The RESTful API for Books Maison - an online library web application</p>
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Live API documentation: [http://api.books-maison.live/api-docs](http://api.books-maison.live/api-docs)
 
-## Description
+## Table of Contents
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- [1. Primary Features](#1-primary-features)
+- [2. Technologies Used](#2-technologies-used)
+- [3. Getting Started](#3-getting-started)
+  - [3.1. Prerequisites](#31-prerequisites)
+  - [3.2. Installation](#32-installation)
+- [4. License](#4-license)
 
-## Installation
+## 1. Primary Features
+
+- CRUD (Create, Read, Update, Delete) users, books, authors, checkouts, fines
+- User authentication and authorization using JWT (JSON Web Token)
+- Allowing users to borrow and return books
+- Calculating fines for late returns
+- Allowing users to pay fines using [Momo E-wallet](https://www.momo.vn/)
+
+> **Note**:
+>
+> - Whenever a user borrows a book, a checkout record is created with a due date.
+> - If the user returns the book after the due date, a fine is calculated based on the number of days the book is overdue.
+
+## 2. Technologies Used
+
+- [NestJS](https://nestjs.com/): A progressive Node.js framework for building efficient, reliable and scalable server-side applications.
+- [TypeORM](https://typeorm.io/): An ORM that can run in NodeJS, Browser, Cordova, PhoneGap, Ionic, React Native, NativeScript, Expo, and Electron platforms and can be used with TypeScript and JavaScript (ES5, ES6, ES7, ES8).
+- [PostgreSQL](https://www.postgresql.org/): A powerful, open source object-relational database system.
+- [Redis](https://redis.io/): An open source, in-memory data structure store, used as a database, cache, and message broker.
+- [Swagger UI](https://swagger.io/tools/swagger-ui/): A tool that generates interactive API documentation that lets you try out the API calls directly in the browser.
+- [Docker](https://www.docker.com/): A platform for developing, shipping, and running applications in containers.
+- [DigitalOcean](https://www.digitalocean.com/): A cloud infrastructure provider that offers cloud services to help deploy modern apps.
+
+## 3. Getting Started
+
+### 3.1. Prerequisites
+
+You need to have the following installed on your machine:
+
+- [Node.js 22.3.0+](https://nodejs.org/en/download/)
+- [Yarn 1.22.22](https://yarnpkg.com/getting-started/install)
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+- [Git](https://git-scm.com/downloads)
+
+Once installed Node.js, you also have to enable [`corepack`](https://nodejs.org/api/corepack.html), and install the correct version of Yarn:
 
 ```bash
-$ yarn install
+corepack enable && corepack install --global yarn@1.22.22
 ```
 
-## Running the app
+### 3.2. Installation
+
+1. Clone the repository:
 
 ```bash
-# development
-$ yarn run start
-
-# watch mode
-$ yarn run start:dev
-
-# production mode
-$ yarn run start:prod
+git clone https://github.com/dung204/books-maison-backend.git
 ```
 
-## Test
+2. Change into the project directory:
 
 ```bash
-# unit tests
-$ yarn run test
-
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
+cd books-maison-backend
 ```
 
-## Support
+3. Install the dependencies:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+yarn install --frozen-lockfile
+```
 
-## Stay in touch
+4. Create a `.env` file in the root of the project. The `.env` **must** contains all variables in the [`.env.example`](.env.example) file.
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+> **Note**: The `MOMO_IPN_URL` environment variable is the URL that Momo will send the IPN (Instant Payment Notification) to. You must a service like [ngrok](https://ngrok.com/), to expose your local server to the internet, and then use the generated URL as the value for this variable.
 
-## License
+5. To run the application in development mode, you have to install PostgreSQL and Redis (on your local machine or using Docker). You have to make sure that the PostgreSQL and Redis connection in `.env` file is correct. Once ready, you can run the following command:
 
-Nest is [MIT licensed](LICENSE).
+```bash
+yarn start:dev
+```
+
+6. To run the application in production-like mode, you can use Docker Compose with the following command:
+
+```bash
+docker-compose up -d
+```
+
+7. Run the database migrations:
+
+```bash
+yarn migration:run
+```
+
+In case of running with Docker Compose, you have to run the migrations inside the Docker container. You can do this by running the following command:
+
+```bash
+docker-compose exec api yarn migration:run
+```
+
+> **Note**: `api` is the name of the service in the [`docker-compose.yml`](docker-compose.yml) file.
+
+8. The application should be running at `http://localhost:<APP_PORT>`, where `APP_PORT` is the environment variable in the `.env` file. The API documentation can be found at `http://localhost:<APP_PORT>/api-docs`.
+
+9. To stop the application running with Docker Compose, you can run the following command:
+
+```bash
+docker-compose down
+```
+
+## 4. License
+
+This project is licensed under the Unlicense - see the [LICENSE](LICENSE) file for details.
+
+[![DigitalOcean Referral Badge](https://web-platforms.sfo2.cdn.digitaloceanspaces.com/WWW/Badge%203.svg)](https://www.digitalocean.com/?refcode=2fd2624bd8d3&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge)
