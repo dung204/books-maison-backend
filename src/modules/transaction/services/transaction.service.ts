@@ -112,7 +112,7 @@ export class TransactionService {
     }
 
     const transaction = new Transaction();
-    transaction.id = `BM_${Date.now()}`;
+    transaction.id = `BM_TR_${Date.now()}`;
     transaction.user = UserDto.fromUser(user);
     transaction.amount = amount;
     transaction.method = transactionMethod;

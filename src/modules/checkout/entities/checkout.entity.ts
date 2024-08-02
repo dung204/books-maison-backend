@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 
 import { Book } from '@/modules/book/entities/book.entity';
 import { CheckoutStatus } from '@/modules/checkout/enum/checkout-status.enum';
@@ -9,10 +9,10 @@ import { User } from '@/modules/user/entities/user.entity';
 @Entity({ schema: 'public', name: 'checkouts' })
 export class Checkout {
   @ApiProperty({
-    description: 'The UUID of the checkout',
-    example: 'da2b45e0-4fa5-5aa3-a5a8-a2783c888691',
+    description: 'The ID of the checkout (format: `BM_CH_${Date.now()}`)',
+    example: 'BM_CH_1722579024486',
   })
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('character varying')
   id: string;
 
   @ApiProperty({
