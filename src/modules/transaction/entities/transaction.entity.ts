@@ -8,8 +8,8 @@ import { User } from '@/modules/user/entities/user.entity';
 @Entity({ schema: 'public', name: 'transactions' })
 export class Transaction {
   @ApiProperty({
-    description: 'The ID of the transaction',
-    example: 'af119453-910b-5d5a-9c21-706cb677539d',
+    description: 'The ID of the transaction (format: `BM_TR_${Date.now()}`)',
+    example: 'BM_TR_1722578983111',
   })
   @PrimaryColumn('character varying')
   id: string;

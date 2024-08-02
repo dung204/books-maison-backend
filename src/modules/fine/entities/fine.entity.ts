@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 import { FineStatus } from '@/modules/fine/enums/fine-status.enum';
@@ -14,10 +8,10 @@ import { Transaction } from '@/modules/transaction/entities/transaction.entity';
 @Entity({ schema: 'public', name: 'fines' })
 export class Fine {
   @ApiProperty({
-    description: 'The UUID of the fine',
-    example: '0d3efe44-b463-505c-b5a3-fb9789bd7f13',
+    description: 'The ID of the fine (format: `BM_FI_${Date.now()}`)',
+    example: 'BM_FI_1722579577171',
   })
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('character varying')
   id: string;
 
   @ApiProperty({
