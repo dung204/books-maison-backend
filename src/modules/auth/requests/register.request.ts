@@ -18,7 +18,7 @@ export class RegisterRequest {
   email: string;
 
   @ApiProperty({
-    description: 'The password of the user (requires strong password)',
+    description: 'The password of the user',
     example: 'fVs))^vue{lbwIH',
   })
   @MinLength(6, { message: 'Password must contain at least 6 characters' })

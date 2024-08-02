@@ -3,12 +3,14 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { PasswordUtils } from '@/base/utils/password.utils';
 import { USER_ORDERABLE_FIELDS } from '@/modules/user/constants/user-orderable-fields.constant';
+import { ChangePasswordDto } from '@/modules/user/dto/change-password.dto';
 import { UserDto } from '@/modules/user/dto/user.dto';
 import { User } from '@/modules/user/entities/user.entity';
 import { UserRepository } from '@/modules/user/repositories/user.repository';
@@ -79,7 +81,7 @@ export class UserService {
 
   async update(
     id: string,
-    { password, ...updateUserDto }: UpdateUserDto,
+    updateUserDto: UpdateUserDto,
   ): Promise<SuccessResponse<UserDto>> {
     if (!this.userRepository.isExistedById(id))
       throw new NotFoundException('User not found.');
@@ -90,15 +92,43 @@ export class UserService {
     if (existedUserByEmail?.id !== id)
       throw new ConflictException('Email already taken');
 
-    const updateStatus = await this.userRepository.updateUserById(id, {
-      ...updateUserDto,
-      ...(password && { password: await PasswordUtils.hashPassword(password) }),
-    });
+    const updateStatus = await this.userRepository.updateUserById(
+      id,
+      updateUserDto,
+    );
     if (updateStatus != 1)
       throw new ConflictException('Conflicted! Cannot update user.');
 
     return {
       data: UserDto.fromUser(await this.userRepository.findById(id)),
     };
+  }
+
+  async changePassword(user: User, changePasswordDto: ChangePasswordDto) {
+    const passwordMatched = await PasswordUtils.isPasswordMatched(
+      changePasswordDto.password,
+      user.password,
+    );
+
+    if (!passwordMatched)
+      throw new UnauthorizedException(
+        'Old password does not match with the current password.',
+      );
+
+    const updateStatus = await this.userRepository.update(
+      {
+        id: user.id,
+      },
+      {
+        password: await PasswordUtils.hashPassword(
+          changePasswordDto.newPassword,
+        ),
+      },
+    );
+
+    if (updateStatus.affected != 1)
+      throw new ConflictException(
+        'Conflicted! Cannot change password of current user.',
+      );
   }
 }
