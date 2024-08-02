@@ -9,8 +9,8 @@ const FINE_AMOUNT_PER_DAY = 10_000;
 
 export class FineDto {
   @ApiProperty({
-    description: 'The UUID of the fine',
-    example: '0d3efe44-b463-505c-b5a3-fb9789bd7f13',
+    description: 'The ID of the fine (format: `BM_FI_${Date.now()}`)',
+    example: 'BM_FI_1722579577171',
   })
   id: string;
 

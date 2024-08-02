@@ -40,6 +40,7 @@ export class FineService {
       );
 
     const fine = new Fine();
+    fine.id = `BM_FI_${Date.now()}`;
     fine.checkout = checkout;
 
     await this.fineRepository.save(fine);

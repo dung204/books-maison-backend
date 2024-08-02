@@ -57,6 +57,7 @@ export class CheckoutService {
       throw new BadRequestException('This book is currently out of stock.');
 
     const checkout = new Checkout();
+    checkout.id = `BM_CH_${Date.now()}`;
     const checkoutTimestamp = new Date();
     const dueTimestamp = addWeeks(checkoutTimestamp, this.RENTING_WEEKS);
 
@@ -92,6 +93,7 @@ export class CheckoutService {
       throw new BadRequestException('This book is currently out of stock.');
 
     const checkout = new Checkout();
+    checkout.id = `BM_CH_${Date.now()}`;
     const checkoutTimestamp = new Date();
     const dueTimestamp = addWeeks(checkoutTimestamp, this.RENTING_WEEKS);
 
