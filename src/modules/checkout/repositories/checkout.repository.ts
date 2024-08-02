@@ -25,7 +25,7 @@ export class CheckoutRepository extends Repository<Checkout> {
       .andWhere('checkout.user.id = :userId', { userId })
       .andWhere('checkout.book.id = :bookId', { bookId })
       .andWhere('checkout.status = :status', {
-        status: CheckoutStatus.RENTING,
+        status: CheckoutStatus.BORROWING,
       })
       .getOne();
   }
@@ -111,7 +111,7 @@ export class CheckoutRepository extends Repository<Checkout> {
 
   getRentingCheckoutsDueBeforeToday() {
     return this.createQueryBuilder('checkout')
-      .where('checkout.status = :status', { status: CheckoutStatus.RENTING })
+      .where('checkout.status = :status', { status: CheckoutStatus.BORROWING })
       .andWhere('checkout.dueTimestamp < CURRENT_TIMESTAMP')
       .getMany();
   }

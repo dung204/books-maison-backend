@@ -1,5 +1,5 @@
 export enum CheckoutStatus {
-  RENTING = 'RENTING',
+  BORROWING = 'BORROWING',
   OVERDUE = 'OVERDUE',
   RETURNED = 'RETURNED',
 }

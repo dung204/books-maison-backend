@@ -34,7 +34,7 @@ export class Checkout {
     enum: CheckoutStatus,
     enumName: 'CheckoutStatus',
   })
-  @Column('enum', { enum: CheckoutStatus, default: CheckoutStatus.RENTING })
+  @Column('enum', { enum: CheckoutStatus, default: CheckoutStatus.BORROWING })
   status: CheckoutStatus;
 
   @ApiProperty({
