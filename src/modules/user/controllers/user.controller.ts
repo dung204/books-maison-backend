@@ -13,8 +13,10 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiConflictResponse,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
+  ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOperation,
   ApiTags,
@@ -27,6 +29,7 @@ import { SuccessResponse } from '@/base/common/responses/success.response';
 import { CustomRequest } from '@/base/common/types/custom-request.type';
 import { AdminGuard } from '@/modules/auth/guards/admin.guard';
 import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
+import { ChangePasswordDto } from '@/modules/user/dto/change-password.dto';
 import { UserDto } from '@/modules/user/dto/user.dto';
 import { UpdateProfileRequest } from '@/modules/user/requests/update-profile.request';
 
@@ -65,6 +68,7 @@ export class UserController {
     status: HttpStatus.OK,
     schema: UserDto,
     isArray: false,
+    description: 'Profile is updated successfully',
   })
   @ApiUnauthorizedResponse({
     description: 'The user is not logged in',
@@ -84,6 +88,28 @@ export class UserController {
   ) {
     const currentUser = req.user;
     return this.userService.update(currentUser.id, updateProfileRequest);
+  }
+
+  @ApiOperation({ summary: 'Change the password of current user' })
+  @ApiNoContentResponse({ description: 'Password is changed successfully' })
+  @ApiUnauthorizedResponse({
+    description: `- The user is not logged in\n\n- The old password mismatches with the current password`,
+  })
+  @ApiConflictResponse({
+    description: 'Conflicted',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error.',
+  })
+  @UseGuards(JwtAccessGuard)
+  @Patch('/me/password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async changePasswordOfCurrentUser(
+    @Request() req: CustomRequest,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    const currentUser = req.user;
+    return this.userService.changePassword(currentUser, changePasswordDto);
   }
 
   @ApiOperation({ summary: 'Get all users (for ADMIN only)' })

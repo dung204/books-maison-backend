@@ -1,6 +1,6 @@
 import { Optional } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString, IsStrongPassword } from 'class-validator';
+import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class CreateUserDto {
   @ApiProperty({
@@ -14,7 +14,8 @@ export class CreateUserDto {
     description: 'The password of the user (requires strong password)',
     example: 'fVs))^vue{lbwIH',
   })
-  @IsStrongPassword({}, { message: 'Password is not a strong password' })
+  @MinLength(6, { message: 'Password must contain at least 6 characters' })
+  @MaxLength(100, { message: 'Password must not exceed 100 characters' })
   password: string;
 
   @ApiProperty({
