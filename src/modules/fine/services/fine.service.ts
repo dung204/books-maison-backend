@@ -91,7 +91,7 @@ export class FineService {
     };
   }
 
-  async findOne(user: User, id: string) {
+  async findOne(user: User, id: string): Promise<SuccessResponse<FineDto>> {
     const fine = await this.fineRepository.findById(id);
 
     if (!fine) throw new NotFoundException('Fine not found.');
@@ -100,7 +100,9 @@ export class FineService {
     if (user.role !== Role.ADMIN && fine.checkout.user.id !== user.id)
       throw new ForbiddenException();
 
-    return FineDto.fromFine(fine);
+    return {
+      data: FineDto.fromFine(fine),
+    };
   }
 
   async cancelFine(id: string): Promise<SuccessResponse<FineDto>> {
