@@ -21,10 +21,10 @@ import {
 } from '@nestjs/swagger';
 
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
-import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { AdminGuard } from '@/modules/auth/guards/admin.guard';
 import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
+import { AuthorSearchDto } from '@/modules/author/dto/author-search.dto';
 import { Author } from '@/modules/author/entities/author.entity';
 import { AuthorService } from '@/modules/author/services/author.service';
 
@@ -79,8 +79,8 @@ export class AuthorController {
     description: 'Internal Server Error.',
   })
   @Get('/')
-  findAll(@Query() paginationQueryDto: PaginationQueryDto) {
-    return this.authorService.findAll(paginationQueryDto);
+  findAll(@Query() authorSearchDto: AuthorSearchDto) {
+    return this.authorService.findAll(authorSearchDto);
   }
 
   @ApiOperation({

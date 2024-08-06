@@ -1,10 +1,30 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsEnum, IsOptional, IsUUID } from 'class-validator';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
+import {
+  IsDateString,
+  IsEnum,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
-import { CheckoutStatus } from '@/modules/checkout/enum/checkout-status.enum';
+import { CheckoutOrderableField } from '@/modules/checkout/enums/checkout-orderable-field.enum';
+import { CheckoutStatus } from '@/modules/checkout/enums/checkout-status.enum';
 
-export class CheckoutSearchDto extends PaginationQueryDto {
+export class CheckoutSearchDto extends OmitType(PaginationQueryDto, [
+  'orderBy',
+]) {
+  @ApiProperty({
+    description: 'The field to order the results by',
+    enum: CheckoutOrderableField,
+    enumName: 'CheckoutOrderableFields',
+    default: CheckoutOrderableField.CREATED_TIMESTAMP,
+    required: false,
+  })
+  @IsOptional()
+  @IsString({ message: 'Order by must be a string' })
+  orderBy?: CheckoutOrderableField = CheckoutOrderableField.CREATED_TIMESTAMP;
+
   @ApiProperty({
     description: 'Every checkouts of this user will be returned',
     required: false,

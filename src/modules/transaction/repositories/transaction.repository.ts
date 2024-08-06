@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
-import { TRANSACTION_ORDERABLE_FIELDS } from '@/modules/transaction/constants/transaction-orderable-fields.constant';
 import { TransactionSearchDto } from '@/modules/transaction/dto/transaction-search.dto';
 import { Transaction } from '@/modules/transaction/entities/transaction.entity';
+import { TransactionOrderableField } from '@/modules/transaction/enums/transaction-orderable-field.enum';
 
 @Injectable()
 export class TransactionRepository extends Repository<Transaction> {
@@ -20,12 +20,9 @@ export class TransactionRepository extends Repository<Transaction> {
     order,
   }: TransactionSearchDto) {
     const skip = (page - 1) * pageSize;
-    orderBy = TRANSACTION_ORDERABLE_FIELDS.includes(orderBy)
-      ? orderBy
-      : 'createdTimestamp';
     const query = this.createQueryBuilder('transaction')
       .leftJoinAndSelect('transaction.user', 'user')
-      .orderBy(`transaction.${orderBy}`, order)
+      .orderBy(this.resolveOrderBy(orderBy), order)
       .skip(skip)
       .take(pageSize);
 
@@ -45,5 +42,11 @@ export class TransactionRepository extends Repository<Transaction> {
       .leftJoinAndSelect('transaction.user', 'user')
       .where('transaction.id = :id', { id })
       .getOne();
+  }
+
+  private resolveOrderBy(orderBy: TransactionOrderableField) {
+    return Object.values(TransactionOrderableField).includes(orderBy)
+      ? `transaction.${orderBy}`
+      : `transaction.${TransactionOrderableField.CREATED_TIMESTAMP}`;
   }
 }

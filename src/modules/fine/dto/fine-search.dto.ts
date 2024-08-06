@@ -1,11 +1,29 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsDateString, IsEnum, IsOptional, IsUUID } from 'class-validator';
+import {
+  IsDateString,
+  IsEnum,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
+import { FineOrderableField } from '@/modules/fine/enums/fine-orderable-field.enum';
 import { FineStatus } from '@/modules/fine/enums/fine-status.enum';
 
-export class FineSearchDto extends PaginationQueryDto {
+export class FineSearchDto extends OmitType(PaginationQueryDto, ['orderBy']) {
+  @ApiProperty({
+    description: 'The field to order the results by',
+    enum: FineOrderableField,
+    enumName: 'FineOrderableField',
+    default: FineOrderableField.CREATED_TIMESTAMP,
+    required: false,
+  })
+  @IsOptional()
+  @IsString({ message: 'Order by must be a string' })
+  orderBy?: FineOrderableField = FineOrderableField.CREATED_TIMESTAMP;
+
   @ApiProperty({
     description: 'Every fines of this user will be returned',
     required: false,

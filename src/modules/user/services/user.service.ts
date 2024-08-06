@@ -6,11 +6,10 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 
-import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { PasswordUtils } from '@/base/utils/password.utils';
-import { USER_ORDERABLE_FIELDS } from '@/modules/user/constants/user-orderable-fields.constant';
 import { ChangePasswordDto } from '@/modules/user/dto/change-password.dto';
+import { UserSearchDto } from '@/modules/user/dto/user-search.dto';
 import { UserDto } from '@/modules/user/dto/user.dto';
 import { User } from '@/modules/user/entities/user.entity';
 import { UserRepository } from '@/modules/user/repositories/user.repository';
@@ -35,23 +34,12 @@ export class UserService {
     };
   }
 
-  async findAll({
-    page,
-    pageSize,
-    orderBy,
-    order,
-  }: PaginationQueryDto): Promise<SuccessResponse<UserDto[]>> {
-    const skip = (page - 1) * pageSize;
-    orderBy = USER_ORDERABLE_FIELDS.includes(orderBy)
-      ? orderBy
-      : 'createdTimestamp';
-    const [users, total] = await this.userRepository.findAndCount({
-      skip,
-      take: pageSize,
-      order: {
-        [orderBy]: order,
-      },
-    });
+  async findAll(
+    userSearchDto: UserSearchDto,
+  ): Promise<SuccessResponse<UserDto[]>> {
+    const { page, pageSize } = userSearchDto;
+    const [users, total] =
+      await this.userRepository.findAllAndCount(userSearchDto);
     const totalPage = Math.ceil(total / pageSize);
 
     return {

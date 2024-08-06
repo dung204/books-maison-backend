@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
-import { FINE_ORDERABLE_FIELDS } from '@/modules/fine/constants/fine-orderable-fields.constant';
 import { FineSearchDto } from '@/modules/fine/dto/fine-search.dto';
 import { Fine } from '@/modules/fine/entities/fine.entity';
+import { FineOrderableField } from '@/modules/fine/enums/fine-orderable-field.enum';
 
 @Injectable()
 export class FineRepository extends Repository<Fine> {
@@ -22,9 +22,6 @@ export class FineRepository extends Repository<Fine> {
     order,
   }: FineSearchDto) {
     const skip = (page - 1) * pageSize;
-    orderBy = FINE_ORDERABLE_FIELDS.includes(orderBy)
-      ? orderBy
-      : 'createdTimestamp';
     const query = this.createQueryBuilder('fine')
       .leftJoinAndSelect('fine.checkout', 'checkout')
       .leftJoinAndSelect('fine.transaction', 'transaction')
@@ -33,7 +30,7 @@ export class FineRepository extends Repository<Fine> {
       .leftJoinAndSelect('book.authors', 'authors')
       .leftJoinAndSelect('book.categories', 'categories')
       .leftJoinAndSelect('transaction.user', 'transactionUser')
-      .orderBy(`fine.${orderBy}`, order)
+      .orderBy(this.resolveOrderBy(orderBy), order)
       .skip(skip)
       .take(pageSize);
 
@@ -84,5 +81,14 @@ export class FineRepository extends Repository<Fine> {
       .leftJoinAndSelect('transaction.user', 'transactionUser')
       .where('checkout.id = :checkoutId', { checkoutId })
       .getExists();
+  }
+
+  private resolveOrderBy(orderBy: FineOrderableField) {
+    if (Object.values(FineOrderableField).includes(orderBy)) {
+      if (orderBy === FineOrderableField.CHECKOUT) return `checkout.id`;
+      return `fine.${orderBy}`;
+    }
+
+    return `fine.${FineOrderableField.CREATED_TIMESTAMP}`;
   }
 }

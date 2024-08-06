@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
   IsInt,
@@ -9,8 +9,20 @@ import {
 } from 'class-validator';
 
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
+import { BookOrderableField } from '@/modules/book/enums/book-orderable-field.enum';
 
-export class BookSearchDto extends PaginationQueryDto {
+export class BookSearchDto extends OmitType(PaginationQueryDto, ['orderBy']) {
+  @ApiProperty({
+    description: 'The field to order the books by',
+    enum: BookOrderableField,
+    enumName: 'BookOrderableFields',
+    default: BookOrderableField.CREATED_TIMESTAMP,
+    required: false,
+  })
+  @IsOptional()
+  @IsString({ message: 'Order by must be a string' })
+  orderBy?: BookOrderableField = BookOrderableField.CREATED_TIMESTAMP;
+
   @ApiProperty({
     description:
       'Every books with title containing this title will be returned',
