@@ -22,10 +22,10 @@ import {
 } from '@nestjs/swagger';
 
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
-import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { AdminGuard } from '@/modules/auth/guards/admin.guard';
 import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
+import { CategorySearchDto } from '@/modules/category/dto/category-search.dto';
 import { Category } from '@/modules/category/entities/category.entity';
 
 import { CreateCategoryDto } from '../dto/create-category.dto';
@@ -80,8 +80,8 @@ export class CategoryController {
     description: 'Internal Server Error.',
   })
   @Get('/')
-  findAll(@Query() paginationQueryDto: PaginationQueryDto) {
-    return this.categoryService.findAll(paginationQueryDto);
+  findAll(@Query() categorySearchDto: CategorySearchDto) {
+    return this.categoryService.findAll(categorySearchDto);
   }
 
   @ApiOperation({

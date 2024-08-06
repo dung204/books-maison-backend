@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
-import { BOOK_ORDERABLE_FIELDS } from '@/modules/book/constants/book-orderable-fields.constant';
+import { BookOrderableField } from '@/modules/book/enums/book-orderable-field.enum';
 import { FavouriteBookSearchDto } from '@/modules/favourite-book/dto/favourite-book-search.dto';
 import { FavouriteBook } from '@/modules/favourite-book/entities/favourite-book.entity';
 
@@ -46,15 +46,15 @@ export class FavouriteBookRepository extends Repository<FavouriteBook> {
     }: FavouriteBookSearchDto,
   ) {
     const skip = (page - 1) * pageSize;
-    orderBy = BOOK_ORDERABLE_FIELDS.includes(orderBy)
+    const actualOrderBy = Object.values(BookOrderableField).includes(orderBy)
       ? orderBy
-      : 'createdTimestamp';
+      : BookOrderableField.CREATED_TIMESTAMP;
     const query = this.createQueryBuilder('favouriteBook')
       .leftJoinAndSelect('favouriteBook.book', 'book')
       .leftJoinAndSelect('book.authors', 'author')
       .leftJoinAndSelect('book.categories', 'category')
       .andWhere('favouriteBook.userId = :userId', { userId })
-      .orderBy(`book.${orderBy}`, order)
+      .orderBy(`book.${actualOrderBy}`, order)
       .skip(skip)
       .take(pageSize);
 

@@ -5,7 +5,7 @@ import { AuthorSearchDto } from '@/modules/author/dto/author-search.dto';
 import { CreateAuthorDto } from '@/modules/author/dto/create-author.dto';
 import { UpdateAuthorDto } from '@/modules/author/dto/update-author.dto';
 import { Author } from '@/modules/author/entities/author.entity';
-import { AuthorOrderableFields } from '@/modules/author/enum/author-orderable-fields.enum';
+import { AuthorOrderableField } from '@/modules/author/enums/author-orderable-field.enum';
 
 @Injectable()
 export class AuthorRepository extends Repository<Author> {
@@ -26,9 +26,9 @@ export class AuthorRepository extends Repository<Author> {
     yearOfDeathTo,
   }: AuthorSearchDto) {
     const skip = (page - 1) * pageSize;
-    const actualOrderBy = Object.values(AuthorOrderableFields).includes(orderBy)
+    const actualOrderBy = Object.values(AuthorOrderableField).includes(orderBy)
       ? orderBy
-      : AuthorOrderableFields.CREATED_TIMESTAMP;
+      : AuthorOrderableField.CREATED_TIMESTAMP;
     const query = this.createQueryBuilder('author')
       .orderBy(`author.${actualOrderBy}`, order)
       .skip(skip)

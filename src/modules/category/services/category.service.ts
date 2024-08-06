@@ -5,9 +5,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { SuccessResponse } from '@/base/common/responses/success.response';
-import { CATEGORY_ORDERABLE_FIELDS } from '@/modules/category/constants/category-orderable-fields.constant';
+import { CategorySearchDto } from '@/modules/category/dto/category-search.dto';
 import { Category } from '@/modules/category/entities/category.entity';
 import { CategoryRepository } from '@/modules/category/repositories/category.repository';
 
@@ -31,23 +30,12 @@ export class CategoryService {
     };
   }
 
-  async findAll({
-    page,
-    pageSize,
-    orderBy,
-    order,
-  }: PaginationQueryDto): Promise<SuccessResponse<Category[]>> {
-    const skip = (page - 1) * pageSize;
-    orderBy = CATEGORY_ORDERABLE_FIELDS.includes(orderBy)
-      ? orderBy
-      : 'createdTimestamp';
-    const [categories, total] = await this.categoryRepository.findAndCount({
-      skip,
-      take: pageSize,
-      order: {
-        [orderBy]: order,
-      },
-    });
+  async findAll(
+    categorySearchDto: CategorySearchDto,
+  ): Promise<SuccessResponse<Category[]>> {
+    const { page, pageSize } = categorySearchDto;
+    const [categories, total] =
+      await this.categoryRepository.findAllAndCount(categorySearchDto);
     const totalPage = Math.ceil(total / pageSize);
 
     return {

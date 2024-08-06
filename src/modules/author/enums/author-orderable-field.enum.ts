@@ -1,4 +1,4 @@
-export enum AuthorOrderableFields {
+export enum AuthorOrderableField {
   CREATED_TIMESTAMP = 'createdTimestamp',
   ID = 'id',
   NAME = 'name',

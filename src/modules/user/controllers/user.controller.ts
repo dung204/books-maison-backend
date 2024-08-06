@@ -24,12 +24,12 @@ import {
 } from '@nestjs/swagger';
 
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
-import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { CustomRequest } from '@/base/common/types/custom-request.type';
 import { AdminGuard } from '@/modules/auth/guards/admin.guard';
 import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
 import { ChangePasswordDto } from '@/modules/user/dto/change-password.dto';
+import { UserSearchDto } from '@/modules/user/dto/user-search.dto';
 import { UserDto } from '@/modules/user/dto/user.dto';
 import { UpdateProfileRequest } from '@/modules/user/requests/update-profile.request';
 
@@ -132,8 +132,8 @@ export class UserController {
   })
   @UseGuards(JwtAccessGuard, AdminGuard)
   @Get('/')
-  findAll(@Query() paginationQueryDto: PaginationQueryDto) {
-    return this.userService.findAll(paginationQueryDto);
+  findAll(@Query() userSearchDto: UserSearchDto) {
+    return this.userService.findAll(userSearchDto);
   }
 
   @ApiOperation({ summary: 'Get a user by id (for ADMIN only)' })

@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
-import { CHECKOUT_ORDERABLE_FIELDS } from '@/modules/checkout/constants/checkout-orderable-fields.constant';
 import { CheckoutSearchDto } from '@/modules/checkout/dto/checkout-search.dto';
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
-import { CheckoutStatus } from '@/modules/checkout/enum/checkout-status.enum';
+import { CheckoutOrderableField } from '@/modules/checkout/enums/checkout-orderable-field.enum';
+import { CheckoutStatus } from '@/modules/checkout/enums/checkout-status.enum';
 
 @Injectable()
 export class CheckoutRepository extends Repository<Checkout> {
@@ -46,15 +46,12 @@ export class CheckoutRepository extends Repository<Checkout> {
     toReturnedTimestamp,
   }: CheckoutSearchDto) {
     const skip = (page - 1) * pageSize;
-    orderBy = CHECKOUT_ORDERABLE_FIELDS.includes(orderBy)
-      ? orderBy
-      : 'createdTimestamp';
     const query = this.createQueryBuilder('checkout')
       .leftJoinAndSelect('checkout.user', 'user')
       .leftJoinAndSelect('checkout.book', 'book')
       .leftJoinAndSelect('book.authors', 'author')
       .leftJoinAndSelect('book.categories', 'category')
-      .orderBy(`checkout.${orderBy}`, order)
+      .orderBy(this.resolveOrderBy(orderBy), order)
       .skip(skip)
       .take(pageSize);
 
@@ -114,5 +111,14 @@ export class CheckoutRepository extends Repository<Checkout> {
       .where('checkout.status = :status', { status: CheckoutStatus.BORROWING })
       .andWhere('checkout.dueTimestamp < CURRENT_TIMESTAMP')
       .getMany();
+  }
+
+  private resolveOrderBy(orderBy: CheckoutOrderableField) {
+    if (Object.values(CheckoutOrderableField).includes(orderBy)) {
+      if (orderBy === CheckoutOrderableField.BOOK) return 'book.title';
+      return `checkout.${orderBy}`;
+    }
+
+    return `checkout.${CheckoutOrderableField.CREATED_TIMESTAMP}`;
   }
 }

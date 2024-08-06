@@ -10,7 +10,7 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { Role } from '@/base/common/enum/role.enum';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
-import { CheckoutStatus } from '@/modules/checkout/enum/checkout-status.enum';
+import { CheckoutStatus } from '@/modules/checkout/enums/checkout-status.enum';
 import { FineSearchDto } from '@/modules/fine/dto/fine-search.dto';
 import { FineDto } from '@/modules/fine/dto/fine.dto';
 import { PayFineDto } from '@/modules/fine/dto/pay-fine.dto';

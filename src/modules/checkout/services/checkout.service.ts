@@ -19,7 +19,7 @@ import { UpdateCheckoutNoteDto } from '@/modules/checkout/dto/update-checkout-no
 import { UserCheckoutSearchDto } from '@/modules/checkout/dto/user-checkout-search.dto';
 import { UserCreateCheckoutDto } from '@/modules/checkout/dto/user-create-checkout.dto';
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
-import { CheckoutStatus } from '@/modules/checkout/enum/checkout-status.enum';
+import { CheckoutStatus } from '@/modules/checkout/enums/checkout-status.enum';
 import { CheckoutRepository } from '@/modules/checkout/repositories/checkout.repository';
 import { FineService } from '@/modules/fine/services/fine.service';
 import { UserDto } from '@/modules/user/dto/user.dto';

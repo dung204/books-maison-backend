@@ -2,19 +2,19 @@ import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { IsOptional, IsPositive, IsString } from 'class-validator';
 
 import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
-import { AuthorOrderableFields } from '@/modules/author/enum/author-orderable-fields.enum';
+import { AuthorOrderableField } from '@/modules/author/enums/author-orderable-field.enum';
 
 export class AuthorSearchDto extends OmitType(PaginationQueryDto, ['orderBy']) {
   @ApiProperty({
     description: 'The field to order the authors by',
-    enum: AuthorOrderableFields,
+    enum: AuthorOrderableField,
     enumName: 'AuthorOrderableFields',
-    default: AuthorOrderableFields.CREATED_TIMESTAMP,
+    default: AuthorOrderableField.CREATED_TIMESTAMP,
     required: false,
   })
   @IsOptional()
   @IsString({ message: 'Order by must be a string' })
-  orderBy?: AuthorOrderableFields = AuthorOrderableFields.CREATED_TIMESTAMP;
+  orderBy?: AuthorOrderableField = AuthorOrderableField.CREATED_TIMESTAMP;
 
   @ApiProperty({
     description:

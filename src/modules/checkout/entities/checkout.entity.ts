@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 
 import { Book } from '@/modules/book/entities/book.entity';
-import { CheckoutStatus } from '@/modules/checkout/enum/checkout-status.enum';
+import { CheckoutStatus } from '@/modules/checkout/enums/checkout-status.enum';
 import { UserDto } from '@/modules/user/dto/user.dto';
 import { User } from '@/modules/user/entities/user.entity';
 

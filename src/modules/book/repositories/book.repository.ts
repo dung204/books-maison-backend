@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
-import { BOOK_ORDERABLE_FIELDS } from '@/modules/book/constants/book-orderable-fields.constant';
 import { BookSearchDto } from '@/modules/book/dto/book-search.dto';
 import { Book } from '@/modules/book/entities/book.entity';
+import { BookOrderableField } from '@/modules/book/enums/book-orderable-field.enum';
 
 @Injectable()
 export class BookRepository extends Repository<Book> {
@@ -36,13 +36,13 @@ export class BookRepository extends Repository<Book> {
     categoryId: categoryIds,
   }: BookSearchDto) {
     const skip = (page - 1) * pageSize;
-    orderBy = BOOK_ORDERABLE_FIELDS.includes(orderBy)
+    const actualOrderBy = Object.values(BookOrderableField).includes(orderBy)
       ? orderBy
-      : 'createdTimestamp';
+      : BookOrderableField.CREATED_TIMESTAMP;
     const query = this.createQueryBuilder('book')
       .leftJoinAndSelect('book.authors', 'author')
       .leftJoinAndSelect('book.categories', 'category')
-      .orderBy(`book.${orderBy}`, order)
+      .orderBy(`book.${actualOrderBy}`, order)
       .skip(skip)
       .take(pageSize);
 
