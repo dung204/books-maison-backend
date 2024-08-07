@@ -35,7 +35,7 @@ export class AuthorRepository extends Repository<Author> {
       .take(pageSize);
 
     if (name) {
-      query.andWhere('LOWER(author.name) LIKE LOWER(:title)', {
+      query.andWhere('LOWER(author.name) LIKE LOWER(:name)', {
         name: `%${name}%`,
       });
     }
