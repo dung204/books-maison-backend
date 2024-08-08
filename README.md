@@ -86,13 +86,15 @@ yarn install --frozen-lockfile
 yarn start:dev
 ```
 
-6. To run the application in production-like mode, you can use Docker Compose with the following command:
+6. The application **always run in HTTPS mode**, which requires two files: `cert.pem` - the public TLS certificate and `key.pem` - the private key. Both files are stored in the `cert` directory, in the root of the project.
+
+7. To run the application in production-like mode, you can use Docker Compose with the following command:
 
 ```bash
 docker-compose up -d
 ```
 
-7. Run the database migrations:
+8. Run the database migrations:
 
 ```bash
 yarn migration:run
@@ -106,9 +108,9 @@ docker-compose exec api yarn migration:run
 
 > **Note**: `api` is the name of the service in the [`docker-compose.yml`](docker-compose.yml) file.
 
-8. The application should be running at `http://localhost:<APP_PORT>`, where `APP_PORT` is the environment variable in the `.env` file. The API documentation can be found at `http://localhost:<APP_PORT>/api-docs`.
+9. The application should be running at `http://localhost:<APP_PORT>`, where `APP_PORT` is the environment variable in the `.env` file. The API documentation can be found at `http://localhost:<APP_PORT>/api-docs`.
 
-9. To stop the application running with Docker Compose, you can run the following command:
+10. To stop the application running with Docker Compose, you can run the following command:
 
 ```bash
 docker-compose down

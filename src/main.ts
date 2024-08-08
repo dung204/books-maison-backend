@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AxiosError } from 'axios';
+import * as fs from 'fs';
 import {
   StorageDriver,
   initializeTransactionalContext,
@@ -18,7 +19,12 @@ import { AppModule } from './modules/app/app.module';
 
 async function bootstrap() {
   const logger = new Logger(bootstrap.name);
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    httpsOptions: {
+      key: fs.readFileSync('./cert/key.pem'),
+      cert: fs.readFileSync('./cert/cert.pem'),
+    },
+  });
   const httpService = new HttpService();
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
