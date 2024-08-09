@@ -100,8 +100,10 @@ export class BookController {
     description: 'Internal Server Error.',
   })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.bookService.findOne(id);
+  async findOne(@Param('id') id: string): Promise<SuccessResponse<Book>> {
+    return {
+      data: await this.bookService.findOne(id),
+    };
   }
 
   @ApiBearerAuth('JWT')
