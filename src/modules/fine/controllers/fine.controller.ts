@@ -28,7 +28,6 @@ import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
 import { FineSearchDto } from '@/modules/fine/dto/fine-search.dto';
 import { FineDto } from '@/modules/fine/dto/fine.dto';
 import { PayFineDto } from '@/modules/fine/dto/pay-fine.dto';
-import UserFineSearchDto from '@/modules/fine/dto/user-fine-search.dto';
 import { Fine } from '@/modules/fine/entities/fine.entity';
 import { FineStatus } from '@/modules/fine/enums/fine-status.enum';
 import { FineService } from '@/modules/fine/services/fine.service';
@@ -64,35 +63,6 @@ export class FineController {
   @Get('/')
   findAll(@Query() fineSearchDto: FineSearchDto) {
     return this.fineService.findAll(fineSearchDto);
-  }
-
-  @ApiOperation({
-    summary: 'Get all fines of the current authenticated user',
-  })
-  @ApiSuccessResponse({
-    status: HttpStatus.OK,
-    schema: FineDto,
-    isArray: false,
-    pagination: true,
-    description: 'Get all fines successfully (with pagination metadata).',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'User login is required.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
-  })
-  @UseGuards(JwtAccessGuard)
-  @Get('/me')
-  findAllFinesOfCurrentUser(
-    @Request() req: CustomRequest,
-    @Query() userFineSearchDto: UserFineSearchDto,
-  ) {
-    const currentUser = req.user;
-    return this.fineService.findAllFinesOfCurrentUser(
-      currentUser,
-      userFineSearchDto,
-    );
   }
 
   @ApiOperation({

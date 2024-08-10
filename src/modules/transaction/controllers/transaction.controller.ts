@@ -30,7 +30,6 @@ import { CreateTransactionDto } from '@/modules/transaction/dto/create-transacti
 import { MomoNotifyDto } from '@/modules/transaction/dto/momo-notify.dto';
 import { TransactionSearchDto } from '@/modules/transaction/dto/transaction-search.dto';
 import { TransactionDto } from '@/modules/transaction/dto/transaction.dto';
-import { UserTransactionSearchDto } from '@/modules/transaction/dto/user-transaction-search.dto';
 import { Transaction } from '@/modules/transaction/entities/transaction.entity';
 import { TransactionService } from '@/modules/transaction/services/transaction.service';
 
@@ -64,36 +63,6 @@ export class TransactionController {
   @Get('/')
   async findAll(@Query() transactionSearchDto: TransactionSearchDto) {
     return this.transactionService.findAll(transactionSearchDto);
-  }
-
-  @ApiOperation({
-    summary: 'Get all transactions of the current authenticated user',
-  })
-  @ApiSuccessResponse({
-    status: HttpStatus.OK,
-    schema: Transaction,
-    isArray: false,
-    pagination: true,
-    description:
-      'Get all transactions successfully (with pagination metadata).',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'User login is required.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
-  })
-  @UseGuards(JwtAccessGuard)
-  @Get('/me')
-  async findAllTransactionsOfCurrentUser(
-    @Request() req: CustomRequest,
-    @Query() userTransactionSearchDto: UserTransactionSearchDto,
-  ) {
-    const currentUser = req.user;
-    return this.transactionService.findAll({
-      userId: currentUser.id,
-      ...userTransactionSearchDto,
-    });
   }
 
   @ApiOperation({
