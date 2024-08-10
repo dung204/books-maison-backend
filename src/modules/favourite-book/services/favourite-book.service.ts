@@ -82,4 +82,11 @@ export class FavouriteBookService {
       throw new NotFoundException('Book is not the favourite list.');
     }
   }
+
+  checkHasFavoured(user: User, bookId: string) {
+    return this.favouriteBookRepository.isExistedByUserIdAndBookId(
+      user.id,
+      bookId,
+    );
+  }
 }
