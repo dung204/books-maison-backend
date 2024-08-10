@@ -22,6 +22,7 @@ export function configSwagger(app: INestApplication) {
     )
     .addTag('auth', 'Operations about authentication & authorization')
     .addTag('users', 'Operations about users')
+    .addTag('me', 'Operations for the current authenticated user')
     .addTag('books', 'Operations about books')
     .addTag('favourite-books', 'Operations about favourite books')
     .addTag('authors', 'Operations about authors')

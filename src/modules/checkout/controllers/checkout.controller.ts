@@ -31,11 +31,8 @@ import { AdminCreateCheckoutDto } from '@/modules/checkout/dto/admin-create-chec
 import { CheckoutSearchDto } from '@/modules/checkout/dto/checkout-search.dto';
 import { MarkReturnedCheckoutDto } from '@/modules/checkout/dto/mark-returned-checkout.dto';
 import { UpdateCheckoutNoteDto } from '@/modules/checkout/dto/update-checkout-note.dto';
-import { UserCheckoutSearchDto } from '@/modules/checkout/dto/user-checkout-search.dto';
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 import { CheckoutService } from '@/modules/checkout/services/checkout.service';
-
-import { UserCreateCheckoutDto } from '../dto/user-create-checkout.dto';
 
 @ApiBearerAuth('JWT')
 @ApiTags('checkouts')
@@ -147,40 +144,6 @@ export class CheckoutController {
   }
 
   @ApiOperation({
-    summary: 'Create a checkout (for current authenticated user)',
-  })
-  @ApiSuccessResponse({
-    status: HttpStatus.CREATED,
-    schema: Checkout,
-    isArray: false,
-    description: 'Successful checkout creation.',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'User login is required.',
-  })
-  @ApiBadRequestResponse({
-    description: 'Book ID is invalid or the book is out of stock.',
-  })
-  @ApiConflictResponse({
-    description: 'User has already rented this book.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
-  })
-  @UseGuards(JwtAccessGuard)
-  @Post('/me')
-  createCheckoutUsingCurrentUser(
-    @Request() req: CustomRequest,
-    @Body() userCreateCheckoutDto: UserCreateCheckoutDto,
-  ) {
-    const currentUser = req.user;
-    return this.checkoutService.createCheckoutUsingCurrentUser(
-      currentUser,
-      userCreateCheckoutDto,
-    );
-  }
-
-  @ApiOperation({
     summary: 'Get all checkouts (for ADMIN only)',
   })
   @ApiSuccessResponse({
@@ -204,36 +167,6 @@ export class CheckoutController {
   @Get('/')
   findAll(@Query() checkoutSearchDto: CheckoutSearchDto) {
     return this.checkoutService.findAll(checkoutSearchDto);
-  }
-
-  @ApiOperation({
-    summary: 'Get all checkouts of the current authenticated user',
-  })
-  @ApiSuccessResponse({
-    status: HttpStatus.OK,
-    schema: Checkout,
-    isArray: true,
-    pagination: true,
-    description:
-      'Get all checkouts information successfully (with pagination metadata).',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'User login is required.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
-  })
-  @UseGuards(JwtAccessGuard)
-  @Get('/me')
-  findAllCheckoutsOfCurrentUser(
-    @Request() req: CustomRequest,
-    @Query() userCheckoutSearchDto: UserCheckoutSearchDto,
-  ) {
-    const currentUser = req.user;
-    return this.checkoutService.findAllCheckoutsOfCurrentUser(
-      currentUser,
-      userCheckoutSearchDto,
-    );
   }
 
   @ApiOperation({
