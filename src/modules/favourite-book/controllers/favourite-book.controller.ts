@@ -96,6 +96,7 @@ export class FavouriteBookController {
   @ApiInternalServerErrorResponse({
     description: 'Internal Server Error.',
   })
+  @UseGuards(JwtAccessGuard)
   @Get('/check/:id')
   async checkHasFavoured(
     @Request() req: CustomRequest,
