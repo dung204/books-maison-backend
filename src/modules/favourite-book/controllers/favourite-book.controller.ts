@@ -1,6 +1,7 @@
 import {
   Controller,
   Delete,
+  Get,
   HttpCode,
   HttpStatus,
   Param,
@@ -19,6 +20,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
+import { SuccessResponse } from '@/base/common/responses/success.response';
 import { CustomRequest } from '@/base/common/types/custom-request.type';
 import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
 import { FavouriteBookService } from '@/modules/favourite-book/services/favourite-book.service';
@@ -62,6 +64,9 @@ export class FavouriteBookController {
     description:
       'Delete a book from favourite list of the current authenticated user',
   })
+  @ApiUnauthorizedResponse({
+    description: 'User has not signed in.',
+  })
   @ApiNoContentResponse({
     description: 'Favourite book added successfully.',
   })
@@ -80,5 +85,28 @@ export class FavouriteBookController {
   ) {
     const currentUser = req.user;
     return this.favouriteBookService.deleteFavouriteBook(currentUser, bookId);
+  }
+
+  @ApiOperation({
+    summary: 'Check if a book already added in the current user favourite list',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User has not signed in.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error.',
+  })
+  @Get('/check/:id')
+  async checkHasFavoured(
+    @Request() req: CustomRequest,
+    @Param('id') bookId: string,
+  ): Promise<SuccessResponse<boolean>> {
+    const currentUser = req.user;
+    return {
+      data: await this.favouriteBookService.checkHasFavoured(
+        currentUser,
+        bookId,
+      ),
+    };
   }
 }
