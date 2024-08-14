@@ -37,7 +37,7 @@ export class FavouriteBookRepository extends Repository<FavouriteBook> {
       authorName,
       title,
       publisher,
-      language: languages,
+      language,
       minPages,
       maxPages,
       publishedYearFrom,
@@ -58,154 +58,19 @@ export class FavouriteBookRepository extends Repository<FavouriteBook> {
       .skip(skip)
       .take(pageSize);
 
-    const bookIdsContainingAuthorName = new Set(
-      await this.findBookIdsContainingAuthorName(userId, authorName),
-    );
-    const bookIdsContainingCategoryIds = new Set(
-      await this.findBookIdsContainingCategoryIds(userId, categoryIds),
-    );
-    const bookIdsContainingTitle = new Set(
-      await this.findBookIdsContainingTitle(userId, title),
-    );
-    const bookIdsContainingPublisher = new Set(
-      await this.findBookIdsContainingPublisher(userId, publisher),
-    );
-    const bookIdsContainingLanguages = new Set(
-      await this.findBookIdsContainingLanguages(userId, languages),
-    );
-    const bookIdsContainingPublishedYearBetween = new Set(
-      await this.findBookIdsContainingPublishedYearBetween(
-        userId,
-        publishedYearFrom,
-        publishedYearTo,
-      ),
-    );
-    const bookIdsContainingNumberOfPagesBetween = new Set(
-      await this.findBookIdsContainingNumberOfPagesBetween(
-        userId,
-        minPages,
-        maxPages,
-      ),
-    );
-
-    const bookIds = Array.from(
-      bookIdsContainingAuthorName
-        .intersection(bookIdsContainingCategoryIds)
-        .intersection(bookIdsContainingTitle)
-        .intersection(bookIdsContainingPublisher)
-        .intersection(bookIdsContainingLanguages)
-        .intersection(bookIdsContainingPublishedYearBetween)
-        .intersection(bookIdsContainingNumberOfPagesBetween),
-    );
-
-    if (bookIds.length > 0) {
-      query.andWhere('book.id IN (:...bookIds)', { bookIds });
-    } else {
-      query.andWhere('FALSE');
-    }
-
-    const [favouriteBooks, count] = await query.getManyAndCount();
-    const books = favouriteBooks.map((favouriteBook) => favouriteBook.book);
-    return [books, count] as const;
-  }
-
-  async findBookIdsContainingAuthorName(userId: string, authorName: string) {
-    const query = this.createQueryBuilder('favouriteBook')
-      .leftJoinAndSelect('favouriteBook.book', 'book')
-      .leftJoinAndSelect('book.authors', 'author')
-      .andWhere('favouriteBook.userId = :userId', { userId });
-
-    if (authorName) {
-      query.andWhere('LOWER(author.name) LIKE LOWER(:authorName)', {
-        authorName: `%${authorName}%`,
-      });
-    }
-
-    return (await query.getMany()).map(
-      (favouriteBook) => favouriteBook.book.id,
-    );
-  }
-
-  async findBookIdsContainingCategoryIds(
-    userId: string,
-    categoryIds: string[],
-  ) {
-    const query = this.createQueryBuilder('favouriteBook')
-      .leftJoinAndSelect('favouriteBook.book', 'book')
-      .leftJoinAndSelect('book.categories', 'category')
-      .andWhere('favouriteBook.userId = :userId', { userId });
-
-    if (categoryIds) {
-      categoryIds = categoryIds.filter((id) => id !== '');
-
-      if (categoryIds.length !== 0) {
-        query.andWhere('category.id IN (:...categoryIds)', { categoryIds });
-      }
-    }
-
-    return (await query.getMany()).map(
-      (favouriteBook) => favouriteBook.book.id,
-    );
-  }
-
-  async findBookIdsContainingTitle(userId: string, title: string) {
-    const query = this.createQueryBuilder('favouriteBook')
-      .leftJoinAndSelect('favouriteBook.book', 'book')
-      .andWhere('favouriteBook.userId = :userId', { userId });
-
     if (title) {
       query.andWhere('LOWER(book.title) LIKE LOWER(:title)', {
         title: `%${title}%`,
       });
     }
 
-    return (await query.getMany()).map(
-      (favouriteBook) => favouriteBook.book.id,
-    );
-  }
-
-  async findBookIdsContainingPublisher(userId: string, publisher: string) {
-    const query = this.createQueryBuilder('favouriteBook')
-      .leftJoinAndSelect('favouriteBook.book', 'book')
-      .andWhere('favouriteBook.userId = :userId', { userId });
-
-    if (publisher) {
-      query.andWhere('LOWER(book.publisher) LIKE LOWER(:publisher)', {
-        publisher: `%${publisher}%`,
-      });
+    if (minPages) {
+      query.andWhere('book.numberOfPages >= :minPages', { minPages });
     }
 
-    return (await query.getMany()).map(
-      (favouriteBook) => favouriteBook.book.id,
-    );
-  }
-
-  async findBookIdsContainingLanguages(userId: string, languages: string[]) {
-    const query = this.createQueryBuilder('favouriteBook')
-      .leftJoinAndSelect('favouriteBook.book', 'book')
-      .andWhere('favouriteBook.userId = :userId', { userId });
-
-    if (languages) {
-      languages = languages.filter((language) => language !== '');
-
-      if (languages.length !== 0) {
-        query.andWhere('book.language IN (:...languages)', { languages });
-      }
+    if (maxPages) {
+      query.andWhere('book.numberOfPages <= :maxPages', { maxPages });
     }
-
-    return (await query.getMany()).map(
-      (favouriteBook) => favouriteBook.book.id,
-    );
-  }
-
-  async findBookIdsContainingPublishedYearBetween(
-    userId: string,
-    publishedYearFrom: number,
-    publishedYearTo: number,
-  ) {
-    const query = this.createQueryBuilder('favouriteBook')
-      .leftJoinAndSelect('favouriteBook.book', 'book')
-      .andWhere('favouriteBook.userId = :userId', { userId });
 
     if (publishedYearFrom) {
       query.andWhere('book.publishedYear >= :publishedYearFrom', {
@@ -219,34 +84,60 @@ export class FavouriteBookRepository extends Repository<FavouriteBook> {
       });
     }
 
-    return (await query.getMany()).map(
-      (favouriteBook) => favouriteBook.book.id,
-    );
+    if (publisher) {
+      query.andWhere('LOWER(book.publisher) LIKE LOWER(:publisher)', {
+        publisher: `%${publisher}%`,
+      });
+    }
+
+    if (language) {
+      query.andWhere('LOWER(book.language) LIKE LOWER(:language)', {
+        language: `%${language}%`,
+      });
+    }
+
+    if (authorName) {
+      const bookIds = await this.findBookIdsContainingAuthorName(authorName);
+      query.andWhereInIds(bookIds);
+    }
+
+    if (categoryIds) {
+      categoryIds = categoryIds.filter((id) => id !== '');
+      if (categoryIds.length !== 0) {
+        const bookIds =
+          await this.findBookIdsContainingCategoryIds(categoryIds);
+        query.andWhereInIds(bookIds);
+      }
+    }
+
+    const [favouriteBooks, count] = await query.getManyAndCount();
+    const books = favouriteBooks.map((favouriteBook) => favouriteBook.book);
+    return [books, count] as const;
   }
 
-  async findBookIdsContainingNumberOfPagesBetween(
-    userId: string,
-    minPages: number,
-    maxPages: number,
-  ) {
+  private async findBookIdsContainingAuthorName(authorName: string) {
     const query = this.createQueryBuilder('favouriteBook')
       .leftJoinAndSelect('favouriteBook.book', 'book')
-      .andWhere('favouriteBook.userId = :userId', { userId });
-
-    if (minPages) {
-      query.andWhere('book.numberOfPages >= :minPages', {
-        minPages,
+      .leftJoinAndSelect('book.authors', 'author')
+      .leftJoinAndSelect('book.categories', 'category')
+      .select('book.id')
+      .where('LOWER(author.name) LIKE LOWER(:authorName)', {
+        authorName: `%${authorName}%`,
       });
-    }
 
-    if (maxPages) {
-      query.andWhere('book.numberOfPages <= :maxPages', {
-        maxPages,
-      });
-    }
+    const favouriteBooks = await query.getMany();
+    return favouriteBooks.map((favouriteBook) => favouriteBook.book.id);
+  }
 
-    return (await query.getMany()).map(
-      (favouriteBook) => favouriteBook.book.id,
-    );
+  private async findBookIdsContainingCategoryIds(categoryIds: string[]) {
+    const query = this.createQueryBuilder('favouriteBook')
+      .leftJoinAndSelect('favouriteBook.book', 'book')
+      .leftJoinAndSelect('book.authors', 'author')
+      .leftJoinAndSelect('book.categories', 'category')
+      .select('book.id')
+      .where('category.id IN (:...categoryIds)', { categoryIds });
+
+    const favouriteBooks = await query.getMany();
+    return favouriteBooks.map((favouriteBook) => favouriteBook.book.id);
   }
 }
