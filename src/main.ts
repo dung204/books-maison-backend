@@ -37,7 +37,9 @@ async function bootstrap() {
 
   configSwagger(app);
 
-  app.enableCors();
+  app.enableCors({
+    origin: process.env['FE_URL'],
+  });
 
   httpService.axiosRef.interceptors.response.use(
     (response) => response,
