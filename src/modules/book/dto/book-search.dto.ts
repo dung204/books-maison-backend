@@ -86,20 +86,14 @@ export class BookSearchDto extends OmitType(PaginationQueryDto, ['orderBy']) {
   maxPages?: number;
 
   @ApiProperty({
-    description:
-      'Every books containing at least one of these languages will be returned',
+    description: 'Every books containing this language will be returned',
     required: false,
-  })
-  @Transform(({ value }) => {
-    if (typeof value === 'string') return [value];
-    return value;
   })
   @IsOptional()
   @IsString({
-    each: true,
-    message: 'Languages must be an array of string',
+    message: 'Languages must be a string',
   })
-  language?: string[];
+  language?: string;
 
   @ApiProperty({
     description: `Every books with at least one author's name containing this name will be returned`,
