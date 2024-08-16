@@ -30,6 +30,14 @@ services:
   redis:
     container_name: redis
     image: redis:7.0-alpine
+    command:
+      [
+        'redis-server',
+        '--requirepass',
+        '${REDIS_PASSWORD}',
+        '--appendonly',
+        'yes',
+      ]
     ports:
       - '6379:${REDIS_PORT}'
     volumes:
