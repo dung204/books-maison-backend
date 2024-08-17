@@ -12,6 +12,7 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiConflictResponse,
+  ApiConsumes,
   ApiInternalServerErrorResponse,
   ApiNoContentResponse,
   ApiOperation,
@@ -37,6 +38,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @ApiOperation({ summary: 'Register a new account' })
+  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiBody({
     type: RegisterRequest,
   })
@@ -58,6 +60,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Login to the system' })
+  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiBody({
     type: LoginRequest,
   })
@@ -81,6 +84,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Create new (refresh) tokens' })
+  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiBody({
     type: RefreshRequest,
   })

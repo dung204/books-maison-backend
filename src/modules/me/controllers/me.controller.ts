@@ -14,6 +14,7 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiConflictResponse,
+  ApiConsumes,
   ApiInternalServerErrorResponse,
   ApiNoContentResponse,
   ApiOperation,
@@ -78,6 +79,7 @@ export class MeController {
   }
 
   @ApiOperation({ summary: 'Update profile of current user' })
+  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiSuccessResponse({
     status: HttpStatus.OK,
     schema: UserDto,
@@ -105,6 +107,7 @@ export class MeController {
   }
 
   @ApiOperation({ summary: 'Change the password of current user' })
+  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiNoContentResponse({ description: 'Password is changed successfully' })
   @ApiUnauthorizedResponse({
     description: `- The user is not logged in\n\n- The old password mismatches with the current password`,
@@ -189,6 +192,7 @@ export class MeController {
   @ApiOperation({
     summary: 'Create a checkout (for current authenticated user)',
   })
+  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiSuccessResponse({
     status: HttpStatus.CREATED,
     schema: Checkout,

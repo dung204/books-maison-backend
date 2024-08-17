@@ -13,6 +13,7 @@ import {
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiConsumes,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
@@ -38,6 +39,7 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @ApiBearerAuth('JWT')
+  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiOperation({
     summary: 'Create a new categories (for ADMIN only)',
   })
@@ -107,6 +109,7 @@ export class CategoryController {
   }
 
   @ApiBearerAuth('JWT')
+  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiOperation({
     summary: 'Update a category by ID (for ADMIN only)',
   })

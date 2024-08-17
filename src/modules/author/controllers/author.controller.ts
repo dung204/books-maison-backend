@@ -12,6 +12,7 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiConsumes,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
@@ -37,6 +38,7 @@ export class AuthorController {
   constructor(private readonly authorService: AuthorService) {}
 
   @ApiBearerAuth('JWT')
+  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiOperation({
     summary: 'Create a new author (for ADMIN only)',
   })
@@ -106,6 +108,7 @@ export class AuthorController {
   }
 
   @ApiBearerAuth('JWT')
+  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiOperation({
     summary: 'Update an author by ID (for ADMIN only)',
   })

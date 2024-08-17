@@ -10,7 +10,7 @@ export class LoginRequest {
   email: string;
 
   @ApiProperty({
-    description: 'The password of the user (requires strong password)',
+    description: 'The password of the user',
     example: 'fVs))^vue{lbwIH',
   })
   @IsString()

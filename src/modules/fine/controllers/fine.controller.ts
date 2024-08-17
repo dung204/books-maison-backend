@@ -13,6 +13,7 @@ import {
 import {
   ApiBearerAuth,
   ApiConflictResponse,
+  ApiConsumes,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
@@ -100,6 +101,7 @@ export class FineController {
     summary: 'Pay fine',
     description: `- This route only creates a money transaction to pay the fine. The fine will **NOT** be marked as \`${FineStatus.PAID}\` immediately (since money transactions might fail). However, the fine will certainly be marked as \`${FineStatus.PAID}\` when the corresponding money transaction is saved to the database successfully.\n\n- If using \`${TransactionMethod.CASH}\` method, the current authenticated user must be an \`ADMIN\`.`,
   })
+  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiSuccessResponse({
     status: HttpStatus.CREATED,
     schema: Fine,

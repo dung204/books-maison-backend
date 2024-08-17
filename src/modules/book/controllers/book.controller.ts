@@ -13,6 +13,7 @@ import {
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiConsumes,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
@@ -38,6 +39,7 @@ export class BookController {
   constructor(private readonly bookService: BookService) {}
 
   @ApiBearerAuth('JWT')
+  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiOperation({
     summary: 'Create a new book (for ADMIN only)',
   })
@@ -107,6 +109,7 @@ export class BookController {
   }
 
   @ApiBearerAuth('JWT')
+  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiOperation({
     summary: 'Update a book by ID (for ADMIN only)',
   })

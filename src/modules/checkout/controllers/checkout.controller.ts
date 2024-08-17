@@ -14,6 +14,7 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiConflictResponse,
+  ApiConsumes,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
@@ -43,6 +44,7 @@ export class CheckoutController {
   @ApiOperation({
     summary: 'Create a checkout (for ADMIN only)',
   })
+  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiSuccessResponse({
     status: HttpStatus.CREATED,
     schema: Checkout,
@@ -77,6 +79,7 @@ export class CheckoutController {
   @ApiOperation({
     summary: 'Mark a checkout as returned (for ADMIN only)',
   })
+  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiSuccessResponse({
     status: HttpStatus.CREATED,
     schema: Checkout,
@@ -113,6 +116,7 @@ export class CheckoutController {
   @ApiOperation({
     summary: 'Update note of a checkout (for ADMIN only)',
   })
+  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiSuccessResponse({
     status: HttpStatus.CREATED,
     schema: Checkout,
