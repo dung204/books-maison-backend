@@ -13,6 +13,7 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
+  ApiConsumes,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
@@ -100,6 +101,7 @@ export class TransactionController {
     summary: 'Create a transaction',
     description: 'For cash transactions, only ADMIN can create',
   })
+  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiSuccessResponse({
     status: HttpStatus.OK,
     schema: TransactionDto,
@@ -135,6 +137,7 @@ export class TransactionController {
   @ApiOperation({
     summary: 'Callback route for Momo API to notify Momo transactions',
   })
+  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiBody({
     type: MomoNotifyDto,
     description:
