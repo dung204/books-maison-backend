@@ -6,13 +6,13 @@ import {
   HttpStatus,
   Post,
   Request,
+  UseFilters,
   UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
   ApiBody,
   ApiConflictResponse,
-  ApiConsumes,
-  ApiInternalServerErrorResponse,
   ApiNoContentResponse,
   ApiOperation,
   ApiTags,
@@ -22,6 +22,7 @@ import {
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
 import { CustomRequest } from '@/base/common/types/custom-request.type';
 import { Public } from '@/modules/auth/decorators/public.decorator';
+import { JwtExceptionFilter } from '@/modules/auth/filters/jwt-exception.filter';
 import { LocalAuthGuard } from '@/modules/auth/guards/local-auth.guard';
 import { LoginRequest } from '@/modules/auth/requests/login.request';
 import { RefreshRequest } from '@/modules/auth/requests/refresh.request';
@@ -78,8 +79,8 @@ export class AuthController {
     return this.authService.login(req.user);
   }
 
+  @Public()
   @ApiOperation({ summary: 'Create new (refresh) tokens' })
-  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiBody({
     type: RefreshRequest,
   })
@@ -89,9 +90,13 @@ export class AuthController {
     schema: RefreshSuccessPayload,
     isArray: false,
   })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
+  @ApiUnauthorizedResponse({
+    description: 'Refresh token is blacklisted',
   })
+  @ApiBadRequestResponse({
+    description: 'JWT error (malformed, expired, ...)',
+  })
+  @UseFilters(JwtExceptionFilter)
   @Post('/refresh')
   @HttpCode(HttpStatus.OK)
   async refresh(@Body() { refreshToken }: RefreshRequest) {
