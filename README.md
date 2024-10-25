@@ -78,9 +78,9 @@ yarn install --frozen-lockfile
 
 4. Create a `.env` file in the root of the project. The `.env` **must** contains all variables in the [`.env.example`](.env.example) file.
 
-> **Note**: The `MOMO_IPN_URL` environment variable is the URL that Momo will send the IPN (Instant Payment Notification) to. You must a service like [ngrok](https://ngrok.com/), to expose your local server to the internet, and then use the generated URL as the value for this variable.
+> **Note**: The `MOMO_IPN_URL` environment variable is the URL that Momo will send the IPN (Instant Payment Notification) to. During development, you must a service like [ngrok](https://ngrok.com/), to expose your local server to the internet, and then use the generated URL as the value for this variable.
 
-5. The application **always run in HTTPS mode**, which requires two files: `cert.pem` - the public TLS certificate and `key.pem` - the private key. Both files are stored in the `cert` directory, in the root of the project. You can use [`mkcert`](https://github.com/FiloSottile/mkcert) to generate these files but **only for development purposes**.
+5. The application always runs in HTTPS mode **only when `USE_HTTPS` in `.env` is set to `true`**. This requires two files: `cert.pem` (the public TLS certificate) and `key.pem` (the private key). Both files must be stored in the `cert` directory at the root of the project. You can use [`mkcert`](https://github.com/FiloSottile/mkcert) to generate these files for development purposes.
 
 6. To run the application in development mode, you have to install PostgreSQL and Redis (on your local machine or using Docker). You have to make sure that the PostgreSQL and Redis connection in `.env` file is correct. Once ready, you can run the following command:
 
