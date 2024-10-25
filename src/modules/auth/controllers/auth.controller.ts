@@ -9,7 +9,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
-  ApiBearerAuth,
   ApiBody,
   ApiConflictResponse,
   ApiConsumes,
@@ -21,8 +20,9 @@ import {
 } from '@nestjs/swagger';
 
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
+import { Private } from '@/base/common/decorators/private.decorator';
+import { Public } from '@/base/common/decorators/public.decorator';
 import { CustomRequest } from '@/base/common/types/custom-request.type';
-import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
 import { LocalAuthGuard } from '@/modules/auth/guards/local-auth.guard';
 import { LoginRequest } from '@/modules/auth/requests/login.request';
 import { RefreshRequest } from '@/modules/auth/requests/refresh.request';
@@ -37,8 +37,8 @@ import { UserDto } from '@/modules/user/dto/user.dto';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @Public()
   @ApiOperation({ summary: 'Register a new account' })
-  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiBody({
     type: RegisterRequest,
   })
@@ -51,16 +51,13 @@ export class AuthController {
   @ApiConflictResponse({
     description: 'Email already taken',
   })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error',
-  })
   @Post('/register')
   async register(@Body() registerRequest: RegisterRequest) {
     return this.authService.register(registerRequest);
   }
 
+  @Public()
   @ApiOperation({ summary: 'Login to the system' })
-  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiBody({
     type: LoginRequest,
   })
@@ -72,9 +69,6 @@ export class AuthController {
   })
   @ApiUnauthorizedResponse({
     description: 'The email or password is invalid.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
   })
   @UseGuards(LocalAuthGuard)
   @Post('/login')
@@ -103,20 +97,13 @@ export class AuthController {
     return this.authService.refresh(refreshToken);
   }
 
-  @ApiBearerAuth('JWT')
+  @Private()
   @ApiOperation({
     summary: 'Logout to the system',
   })
   @ApiNoContentResponse({
     description: 'Successful logout',
   })
-  @ApiUnauthorizedResponse({
-    description: 'The user did not log in',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error',
-  })
-  @UseGuards(JwtAccessGuard)
   @Delete('/logout')
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@Request() req: CustomRequest) {

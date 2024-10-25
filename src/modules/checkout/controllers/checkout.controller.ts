@@ -8,26 +8,22 @@ import {
   Post,
   Query,
   Request,
-  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiConflictResponse,
-  ApiConsumes,
   ApiForbiddenResponse,
-  ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOperation,
   ApiTags,
-  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
+import { Admin } from '@/base/common/decorators/admin.decorator';
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
+import { Private } from '@/base/common/decorators/private.decorator';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { CustomRequest } from '@/base/common/types/custom-request.type';
-import { AdminGuard } from '@/modules/auth/guards/admin.guard';
-import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
 import { AdminCreateCheckoutDto } from '@/modules/checkout/dto/admin-create-checkout.dto';
 import { CheckoutSearchDto } from '@/modules/checkout/dto/checkout-search.dto';
 import { MarkReturnedCheckoutDto } from '@/modules/checkout/dto/mark-returned-checkout.dto';
@@ -41,21 +37,15 @@ import { CheckoutService } from '@/modules/checkout/services/checkout.service';
 export class CheckoutController {
   constructor(private readonly checkoutService: CheckoutService) {}
 
+  @Admin()
   @ApiOperation({
     summary: 'Create a checkout (for ADMIN only)',
   })
-  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiSuccessResponse({
     status: HttpStatus.CREATED,
     schema: Checkout,
     isArray: false,
     description: 'Successful checkout creation.',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'User login is required.',
-  })
-  @ApiForbiddenResponse({
-    description: 'The current authenticated user is not an ADMIN.',
   })
   @ApiBadRequestResponse({
     description: 'Book ID is invalid or the book is out of stock.',
@@ -63,10 +53,6 @@ export class CheckoutController {
   @ApiConflictResponse({
     description: 'User has already rented this book.',
   })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
-  })
-  @UseGuards(JwtAccessGuard, AdminGuard)
   @Post('/')
   createCheckoutUsingAdminUser(
     @Body() adminCreateCheckoutDto: AdminCreateCheckoutDto,
@@ -76,21 +62,15 @@ export class CheckoutController {
     );
   }
 
+  @Admin()
   @ApiOperation({
     summary: 'Mark a checkout as returned (for ADMIN only)',
   })
-  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiSuccessResponse({
     status: HttpStatus.CREATED,
     schema: Checkout,
     isArray: false,
     description: 'Checkout is marked as returned successfully.',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'User login is required.',
-  })
-  @ApiForbiddenResponse({
-    description: 'The current authenticated user is not an ADMIN.',
   })
   @ApiNotFoundResponse({
     description: 'Checkout not found.',
@@ -98,10 +78,6 @@ export class CheckoutController {
   @ApiConflictResponse({
     description: 'The checkout has already been marked as RETURNED.',
   })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
-  })
-  @UseGuards(JwtAccessGuard, AdminGuard)
   @Patch('/return/:id')
   markCheckoutAsReturned(
     @Body() markReturnedCheckoutDto: MarkReturnedCheckoutDto,
@@ -113,29 +89,19 @@ export class CheckoutController {
     );
   }
 
+  @Admin()
   @ApiOperation({
     summary: 'Update note of a checkout (for ADMIN only)',
   })
-  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiSuccessResponse({
     status: HttpStatus.CREATED,
     schema: Checkout,
     isArray: false,
     description: 'Checkout note updated successfully.',
   })
-  @ApiUnauthorizedResponse({
-    description: 'User login is required.',
-  })
-  @ApiForbiddenResponse({
-    description: 'The current authenticated user is not an ADMIN.',
-  })
   @ApiNotFoundResponse({
     description: 'Checkout not found.',
   })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
-  })
-  @UseGuards(JwtAccessGuard, AdminGuard)
   @Patch('/note/:id')
   updateCheckoutNote(
     @Param('id') checkoutId: string,
@@ -147,6 +113,7 @@ export class CheckoutController {
     );
   }
 
+  @Admin()
   @ApiOperation({
     summary: 'Get all checkouts (for ADMIN only)',
   })
@@ -158,21 +125,12 @@ export class CheckoutController {
     description:
       'Get all checkouts information successfully (with pagination metadata).',
   })
-  @ApiUnauthorizedResponse({
-    description: 'User login is required',
-  })
-  @ApiForbiddenResponse({
-    description: 'The current authenticated user is not an ADMIN.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
-  })
-  @UseGuards(JwtAccessGuard, AdminGuard)
   @Get('/')
   findAll(@Query() checkoutSearchDto: CheckoutSearchDto) {
     return this.checkoutService.findAll(checkoutSearchDto);
   }
 
+  @Private()
   @ApiOperation({
     summary: 'Get a checkout by ID',
     description:
@@ -184,9 +142,6 @@ export class CheckoutController {
     isArray: false,
     description: 'Checkout is retrieved successfully.',
   })
-  @ApiUnauthorizedResponse({
-    description: 'User login is required.',
-  })
   @ApiForbiddenResponse({
     description:
       'The current authenticated user is not an ADMIN nor the owner of the checkout.',
@@ -194,10 +149,6 @@ export class CheckoutController {
   @ApiNotFoundResponse({
     description: 'Checkout not found.',
   })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
-  })
-  @UseGuards(JwtAccessGuard)
   @Get(':id')
   async findOne(
     @Request() req: CustomRequest,

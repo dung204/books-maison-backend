@@ -7,24 +7,18 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
-  ApiBearerAuth,
-  ApiConsumes,
-  ApiForbiddenResponse,
-  ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOperation,
   ApiTags,
-  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
+import { Admin } from '@/base/common/decorators/admin.decorator';
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
+import { Public } from '@/base/common/decorators/public.decorator';
 import { SuccessResponse } from '@/base/common/responses/success.response';
-import { AdminGuard } from '@/modules/auth/guards/admin.guard';
-import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
 import { AuthorSearchDto } from '@/modules/author/dto/author-search.dto';
 import { Author } from '@/modules/author/entities/author.entity';
 import { AuthorService } from '@/modules/author/services/author.service';
@@ -37,8 +31,7 @@ import { UpdateAuthorDto } from '../dto/update-author.dto';
 export class AuthorController {
   constructor(private readonly authorService: AuthorService) {}
 
-  @ApiBearerAuth('JWT')
-  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+  @Admin()
   @ApiOperation({
     summary: 'Create a new author (for ADMIN only)',
   })
@@ -51,21 +44,12 @@ export class AuthorController {
   @ApiBadRequestResponse({
     description: 'Author information is invalid',
   })
-  @ApiUnauthorizedResponse({
-    description: 'User login is required',
-  })
-  @ApiForbiddenResponse({
-    description: 'The current authenticated user is not an ADMIN.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
-  })
-  @UseGuards(JwtAccessGuard, AdminGuard)
   @Post('/')
   create(@Body() createAuthorDto: CreateAuthorDto) {
     return this.authorService.create(createAuthorDto);
   }
 
+  @Public()
   @ApiOperation({
     summary: 'Get all authors',
   })
@@ -77,14 +61,12 @@ export class AuthorController {
     description:
       'Get all authors information successfully (with pagination metadata).',
   })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
-  })
   @Get('/')
   findAll(@Query() authorSearchDto: AuthorSearchDto) {
     return this.authorService.findAll(authorSearchDto);
   }
 
+  @Public()
   @ApiOperation({
     summary: 'Get an author by ID',
   })
@@ -97,9 +79,6 @@ export class AuthorController {
   @ApiNotFoundResponse({
     description: 'Author is not found',
   })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
-  })
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<SuccessResponse<Author>> {
     return {
@@ -107,8 +86,7 @@ export class AuthorController {
     };
   }
 
-  @ApiBearerAuth('JWT')
-  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+  @Admin()
   @ApiOperation({
     summary: 'Update an author by ID (for ADMIN only)',
   })
@@ -121,16 +99,6 @@ export class AuthorController {
   @ApiBadRequestResponse({
     description: 'Author information is invalid',
   })
-  @ApiUnauthorizedResponse({
-    description: 'User login is required',
-  })
-  @ApiForbiddenResponse({
-    description: 'The current authenticated user is not an ADMIN.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
-  })
-  @UseGuards(JwtAccessGuard, AdminGuard)
   @Patch(':id')
   async update(
     @Param('id') id: string,
