@@ -78,7 +78,12 @@ export class AuthService {
       throw new UnauthorizedException('Refresh token is blacklisted.');
     }
 
-    const { sub: userId } = this.jwtService.decode<JwtPayload>(refreshToken);
+    const { refreshSecret } =
+      this.configService.getOrThrow<JwtConfigOptions>('jwt');
+
+    const { sub: userId } = this.jwtService.verify<JwtPayload>(refreshToken, {
+      secret: refreshSecret,
+    });
     const { id, role } = await this.userRepository.findById(userId);
 
     await this.blacklistToken(refreshToken);

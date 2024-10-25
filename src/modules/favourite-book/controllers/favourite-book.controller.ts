@@ -7,30 +7,26 @@ import {
   Param,
   Post,
   Request,
-  UseGuards,
 } from '@nestjs/common';
 import {
-  ApiBearerAuth,
   ApiConflictResponse,
-  ApiInternalServerErrorResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOperation,
   ApiTags,
-  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { CustomRequest } from '@/base/common/types/custom-request.type';
-import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
+import { Private } from '@/modules/auth/decorators/private.decorator';
 import { FavouriteBookService } from '@/modules/favourite-book/services/favourite-book.service';
 
-@ApiBearerAuth('JWT')
 @ApiTags('favourite-books')
 @Controller('favourite-books')
 export class FavouriteBookController {
   constructor(private readonly favouriteBookService: FavouriteBookService) {}
 
+  @Private()
   @ApiOperation({
     summary: 'Add a favourite book',
     description:
@@ -42,16 +38,9 @@ export class FavouriteBookController {
   @ApiConflictResponse({
     description: 'User has already added this book as favourite book.',
   })
-  @ApiUnauthorizedResponse({
-    description: 'User has not signed in.',
-  })
   @ApiNotFoundResponse({
     description: 'Book not found.',
   })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
-  })
-  @UseGuards(JwtAccessGuard)
   @Post('/add/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   addFavouriteBook(@Request() req: CustomRequest, @Param('id') bookId: string) {
@@ -59,13 +48,11 @@ export class FavouriteBookController {
     return this.favouriteBookService.addFavouriteBook(currentUser, bookId);
   }
 
+  @Private()
   @ApiOperation({
     summary: 'Delete a favourite book',
     description:
       'Delete a book from favourite list of the current authenticated user',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'User has not signed in.',
   })
   @ApiNoContentResponse({
     description: 'Favourite book added successfully.',
@@ -73,10 +60,6 @@ export class FavouriteBookController {
   @ApiNotFoundResponse({
     description: 'Book not found in the favourite list.',
   })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
-  })
-  @UseGuards(JwtAccessGuard)
   @Delete('/delete/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteFavouriteBook(
@@ -87,16 +70,10 @@ export class FavouriteBookController {
     return this.favouriteBookService.deleteFavouriteBook(currentUser, bookId);
   }
 
+  @Private()
   @ApiOperation({
     summary: 'Check if a book already added in the current user favourite list',
   })
-  @ApiUnauthorizedResponse({
-    description: 'User has not signed in.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
-  })
-  @UseGuards(JwtAccessGuard)
   @Get('/check/:id')
   async checkHasFavoured(
     @Request() req: CustomRequest,

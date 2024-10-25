@@ -20,10 +20,12 @@ import { AppModule } from './modules/app/app.module';
 async function bootstrap() {
   const logger = new Logger(bootstrap.name);
   const app = await NestFactory.create(AppModule, {
-    httpsOptions: {
-      key: fs.readFileSync('./cert/key.pem'),
-      cert: fs.readFileSync('./cert/cert.pem'),
-    },
+    ...(process.env['USE_HTTPS'] === 'true' && {
+      httpsOptions: {
+        key: fs.readFileSync('./cert/key.pem'),
+        cert: fs.readFileSync('./cert/cert.pem'),
+      },
+    }),
   });
   const httpService = new HttpService();
 

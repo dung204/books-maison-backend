@@ -8,24 +8,18 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import {
-  ApiBearerAuth,
   ApiBody,
-  ApiConsumes,
-  ApiForbiddenResponse,
-  ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOperation,
   ApiTags,
-  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
 import { SuccessResponse } from '@/base/common/responses/success.response';
-import { AdminGuard } from '@/modules/auth/guards/admin.guard';
-import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
+import { Admin } from '@/modules/auth/decorators/admin.decorator';
+import { Public } from '@/modules/auth/decorators/public.decorator';
 import { BookSearchDto } from '@/modules/book/dto/book-search.dto';
 import { Book } from '@/modules/book/entities/book.entity';
 import { BookService } from '@/modules/book/services/book.service';
@@ -38,8 +32,7 @@ import { UpdateBookDto } from '../dto/update-book.dto';
 export class BookController {
   constructor(private readonly bookService: BookService) {}
 
-  @ApiBearerAuth('JWT')
-  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+  @Admin()
   @ApiOperation({
     summary: 'Create a new book (for ADMIN only)',
   })
@@ -52,21 +45,12 @@ export class BookController {
     isArray: false,
     description: 'Successful book creation',
   })
-  @ApiUnauthorizedResponse({
-    description: 'User login is required',
-  })
-  @ApiForbiddenResponse({
-    description: 'The current authenticated user is not an ADMIN.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
-  })
-  @UseGuards(JwtAccessGuard, AdminGuard)
   @Post('/')
   create(@Body() createBookDto: CreateBookDto) {
     return this.bookService.create(createBookDto);
   }
 
+  @Public()
   @ApiOperation({
     summary: 'Get all books',
   })
@@ -78,14 +62,12 @@ export class BookController {
     description:
       'Get all books information successfully (with pagination metadata).',
   })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
-  })
   @Get('/')
   findAll(@Query() bookSearchDto: BookSearchDto) {
     return this.bookService.findAll(bookSearchDto);
   }
 
+  @Public()
   @ApiOperation({
     summary: 'Get a book by ID',
   })
@@ -98,9 +80,6 @@ export class BookController {
   @ApiNotFoundResponse({
     description: 'Book is not found.',
   })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
-  })
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<SuccessResponse<Book>> {
     return {
@@ -108,8 +87,7 @@ export class BookController {
     };
   }
 
-  @ApiBearerAuth('JWT')
-  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+  @Admin()
   @ApiOperation({
     summary: 'Update a book by ID (for ADMIN only)',
   })
@@ -118,16 +96,6 @@ export class BookController {
     schema: Book,
     isArray: false,
   })
-  @ApiUnauthorizedResponse({
-    description: 'User login is required',
-  })
-  @ApiForbiddenResponse({
-    description: 'The current authenticated user is not an ADMIN.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
-  })
-  @UseGuards(JwtAccessGuard, AdminGuard)
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   async update(
