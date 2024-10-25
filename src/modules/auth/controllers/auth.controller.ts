@@ -20,9 +20,8 @@ import {
 } from '@nestjs/swagger';
 
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
-import { Private } from '@/base/common/decorators/private.decorator';
-import { Public } from '@/base/common/decorators/public.decorator';
 import { CustomRequest } from '@/base/common/types/custom-request.type';
+import { Public } from '@/modules/auth/decorators/public.decorator';
 import { LocalAuthGuard } from '@/modules/auth/guards/local-auth.guard';
 import { LoginRequest } from '@/modules/auth/requests/login.request';
 import { RefreshRequest } from '@/modules/auth/requests/refresh.request';
@@ -31,6 +30,8 @@ import { LoginSuccessPayload } from '@/modules/auth/responses/login-success.resp
 import { RefreshSuccessPayload } from '@/modules/auth/responses/refresh-success.response';
 import { AuthService } from '@/modules/auth/services/auth.service';
 import { UserDto } from '@/modules/user/dto/user.dto';
+
+import { Private } from '../decorators/private.decorator';
 
 @ApiTags('auth')
 @Controller('/auth')

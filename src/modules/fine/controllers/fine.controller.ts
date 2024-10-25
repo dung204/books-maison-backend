@@ -17,10 +17,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { Admin } from '@/base/common/decorators/admin.decorator';
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
-import { Private } from '@/base/common/decorators/private.decorator';
 import { CustomRequest } from '@/base/common/types/custom-request.type';
+import { Admin } from '@/modules/auth/decorators/admin.decorator';
+import { Private } from '@/modules/auth/decorators/private.decorator';
 import { FineSearchDto } from '@/modules/fine/dto/fine-search.dto';
 import { FineDto } from '@/modules/fine/dto/fine.dto';
 import { PayFineDto } from '@/modules/fine/dto/pay-fine.dto';

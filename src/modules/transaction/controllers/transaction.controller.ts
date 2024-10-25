@@ -17,12 +17,12 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { Admin } from '@/base/common/decorators/admin.decorator';
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
-import { Private } from '@/base/common/decorators/private.decorator';
-import { Public } from '@/base/common/decorators/public.decorator';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { CustomRequest } from '@/base/common/types/custom-request.type';
+import { Admin } from '@/modules/auth/decorators/admin.decorator';
+import { Private } from '@/modules/auth/decorators/private.decorator';
+import { Public } from '@/modules/auth/decorators/public.decorator';
 import { CreateTransactionDto } from '@/modules/transaction/dto/create-transaction.dto';
 import { MomoNotifyDto } from '@/modules/transaction/dto/momo-notify.dto';
 import { TransactionSearchDto } from '@/modules/transaction/dto/transaction-search.dto';

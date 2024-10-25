@@ -19,11 +19,11 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { Admin } from '@/base/common/decorators/admin.decorator';
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
-import { Private } from '@/base/common/decorators/private.decorator';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { CustomRequest } from '@/base/common/types/custom-request.type';
+import { Admin } from '@/modules/auth/decorators/admin.decorator';
+import { Private } from '@/modules/auth/decorators/private.decorator';
 import { AdminCreateCheckoutDto } from '@/modules/checkout/dto/admin-create-checkout.dto';
 import { CheckoutSearchDto } from '@/modules/checkout/dto/checkout-search.dto';
 import { MarkReturnedCheckoutDto } from '@/modules/checkout/dto/mark-returned-checkout.dto';

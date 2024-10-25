@@ -16,9 +16,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { Private } from '@/base/common/decorators/private.decorator';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { CustomRequest } from '@/base/common/types/custom-request.type';
+import { Private } from '@/modules/auth/decorators/private.decorator';
 import { FavouriteBookService } from '@/modules/favourite-book/services/favourite-book.service';
 
 @ApiTags('favourite-books')

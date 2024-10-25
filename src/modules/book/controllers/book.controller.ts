@@ -16,10 +16,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { Admin } from '@/base/common/decorators/admin.decorator';
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
-import { Public } from '@/base/common/decorators/public.decorator';
 import { SuccessResponse } from '@/base/common/responses/success.response';
+import { Admin } from '@/modules/auth/decorators/admin.decorator';
+import { Public } from '@/modules/auth/decorators/public.decorator';
 import { BookSearchDto } from '@/modules/book/dto/book-search.dto';
 import { Book } from '@/modules/book/entities/book.entity';
 import { BookService } from '@/modules/book/services/book.service';

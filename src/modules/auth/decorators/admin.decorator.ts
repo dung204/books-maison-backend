@@ -1,9 +1,10 @@
 import { UseGuards, applyDecorators } from '@nestjs/common';
 import { ApiForbiddenResponse } from '@nestjs/swagger';
 
-import { Private } from '@/base/common/decorators/private.decorator';
 import { AdminGuard } from '@/modules/auth/guards/admin.guard';
 import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
+
+import { Private } from './private.decorator';
 
 /**
  * Denotes this route is for ADMIN only

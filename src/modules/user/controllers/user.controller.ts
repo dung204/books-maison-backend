@@ -1,9 +1,9 @@
 import { Controller, Get, HttpStatus, Param, Query } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { Admin } from '@/base/common/decorators/admin.decorator';
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
 import { SuccessResponse } from '@/base/common/responses/success.response';
+import { Admin } from '@/modules/auth/decorators/admin.decorator';
 import { UserSearchDto } from '@/modules/user/dto/user-search.dto';
 import { UserDto } from '@/modules/user/dto/user.dto';
 
