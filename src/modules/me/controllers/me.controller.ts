@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Patch,
   Post,
   Query,
@@ -13,6 +15,7 @@ import {
   ApiBadRequestResponse,
   ApiConflictResponse,
   ApiNoContentResponse,
+  ApiNotFoundResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -119,7 +122,7 @@ export class MeController {
     description:
       'Get all favourite books information successfully (with pagination metadata)',
   })
-  @Get('/favourite-books')
+  @Get('/books/favourite')
   getAllFavouriteBooks(
     @Request() req: CustomRequest,
     @Query() favouriteBookSearchDto: FavouriteBookSearchDto,
@@ -129,6 +132,47 @@ export class MeController {
       currentUser,
       favouriteBookSearchDto,
     );
+  }
+
+  @Private()
+  @ApiOperation({
+    summary: 'Add a book to favourite list of the current authenticated user',
+  })
+  @ApiNoContentResponse({
+    description: 'Favourite book added successfully.',
+  })
+  @ApiConflictResponse({
+    description: 'User has already added this book as favourite book.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Book not found.',
+  })
+  @Post('/books/favourite/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  addFavouriteBook(@Request() req: CustomRequest, @Param('id') bookId: string) {
+    const currentUser = req.user;
+    return this.favouriteBookService.addFavouriteBook(currentUser, bookId);
+  }
+
+  @Private()
+  @ApiOperation({
+    summary:
+      'Delete a book from favourite list of the current authenticated user',
+  })
+  @ApiNoContentResponse({
+    description: 'Favourite book added successfully.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Book not found in the favourite list.',
+  })
+  @Delete('/books/favourite/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  deleteFavouriteBook(
+    @Request() req: CustomRequest,
+    @Param('id') bookId: string,
+  ) {
+    const currentUser = req.user;
+    return this.favouriteBookService.deleteFavouriteBook(currentUser, bookId);
   }
 
   @Private()
