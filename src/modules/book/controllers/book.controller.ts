@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  Request,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -18,9 +19,11 @@ import {
 
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
 import { SuccessResponse } from '@/base/common/responses/success.response';
+import { CustomRequest } from '@/base/common/types/custom-request.type';
 import { Admin } from '@/modules/auth/decorators/admin.decorator';
-import { Public } from '@/modules/auth/decorators/public.decorator';
+import { OptionalAuth } from '@/modules/auth/decorators/optional-auth.decorator';
 import { BookSearchDto } from '@/modules/book/dto/book-search.dto';
+import { BookDto } from '@/modules/book/dto/book.dto';
 import { Book } from '@/modules/book/entities/book.entity';
 import { BookService } from '@/modules/book/services/book.service';
 
@@ -50,26 +53,34 @@ export class BookController {
     return this.bookService.create(createBookDto);
   }
 
-  @Public()
+  @OptionalAuth()
   @ApiOperation({
     summary: 'Get all books',
+    description:
+      'This endpoint is public. If a user is signed in, he will know whether a book is in his favourite list, and whether he is borrowing this book',
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
-    schema: Book,
+    schema: BookDto,
     isArray: true,
     pagination: true,
     description:
       'Get all books information successfully (with pagination metadata).',
   })
   @Get('/')
-  findAll(@Query() bookSearchDto: BookSearchDto) {
-    return this.bookService.findAll(bookSearchDto);
+  findAll(
+    @Request() req: CustomRequest,
+    @Query() bookSearchDto: BookSearchDto,
+  ) {
+    const currentUser = req.user;
+    return this.bookService.findAll(bookSearchDto, currentUser);
   }
 
-  @Public()
+  @OptionalAuth()
   @ApiOperation({
     summary: 'Get a book by ID',
+    description:
+      'This endpoint is public. If a user is signed in, he will know whether a book is in his favourite list, and whether he is borrowing this book',
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
@@ -81,9 +92,13 @@ export class BookController {
     description: 'Book is not found.',
   })
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<SuccessResponse<Book>> {
+  async findOne(
+    @Request() req: CustomRequest,
+    @Param('id') id: string,
+  ): Promise<SuccessResponse<Book>> {
+    const currentUser = req.user;
     return {
-      data: await this.bookService.findOne(id),
+      data: await this.bookService.findOne(id, currentUser),
     };
   }
 

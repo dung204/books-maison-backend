@@ -1,19 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Exclude, Expose, plainToInstance } from 'class-transformer';
 
+import { BookUserDataDto } from '@/modules/book/dto/book-user-data.dto';
 import { Book } from '@/modules/book/entities/book.entity';
 
-@Exclude()
 export class BookDto extends Book {
-  @Expose()
   @ApiProperty({
-    description: 'Indicating that the current user is favouring this book',
-    example: true,
-    default: false,
+    description:
+      'Additional data of the current logged in user related to this book',
   })
-  isFavouring: boolean;
-
-  public static fromBook(book: Book) {
-    return plainToInstance(BookDto, book);
-  }
+  userData?: BookUserDataDto;
 }

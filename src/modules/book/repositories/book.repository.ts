@@ -5,9 +5,14 @@ import { rawToEntity } from '@/base/utils/raw-to-entity.util';
 import { StringUtils } from '@/base/utils/string.utils';
 import { Author } from '@/modules/author/entities/author.entity';
 import { BookSearchDto } from '@/modules/book/dto/book-search.dto';
+import { BookDto } from '@/modules/book/dto/book.dto';
 import { Book } from '@/modules/book/entities/book.entity';
 import { BookOrderableField } from '@/modules/book/enums/book-orderable-field.enum';
 import { Category } from '@/modules/category/entities/category.entity';
+import { Checkout } from '@/modules/checkout/entities/checkout.entity';
+import { CheckoutStatus } from '@/modules/checkout/enums/checkout-status.enum';
+import { FavouriteBook } from '@/modules/favourite-book/entities/favourite-book.entity';
+import { User } from '@/modules/user/entities/user.entity';
 
 @Injectable()
 export class BookRepository extends Repository<Book> {
@@ -15,19 +20,28 @@ export class BookRepository extends Repository<Book> {
     super(Book, dataSource.createEntityManager());
   }
 
-  async findById(id: string) {
+  async findById(id: string, user?: User) {
     const query = this.createQueryBuilder('book')
       .leftJoinAndSelect('book.authors', 'author')
       .leftJoinAndSelect('book.categories', 'category')
       .where('book.id = :id', { id });
 
+    this.addSelectUserData(query, user);
+
     const rawResults = await query.getRawMany();
 
     if (rawResults.length === 0) return null;
 
-    const result = rawToEntity(Book, rawResults[0], 'book');
+    const result = rawToEntity(BookDto, rawResults[0], 'book');
     result.categories = [];
     result.authors = [];
+
+    if (user) {
+      result.userData = {
+        isBorrowing: rawResults[0].isBorrowing,
+        isFavouring: rawResults[0].isFavouring,
+      };
+    }
 
     rawResults.forEach((item) => {
       const categoryId = item['category_id'];
@@ -47,6 +61,7 @@ export class BookRepository extends Repository<Book> {
 
   async findAllAndCount(
     bookSearchDto: BookSearchDto,
+    user?: User,
   ): Promise<[Book[], number]> {
     const actualOrderBy = Object.values(BookOrderableField).includes(
       bookSearchDto.orderBy,
@@ -67,8 +82,10 @@ export class BookRepository extends Repository<Book> {
 
     await this.setFindAllFilter(countQuery, bookSearchDto);
 
+    this.addSelectUserData(query, user);
+
     const rawBooks = await query.getRawMany();
-    const mappedBooks: Record<string, Book> = {};
+    const mappedBooks: Record<string, BookDto> = {};
 
     rawBooks.forEach((book) => {
       const bookId = book['book_id'];
@@ -93,6 +110,12 @@ export class BookRepository extends Repository<Book> {
         ...rawToEntity(Book, book, 'book'),
         categories: [rawToEntity(Category, book, 'category')],
         authors: [rawToEntity(Author, book, 'author')],
+        ...(user && {
+          userData: {
+            isFavouring: book.isFavouring,
+            isBorrowing: book.isBorrowing,
+          },
+        }),
       };
     });
 
@@ -131,6 +154,55 @@ export class BookRepository extends Repository<Book> {
       .select(`DISTINCT "temp"."book_id"`)
       .addOrderBy(`"temp"."book_id"`, 'ASC')
       .from(`(${subQuery2.getQuery()})`, 'temp');
+  }
+
+  private addSelectUserData(query: SelectQueryBuilder<Book>, user?: User) {
+    if (user) {
+      query
+        .leftJoin(
+          FavouriteBook,
+          'favouriteBook',
+          'book.id = favouriteBook.bookId',
+        )
+        .leftJoin(Checkout, 'checkout', 'checkout.book.id = book.id')
+        .addSelect(
+          `CASE WHEN EXISTS${this.isUserFavouringSubQuery(query, user.id)} THEN true ELSE false END`,
+          'isFavouring',
+        )
+        .addSelect(
+          `CASE WHEN EXISTS${this.isUserBorrowingSubQuery(query, user.id)} THEN true ELSE false END`,
+          'isBorrowing',
+        );
+    }
+  }
+
+  private isUserFavouringSubQuery(
+    query: SelectQueryBuilder<Book>,
+    userId: string,
+  ) {
+    return query
+      .subQuery()
+      .select('*')
+      .from(FavouriteBook, 'favouriteBook')
+      .where(`favouriteBook.userId = '${userId}'`)
+      .andWhere('favouriteBook.bookId = book.id')
+      .getQuery();
+  }
+
+  private isUserBorrowingSubQuery(
+    query: SelectQueryBuilder<Book>,
+    userId: string,
+  ) {
+    return query
+      .subQuery()
+      .select('*')
+      .from(Checkout, 'checkout')
+      .where(`checkout.user.id = '${userId}'`)
+      .andWhere('checkout.book.id = book.id')
+      .andWhere(
+        `checkout.status IN ('${CheckoutStatus.BORROWING}', '${CheckoutStatus.OVERDUE}')`,
+      )
+      .getQuery();
   }
 
   private async setFindAllFilter(

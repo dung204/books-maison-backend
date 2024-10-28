@@ -4,9 +4,11 @@ import { DeepPartial } from 'typeorm';
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { AuthorService } from '@/modules/author/services/author.service';
 import { BookSearchDto } from '@/modules/book/dto/book-search.dto';
+import { BookDto } from '@/modules/book/dto/book.dto';
 import { Book } from '@/modules/book/entities/book.entity';
 import { BookRepository } from '@/modules/book/repositories/book.repository';
 import { CategoryService } from '@/modules/category/services/category.service';
+import { User } from '@/modules/user/entities/user.entity';
 
 import { CreateBookDto } from '../dto/create-book.dto';
 import { UpdateBookDto } from '../dto/update-book.dto';
@@ -49,10 +51,13 @@ export class BookService {
 
   async findAll(
     bookSearchDto: BookSearchDto,
-  ): Promise<SuccessResponse<Book[]>> {
+    user?: User,
+  ): Promise<SuccessResponse<BookDto[]>> {
     const { page, pageSize } = bookSearchDto;
-    const [books, total] =
-      await this.bookRepository.findAllAndCount(bookSearchDto);
+    const [books, total] = await this.bookRepository.findAllAndCount(
+      bookSearchDto,
+      user,
+    );
     const totalPage = Math.ceil(total / pageSize);
 
     return {
@@ -68,8 +73,8 @@ export class BookService {
     };
   }
 
-  async findOne(id: string) {
-    const book = await this.bookRepository.findById(id);
+  async findOne(id: string, user?: User) {
+    const book = await this.bookRepository.findById(id, user);
 
     if (!book) throw new NotFoundException('Book not found.');
 
