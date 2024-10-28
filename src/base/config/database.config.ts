@@ -14,5 +14,6 @@ export default registerAs(
     autoLoadEntities: true,
     synchronize: false,
     namingStrategy: new SnakeNamingStrategy(),
+    logging: process.env.NODE_ENV === 'development',
   }),
 );
