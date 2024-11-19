@@ -1,6 +1,7 @@
 FROM node:22.3.0-alpine AS base
 RUN npm i -g pnpm
-COPY . /usr/src/app
+COPY package.json pnpm-lock.yaml /usr/src/app/
+COPY .husky /usr/src/app/.husky
 WORKDIR /usr/src/app
 
 FROM base AS prod-deps
@@ -12,10 +13,13 @@ RUN pnpm install --frozen-lockfile
 
 FROM base AS build
 COPY --from=dev-deps /usr/src/app/node_modules /usr/src/app/node_modules
+COPY . /usr/src/app/
 RUN pnpm run build
 
 FROM base AS release
+ENV NODE_ENV=production
 COPY --from=prod-deps /usr/src/app/node_modules /usr/src/app/node_modules
 COPY --from=build /usr/src/app/dist /usr/src/app/dist
+COPY .env /usr/src/app/.env
 
 CMD [ "pnpm", "start:prod" ]
