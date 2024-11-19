@@ -6,14 +6,13 @@ import {
   HttpStatus,
   Post,
   Request,
+  UseFilters,
   UseGuards,
 } from '@nestjs/common';
 import {
-  ApiBearerAuth,
+  ApiBadRequestResponse,
   ApiBody,
   ApiConflictResponse,
-  ApiConsumes,
-  ApiInternalServerErrorResponse,
   ApiNoContentResponse,
   ApiOperation,
   ApiTags,
@@ -22,7 +21,8 @@ import {
 
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
 import { CustomRequest } from '@/base/common/types/custom-request.type';
-import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
+import { Public } from '@/modules/auth/decorators/public.decorator';
+import { JwtExceptionFilter } from '@/modules/auth/filters/jwt-exception.filter';
 import { LocalAuthGuard } from '@/modules/auth/guards/local-auth.guard';
 import { LoginRequest } from '@/modules/auth/requests/login.request';
 import { RefreshRequest } from '@/modules/auth/requests/refresh.request';
@@ -32,13 +32,15 @@ import { RefreshSuccessPayload } from '@/modules/auth/responses/refresh-success.
 import { AuthService } from '@/modules/auth/services/auth.service';
 import { UserDto } from '@/modules/user/dto/user.dto';
 
+import { Private } from '../decorators/private.decorator';
+
 @ApiTags('auth')
 @Controller('/auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @Public()
   @ApiOperation({ summary: 'Register a new account' })
-  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiBody({
     type: RegisterRequest,
   })
@@ -51,16 +53,13 @@ export class AuthController {
   @ApiConflictResponse({
     description: 'Email already taken',
   })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error',
-  })
   @Post('/register')
   async register(@Body() registerRequest: RegisterRequest) {
     return this.authService.register(registerRequest);
   }
 
+  @Public()
   @ApiOperation({ summary: 'Login to the system' })
-  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiBody({
     type: LoginRequest,
   })
@@ -73,9 +72,6 @@ export class AuthController {
   @ApiUnauthorizedResponse({
     description: 'The email or password is invalid.',
   })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
-  })
   @UseGuards(LocalAuthGuard)
   @Post('/login')
   @HttpCode(HttpStatus.OK)
@@ -83,8 +79,8 @@ export class AuthController {
     return this.authService.login(req.user);
   }
 
+  @Public()
   @ApiOperation({ summary: 'Create new (refresh) tokens' })
-  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
   @ApiBody({
     type: RefreshRequest,
   })
@@ -94,29 +90,26 @@ export class AuthController {
     schema: RefreshSuccessPayload,
     isArray: false,
   })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error.',
+  @ApiUnauthorizedResponse({
+    description: 'Refresh token is blacklisted',
   })
+  @ApiBadRequestResponse({
+    description: 'JWT error (malformed, expired, ...)',
+  })
+  @UseFilters(JwtExceptionFilter)
   @Post('/refresh')
   @HttpCode(HttpStatus.OK)
   async refresh(@Body() { refreshToken }: RefreshRequest) {
     return this.authService.refresh(refreshToken);
   }
 
-  @ApiBearerAuth('JWT')
+  @Private()
   @ApiOperation({
     summary: 'Logout to the system',
   })
   @ApiNoContentResponse({
     description: 'Successful logout',
   })
-  @ApiUnauthorizedResponse({
-    description: 'The user did not log in',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error',
-  })
-  @UseGuards(JwtAccessGuard)
   @Delete('/logout')
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@Request() req: CustomRequest) {

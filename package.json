@@ -5,12 +5,11 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
-  "packageManager": "yarn@1.22.22",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "start:dev": "set NODE_ENV=dev && nest start --watch --exec \"node -r tsconfig-paths/register -r ts-node/register ./src/main.ts\"",
+    "start:dev": "set NODE_ENV=development && nest start --watch --exec \"node -r tsconfig-paths/register -r ts-node/register ./src/main.ts\"",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
@@ -20,11 +19,11 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "typeorm": "ts-node ./node_modules/typeorm/cli",
-    "migration:generate": "yarn typeorm -d ./src/base/config/migration.config.ts migration:generate",
+    "migration:generate": "yarn build && yarn typeorm -d ./src/base/config/migration.config.ts migration:generate",
     "migration:create": "yarn typeorm migration:create",
-    "migration:run": "yarn typeorm -d ./src/base/config/migration.config.ts migration:run",
-    "migration:revert": "yarn typeorm -d ./src/base/config/migration.config.ts migration:revert",
-    "prepare": "husky"
+    "migration:run": "nest build && yarn typeorm -d ./src/base/config/migration.config.ts migration:run",
+    "migration:revert": "yarn build && yarn typeorm -d ./src/base/config/migration.config.ts migration:revert",
+    "prepare": "node .husky/install.mjs"
   },
   "dependencies": {
     "@liaoliaots/nestjs-redis": "^9.0.5",
@@ -46,6 +45,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "date-fns": "^3.6.0",
+    "dotenv": "^16.4.5",
     "ioredis": "^5.4.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
@@ -104,7 +104,7 @@
   "lint-staged": {
     "*.{ts,tsx}": [
       "eslint --fix",
-      "prettier --write"
+      "prettier --write --ignore-unknown"
     ]
   }
 }

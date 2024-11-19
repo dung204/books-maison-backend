@@ -6,7 +6,8 @@ Dockerfile
 .prettierrc
 .gitignore
 .eslintrc.js
-README.md
+*.md
 .env.example
 .env*.local
+LICENSE
 dist
