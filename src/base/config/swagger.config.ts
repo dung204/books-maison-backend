@@ -29,6 +29,7 @@ export function configSwagger(app: INestApplication) {
     .addTag('checkouts', 'Operations about checkouts')
     .addTag('fines', 'Operations about fines')
     .addTag('transactions', 'Operations about money transactions')
+    .addTag('media', 'Operations about media (powered by Cloudinary)')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

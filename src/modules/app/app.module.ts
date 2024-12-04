@@ -18,6 +18,7 @@ import { CheckoutModule } from '@/modules/checkout/checkout.module';
 import { FavouriteBookModule } from '@/modules/favourite-book/favourite-book.module';
 import { FineModule } from '@/modules/fine/fine.module';
 import { MeModule } from '@/modules/me/me.module';
+import { MediaModule } from '@/modules/media/media.module';
 import { TransactionModule } from '@/modules/transaction/transaction.module';
 import { UserModule } from '@/modules/user/user.module';
 
@@ -44,6 +45,7 @@ import { UserModule } from '@/modules/user/user.module';
       global: true,
     }),
     DatabaseModule,
+    MediaModule,
     AuthModule,
     UserModule,
     MeModule,
