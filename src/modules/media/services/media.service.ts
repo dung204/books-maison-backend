@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import {
   TransformationOptions,
   UploadApiErrorResponse,
@@ -8,6 +8,7 @@ import {
 import { Readable } from 'stream';
 
 import { SuccessResponse } from '@/base/common/responses/success.response';
+import { DeleteMediaDto } from '@/modules/media/dto/delete-media.dto';
 import { UploadSuccessDto } from '@/modules/media/dto/upload-success.dto';
 
 @Injectable()
@@ -53,5 +54,20 @@ export class MediaService {
         url: result.secure_url,
       },
     };
+  }
+
+  async deleteFile({ name, folder }: DeleteMediaDto) {
+    const fileName = !folder ? name : `${folder}/${name}`;
+
+    const result = await cloudinary.api.delete_resources(
+      [!folder ? name : `${folder}/${name}`],
+      {
+        type: 'upload',
+      },
+    );
+
+    if (result.deleted_counts[fileName].original === 0) {
+      throw new NotFoundException('Media is not found.');
+    }
   }
 }
