@@ -14,6 +14,7 @@ import { UploadSuccessDto } from '@/modules/media/dto/upload-success.dto';
 export class MediaService {
   async uploadFile(
     file: Express.Multer.File,
+    folder?: string,
   ): Promise<SuccessResponse<UploadSuccessDto>> {
     let transformation: TransformationOptions;
 
@@ -31,7 +32,7 @@ export class MediaService {
       [UploadApiResponse | null, UploadApiErrorResponse | null]
     >((resolve) => {
       const uploadStream = cloudinary.uploader.upload_stream(
-        { transformation, resource_type: 'auto' },
+        { transformation, resource_type: 'auto', folder },
         (error: UploadApiErrorResponse, result: UploadApiResponse) => {
           if (error) resolve([null, error]);
           resolve([result, null]);
