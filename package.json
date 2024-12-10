@@ -18,11 +18,10 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "typeorm": "ts-node ./node_modules/typeorm/cli",
-    "migration:generate": "yarn build && yarn typeorm -d ./src/base/config/migration.config.ts migration:generate",
-    "migration:create": "yarn typeorm migration:create",
-    "migration:run": "nest build && yarn typeorm -d ./src/base/config/migration.config.ts migration:run",
-    "migration:revert": "yarn build && yarn typeorm -d ./src/base/config/migration.config.ts migration:revert",
+    "migration:generate": "pnpm typeorm -d ./dist/base/config/migration.config.js migration:generate",
+    "migration:create": "pnpm typeorm migration:create",
+    "migration:run": "pnpm typeorm -d ./dist/base/config/migration.config.js migration:run",
+    "migration:revert": "pnpm typeorm -d ./dist/base/config/migration.config.js migration:revert",
     "prepare": "node .husky/install.mjs"
   },
   "dependencies": {
