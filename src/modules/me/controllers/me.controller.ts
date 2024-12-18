@@ -35,6 +35,9 @@ import { FavouriteBookService } from '@/modules/favourite-book/services/favourit
 import { FineDto } from '@/modules/fine/dto/fine.dto';
 import UserFineSearchDto from '@/modules/fine/dto/user-fine-search.dto';
 import { FineService } from '@/modules/fine/services/fine.service';
+import { AvatarDto } from '@/modules/me/dtos/avatar.dto';
+import { SetAvatarDto } from '@/modules/me/dtos/set-avatar.dto';
+import { AvatarService } from '@/modules/me/services/avatar.service';
 import { UserTransactionSearchDto } from '@/modules/transaction/dto/user-transaction-search.dto';
 import { Transaction } from '@/modules/transaction/entities/transaction.entity';
 import { TransactionService } from '@/modules/transaction/services/transaction.service';
@@ -52,6 +55,7 @@ export class MeController {
     private readonly checkoutService: CheckoutService,
     private readonly fineService: FineService,
     private readonly transactionService: TransactionService,
+    private readonly avatarService: AvatarService,
   ) {}
 
   @Private()
@@ -89,6 +93,31 @@ export class MeController {
   ) {
     const currentUser = req.user;
     return this.userService.update(currentUser.id, updateProfileRequest);
+  }
+
+  @Private()
+  @ApiOperation({
+    summary: 'Set the avatar for the current user',
+    description:
+      'This route is **NOT responsible for uploading the avatar to Cloudinary**. Use [`/api/v1/media/upload`](#/media/MediaController_uploadFile) to upload the avatar first, then use this route to set the avatar for the user',
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: AvatarDto,
+    isArray: false,
+  })
+  @ApiNotFoundResponse({
+    description: 'Assets name not available in Cloudinary',
+  })
+  @ApiConflictResponse({
+    description: 'The avatar ID has already existed',
+  })
+  @Patch('/avatar')
+  async setAvatar(
+    @Request() req: CustomRequest,
+    @Body() setAvatarDto: SetAvatarDto,
+  ) {
+    return this.avatarService.setAvatar(req.user, setAvatarDto);
   }
 
   @Private()

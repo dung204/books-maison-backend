@@ -9,6 +9,7 @@ import { Readable } from 'stream';
 
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { DeleteMediaDto } from '@/modules/media/dto/delete-media.dto';
+import { GetMediaDto } from '@/modules/media/dto/get-media.dto';
 import { UploadSuccessDto } from '@/modules/media/dto/upload-success.dto';
 
 @Injectable()
@@ -69,5 +70,21 @@ export class MediaService {
     if (result.deleted_counts[fileName].original === 0) {
       throw new NotFoundException('Media is not found.');
     }
+  }
+
+  /**
+   * Checks whether file has already existed in Cloudinary
+   */
+  async checkFileExists({ name, folder }: GetMediaDto) {
+    const fileName = !folder ? name : `${folder}/${name}`;
+
+    try {
+      await cloudinary.api.resource(fileName);
+    } catch (errRes: any) {
+      const { error } = errRes;
+      throw new HttpException(error.message, error.http_code);
+    }
+
+    return true;
   }
 }

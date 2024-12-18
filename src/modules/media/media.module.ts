@@ -18,5 +18,6 @@ import { MediaService } from '@/modules/media/services/media.service';
     },
     MediaService,
   ],
+  exports: [MediaService],
 })
 export class MediaModule {}

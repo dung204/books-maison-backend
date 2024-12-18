@@ -24,6 +24,7 @@ export class UserRepository extends Repository<User> {
   }: UserSearchDto) {
     const skip = (page - 1) * pageSize;
     const query = this.createQueryBuilder('user')
+      .leftJoinAndSelect('user.avatar', 'avatar')
       .orderBy(this.resolveOrderBy(orderBy), order)
       .skip(skip)
       .take(pageSize);
@@ -50,11 +51,20 @@ export class UserRepository extends Repository<User> {
   }
 
   findByEmail(email: string) {
-    return this.findOneBy({ email });
+    const query = this.createQueryBuilder('user')
+      .leftJoinAndSelect('user.avatar', 'avatar')
+      .where('user.email = :email', { email });
+
+    return query.getOne();
   }
 
   findById(id: string) {
-    return this.findOneBy({ id });
+    return this.findOne({
+      select: {
+        avatar: { id: true, offsetX: true, offsetY: true, zoom: true },
+      },
+      where: { id },
+    });
   }
 
   async createUser(createUserDto: CreateUserDto) {
