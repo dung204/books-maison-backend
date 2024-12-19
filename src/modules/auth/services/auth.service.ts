@@ -1,4 +1,4 @@
-import { InjectRedis } from '@liaoliaots/nestjs-redis';
+import { RedisService } from '@liaoliaots/nestjs-redis';
 import {
   ConflictException,
   Inject,
@@ -24,13 +24,16 @@ import { UserRepository } from '@/modules/user/repositories/user.repository';
 @Injectable()
 export class AuthService {
   private readonly BLACKLISTED = 'BLACKLISTED';
+  private readonly redis: Redis;
 
   constructor(
     @Inject(UserRepository) private userRepository: UserRepository,
     private jwtService: JwtService,
     private configService: ConfigService,
-    @InjectRedis() private readonly redis: Redis,
-  ) {}
+    private readonly redisService: RedisService,
+  ) {
+    this.redis = this.redisService.getOrThrow();
+  }
 
   async register(
     registerRequest: RegisterRequest,
