@@ -59,12 +59,11 @@ export class UserRepository extends Repository<User> {
   }
 
   findById(id: string) {
-    return this.findOne({
-      select: {
-        avatar: { id: true, offsetX: true, offsetY: true, zoom: true },
-      },
-      where: { id },
-    });
+    const query = this.createQueryBuilder('user')
+      .leftJoinAndSelect('user.avatar', 'avatar')
+      .where('user.id = :id', { id });
+
+    return query.getOne();
   }
 
   async createUser(createUserDto: CreateUserDto) {
