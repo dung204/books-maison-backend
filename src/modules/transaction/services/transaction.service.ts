@@ -1,4 +1,4 @@
-import { InjectRedis } from '@liaoliaots/nestjs-redis';
+import { RedisService } from '@liaoliaots/nestjs-redis';
 import { HttpService } from '@nestjs/axios';
 import {
   BadRequestException,
@@ -34,6 +34,7 @@ import { UserService } from '@/modules/user/services/user.service';
 export class TransactionService {
   private readonly logger: Logger = new Logger(TransactionService.name);
   private readonly MOMO_RESULT_CODE_SUCCESS = 0;
+  private readonly redis: Redis;
 
   constructor(
     @Inject(TransactionRepository)
@@ -41,9 +42,11 @@ export class TransactionService {
     private readonly userService: UserService,
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
-    @InjectRedis() private readonly redis: Redis,
+    private readonly redisService: RedisService,
     private readonly eventEmitter: EventEmitter2,
-  ) {}
+  ) {
+    this.redis = this.redisService.getOrThrow();
+  }
 
   async findAll(
     transactionSearchDto: TransactionSearchDto,

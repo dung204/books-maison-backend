@@ -13,7 +13,7 @@ export default new DataSource({
   database: process.env.DB_DATABASE_NAME,
   synchronize: false,
   entities: ['dist/**/*.entity.js'],
-  migrations: ['dist/**/database/migrations/*{.ts,.js}'],
+  migrations: ['dist/**/database/migrations/*.js'],
   logging: true,
   namingStrategy: new SnakeNamingStrategy(),
 });

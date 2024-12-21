@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose, plainToInstance } from 'class-transformer';
 
+import { AvatarDto } from '@/modules/me/dtos/avatar.dto';
 import { User } from '@/modules/user/entities/user.entity';
 
 @Exclude()
@@ -39,6 +40,13 @@ export class UserDto {
   })
   @Expose()
   address: string;
+
+  @ApiProperty({
+    description: 'Metadata related to the avatar of the user',
+    type: AvatarDto,
+  })
+  @Expose()
+  avatar: AvatarDto;
 
   @ApiProperty({
     description: 'The timestamp indicating when the user is created',

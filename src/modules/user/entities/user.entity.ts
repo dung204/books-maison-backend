@@ -1,6 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { Role } from '@/base/common/enum/role.enum';
+import { Avatar } from '@/modules/me/entities/avatar.entity';
 
 @Entity({ schema: 'public', name: 'users' })
 export class User {
@@ -21,6 +28,14 @@ export class User {
 
   @Column('character varying', { length: 256, nullable: true })
   address: string;
+
+  @OneToOne(() => Avatar, {
+    cascade: true,
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn()
+  avatar: Avatar;
 
   @Column('enum', { enum: Role, default: Role.USER })
   role: Role;
