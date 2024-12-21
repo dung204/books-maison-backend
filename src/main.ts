@@ -55,6 +55,7 @@ async function bootstrap() {
 
   await app.listen(process.env['APP_PORT'] || 3000, () => {
     logger.log(`Server is running on port: ${process.env['APP_PORT'] || 3000}`);
+    logger.log(`Current environment is: ${process.env.NODE_ENV}`);
   });
 }
 bootstrap();

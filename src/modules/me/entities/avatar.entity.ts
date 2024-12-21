@@ -19,4 +19,7 @@ export class Avatar {
 
   @Column('decimal')
   zoom: number;
+
+  @Column('decimal')
+  baseDimension: number;
 }

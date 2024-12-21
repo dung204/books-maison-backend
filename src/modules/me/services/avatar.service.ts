@@ -34,13 +34,13 @@ export class AvatarService {
       folder: this.AVATAR_FOLDER,
     });
 
-    const oldAvatar = await this.avatarRepository.findOneBy({ user });
+    const oldAvatar = await this.avatarRepository.findByUserId(user.id);
     if (oldAvatar) {
       await this.mediaService.deleteFile({
         name: oldAvatar.id,
         folder: this.AVATAR_FOLDER,
       });
-      await this.avatarRepository.delete(oldAvatar);
+      await this.avatarRepository.delete({ id: oldAvatar.id });
     }
 
     const newAvatar = new Avatar();

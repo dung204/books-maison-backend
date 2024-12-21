@@ -30,11 +30,19 @@ export class AvatarDto {
 
   @ApiProperty({
     description:
-      'The zoom ratio of the avatar compared to the original avatar which is scaled to a height of 300px',
+      'The zoom ratio of the avatar compared to the original avatar which is scaled to a height of 300px.',
     example: 1,
   })
   @Expose()
   zoom: number;
+
+  @ApiProperty({
+    description:
+      'The dimension length of the preview image element in the frontend when the image is uploaded from local.',
+    example: 300,
+  })
+  @Expose()
+  baseDimension: number;
 
   public static fromAvatar(avatar: Avatar) {
     return plainToInstance(AvatarDto, avatar);

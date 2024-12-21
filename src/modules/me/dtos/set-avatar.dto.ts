@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsPositive, IsString } from 'class-validator';
 
 export class SetAvatarDto {
   @ApiProperty({
@@ -36,4 +36,14 @@ export class SetAvatarDto {
   @Transform(({ value }) => Number(value))
   @IsNumber({ allowNaN: false, allowInfinity: false })
   zoom: number;
+
+  @ApiProperty({
+    description:
+      'The dimension length of the preview image element in the frontend when the image is uploaded from local.',
+    example: 300,
+  })
+  @Transform(({ value }) => Number(value))
+  @IsNumber({ allowNaN: false, allowInfinity: false })
+  @IsPositive()
+  baseDimension: number;
 }
