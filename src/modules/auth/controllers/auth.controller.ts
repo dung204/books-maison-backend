@@ -22,8 +22,10 @@ import {
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
 import { CustomRequest } from '@/base/common/types/custom-request.type';
 import { Public } from '@/modules/auth/decorators/public.decorator';
+import { OAuthAction } from '@/modules/auth/enums/oauth-action.enum';
 import { JwtExceptionFilter } from '@/modules/auth/filters/jwt-exception.filter';
 import { LocalAuthGuard } from '@/modules/auth/guards/local-auth.guard';
+import { GoogleRequest } from '@/modules/auth/requests/google.request';
 import { LoginRequest } from '@/modules/auth/requests/login.request';
 import { RefreshRequest } from '@/modules/auth/requests/refresh.request';
 import { RegisterRequest } from '@/modules/auth/requests/register.request';
@@ -115,5 +117,23 @@ export class AuthController {
   async logout(@Request() req: CustomRequest) {
     const accessToken = req.headers.authorization.replaceAll('Bearer ', '');
     await this.authService.logout(req.user, accessToken);
+  }
+
+  @Public()
+  @ApiOperation({
+    summary: 'Handle Google authentication',
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    description: 'Successful authentication',
+    schema: LoginSuccessPayload,
+    isArray: false,
+  })
+  @ApiConflictResponse({
+    description: `Due to one of the two reasons:\n- For \`${OAuthAction.AUTHENTICATE}\` action, a user that is not linked to Google has been found.\n- For \`${OAuthAction.LINK}\` & \`${OAuthAction.OVERRIDE}\` action, a user that is already linked to Google has been found.`,
+  })
+  @Post('/google')
+  async handleGoogleAuth(@Body() googleRequest: GoogleRequest) {
+    return this.authService.handleGoogleAuth(googleRequest);
   }
 }

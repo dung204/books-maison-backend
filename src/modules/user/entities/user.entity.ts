@@ -17,7 +17,7 @@ export class User {
   @Column('character varying', { length: 100, unique: true })
   email: string;
 
-  @Column('character varying', { length: 100 })
+  @Column('character varying', { length: 100, nullable: true })
   password: string;
 
   @Column('character varying', { length: 100 })
@@ -42,4 +42,7 @@ export class User {
 
   @Column('timestamp with time zone', { default: () => 'CURRENT_TIMESTAMP' })
   createdTimestamp: Date;
+
+  @Column('character varying', { nullable: true })
+  googleId: string;
 }

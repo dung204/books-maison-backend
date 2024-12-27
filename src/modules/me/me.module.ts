@@ -24,5 +24,6 @@ import { UserModule } from '@/modules/user/user.module';
   ],
   controllers: [MeController],
   providers: [AvatarService, AvatarRepository],
+  exports: [AvatarService],
 })
 export class MeModule {}
