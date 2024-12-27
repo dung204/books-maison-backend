@@ -7,6 +7,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 
 import databaseConfig from '@/base/config/database.config';
+import googleOauthConfig from '@/base/config/google-oauth.config';
 import jwtConfig from '@/base/config/jwt.config';
 import redisConfig from '@/base/config/redis.config';
 import { DatabaseModule } from '@/base/database/database.module';
@@ -26,7 +27,7 @@ import { UserModule } from '@/modules/user/user.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig, redisConfig, jwtConfig],
+      load: [databaseConfig, redisConfig, jwtConfig, googleOauthConfig],
       envFilePath: ['.env.local', '.env'],
     }),
     RedisModule.forRootAsync(

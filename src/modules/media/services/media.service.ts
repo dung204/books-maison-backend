@@ -57,6 +57,24 @@ export class MediaService {
     };
   }
 
+  async uploadFromUrl(url: string, folder?: string) {
+    try {
+      const result = await cloudinary.uploader.upload(url, {
+        folder,
+        resource_type: 'auto',
+        transformation: {
+          quality: 'auto',
+          fetch_format: 'webp',
+          width: 300,
+          height: 300,
+        },
+      });
+      return result;
+    } catch (error) {
+      throw new HttpException(error.message, error.http_code);
+    }
+  }
+
   async deleteFile({ name, folder }: DeleteMediaDto) {
     const fileName = !folder ? name : `${folder}/${name}`;
 

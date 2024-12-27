@@ -55,6 +55,13 @@ export class UserDto {
   @Expose()
   createdTimestamp: Date;
 
+  @ApiProperty({
+    description: 'The corresponding user ID from Google',
+    example: '108821624331579292243',
+  })
+  @Expose()
+  googleId: string;
+
   public static fromUser(user: User): UserDto {
     const userDto = plainToInstance(UserDto, user);
     return userDto;
