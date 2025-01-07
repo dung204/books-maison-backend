@@ -302,4 +302,34 @@ export class MeController {
       ...userTransactionSearchDto,
     });
   }
+
+  @Private()
+  @ApiOperation({ summary: 'Deactivate a user by user id (for ADMIN only)' })
+  @ApiNoContentResponse({
+    description: 'User is deactivated successfully.',
+  })
+  @ApiNotFoundResponse({
+    description: 'User is not found or is already deactivated.',
+  })
+  @Delete('/deactivate/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deactivateUser(@Request() req: CustomRequest) {
+    return this.userService.deactivateUser(req.user);
+  }
+
+  @Private()
+  @ApiOperation({ summary: 'Reactivate a user by user id (for ADMIN only)' })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: UserDto,
+    isArray: false,
+    description: 'User is reactivated successfully.',
+  })
+  @ApiNotFoundResponse({
+    description: 'User is not found or is not currently deactivated.',
+  })
+  @Patch('/reactivate/:id')
+  async reactivateUser(@Request() req: CustomRequest) {
+    return this.userService.reactivateUser(req.user);
+  }
 }

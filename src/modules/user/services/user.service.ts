@@ -119,4 +119,34 @@ export class UserService {
         'Conflicted! Cannot change password of current user.',
       );
   }
+
+  async deactivateUserById(id: string) {
+    const user = await this.findUserById(id);
+    return this.deactivateUser(user);
+  }
+
+  async deactivateUser(user: User) {
+    await this.userRepository.softRemove(user);
+  }
+
+  async reactivateUserById(id: string) {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      withDeleted: true,
+    });
+
+    if (!user) {
+      throw new NotFoundException(
+        'User not found or user is not currently deactivated.',
+      );
+    }
+
+    return this.reactivateUser(user);
+  }
+
+  async reactivateUser(user: User): Promise<SuccessResponse<UserDto>> {
+    return {
+      data: UserDto.fromUser(await this.userRepository.recover(user)),
+    };
+  }
 }
