@@ -59,6 +59,14 @@ export class BookRepository extends Repository<Book> {
     return result;
   }
 
+  async findByIdWithoutUserData(id: string) {
+    return this.createQueryBuilder('book')
+      .leftJoinAndSelect('book.authors', 'author')
+      .leftJoinAndSelect('book.categories', 'category')
+      .where('book.id = :id', { id })
+      .getOne();
+  }
+
   async findAllAndCount(
     bookSearchDto: BookSearchDto,
     user?: User,

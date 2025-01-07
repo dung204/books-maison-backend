@@ -121,7 +121,21 @@ export class UserService {
   }
 
   async deactivateUserById(id: string) {
-    const user = await this.findUserById(id);
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: {
+        checkouts: {
+          fine: true,
+        },
+        transactions: true,
+      },
+    });
+
+    if (!user)
+      throw new NotFoundException(
+        'User not found or user is already deactivated.',
+      );
+
     return this.deactivateUser(user);
   }
 
@@ -132,6 +146,12 @@ export class UserService {
   async reactivateUserById(id: string) {
     const user = await this.userRepository.findOne({
       where: { id },
+      relations: {
+        checkouts: {
+          fine: true,
+        },
+        transactions: true,
+      },
       withDeleted: true,
     });
 

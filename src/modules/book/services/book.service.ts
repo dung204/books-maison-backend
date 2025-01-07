@@ -73,7 +73,7 @@ export class BookService {
     };
   }
 
-  async findOne(id: string, user?: User) {
+  async findOne(id: string, user?: User): Promise<BookDto> {
     const book = await this.bookRepository.findById(id, user);
 
     if (!book) throw new NotFoundException('Book not found.');
@@ -81,12 +81,8 @@ export class BookService {
     return book;
   }
 
-  async findOneWithoutUserData(id: string) {
-    const book = await this.bookRepository.findOne({
-      where: {
-        id,
-      },
-    });
+  async findOneWithoutUserData(id: string): Promise<Book> {
+    const book = await this.bookRepository.findByIdWithoutUserData(id);
 
     if (!book) throw new NotFoundException('Book not found.');
 

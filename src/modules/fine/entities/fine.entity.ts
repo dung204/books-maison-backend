@@ -26,7 +26,7 @@ export class Fine {
     description: 'The corresponding checkout of the fine',
     type: Checkout,
   })
-  @OneToOne(() => Checkout)
+  @OneToOne(() => Checkout, { onDelete: 'CASCADE' })
   @JoinColumn()
   checkout: Checkout;
 

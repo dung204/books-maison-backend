@@ -23,7 +23,6 @@ import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 import { CheckoutStatus } from '@/modules/checkout/enums/checkout-status.enum';
 import { CheckoutRepository } from '@/modules/checkout/repositories/checkout.repository';
 import { FineService } from '@/modules/fine/services/fine.service';
-import { UserDto } from '@/modules/user/dto/user.dto';
 import { User } from '@/modules/user/entities/user.entity';
 import { UserService } from '@/modules/user/services/user.service';
 
@@ -62,7 +61,7 @@ export class CheckoutService {
     const checkoutTimestamp = new Date();
     const dueTimestamp = addWeeks(checkoutTimestamp, this.RENTING_WEEKS);
 
-    checkout.user = UserDto.fromUser(user);
+    checkout.user = user;
     checkout.book = await this.bookService.update(bookId, {
       quantity: book.quantity - 1,
     });
@@ -100,7 +99,7 @@ export class CheckoutService {
     const checkoutTimestamp = new Date();
     const dueTimestamp = addWeeks(checkoutTimestamp, this.RENTING_WEEKS);
 
-    checkout.user = UserDto.fromUser(user);
+    checkout.user = user;
     checkout.book = await this.bookService.update(bookId, {
       quantity: book.quantity - 1,
     });

@@ -3,8 +3,11 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+
+import { Book } from '@/modules/book/entities/book.entity';
 
 @Entity({ schema: 'public', name: 'categories' })
 export class Category {
@@ -22,4 +25,9 @@ export class Category {
 
   @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
   deletedTimestamp: Date;
+
+  @ManyToMany(() => Book, {
+    cascade: ['remove', 'soft-remove', 'recover'],
+  })
+  books: Book[];
 }

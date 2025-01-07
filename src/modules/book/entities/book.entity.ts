@@ -22,11 +22,13 @@ export class Book {
   @Column('character varying', { length: 256 })
   title: string;
 
-  @ManyToMany(() => Category)
+  @ManyToMany(() => Category, {
+    onDelete: 'CASCADE',
+  })
   @JoinTable()
   categories: Category[];
 
-  @ManyToMany(() => Author)
+  @ManyToMany(() => Author, { onDelete: 'CASCADE' })
   @JoinTable()
   authors: Author[];
 

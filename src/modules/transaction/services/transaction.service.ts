@@ -26,7 +26,6 @@ import { TransactionEvents } from '@/modules/transaction/enums/transaction-event
 import { TransactionMethod } from '@/modules/transaction/enums/transaction-method.enum';
 import { TransactionRepository } from '@/modules/transaction/repositories/transaction.repository';
 import { CreateMomoLinkSuccessResponse } from '@/modules/transaction/responses/create-momo-link-success.response';
-import { UserDto } from '@/modules/user/dto/user.dto';
 import { User } from '@/modules/user/entities/user.entity';
 import { UserService } from '@/modules/user/services/user.service';
 
@@ -116,7 +115,7 @@ export class TransactionService {
 
     const transaction = new Transaction();
     transaction.id = `BM_TR_${Date.now()}`;
-    transaction.user = UserDto.fromUser(user);
+    transaction.user = user;
     transaction.amount = amount;
     transaction.method = transactionMethod;
 
