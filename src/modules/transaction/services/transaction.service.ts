@@ -50,14 +50,14 @@ export class TransactionService {
 
   async findAll(
     transactionSearchDto: TransactionSearchDto,
-  ): Promise<SuccessResponse<Transaction[]>> {
+  ): Promise<SuccessResponse<TransactionDto[]>> {
     const { page, pageSize } = transactionSearchDto;
     const [transactions, total] =
       await this.transactionRepository.findAllAndCount(transactionSearchDto);
     const totalPage = Math.ceil(total / pageSize);
 
     return {
-      data: transactions,
+      data: transactions.map(TransactionDto.fromTransaction),
       pagination: {
         total,
         page,
@@ -72,7 +72,7 @@ export class TransactionService {
   async findById(
     user: User,
     id: string,
-  ): Promise<SuccessResponse<Transaction>> {
+  ): Promise<SuccessResponse<TransactionDto>> {
     const transaction = await this.transactionRepository.findById(id);
 
     if (!transaction) throw new NotFoundException('Fine not found.');
@@ -82,7 +82,7 @@ export class TransactionService {
       throw new ForbiddenException();
 
     return {
-      data: transaction,
+      data: TransactionDto.fromTransaction(transaction),
     };
   }
 
@@ -127,7 +127,7 @@ export class TransactionService {
         TransactionEvents.SAVED,
         new SavedTransactionEventDto(savedTransaction, extraData),
       );
-      return savedTransaction;
+      return TransactionDto.fromTransaction(savedTransaction);
     }
 
     transaction.createdTimestamp = new Date();
@@ -149,7 +149,7 @@ export class TransactionService {
         ),
       );
       return {
-        ...transaction,
+        ...TransactionDto.fromTransaction(transaction),
         purchaseUrl,
       };
     }

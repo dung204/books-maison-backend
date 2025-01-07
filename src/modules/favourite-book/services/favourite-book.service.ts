@@ -34,7 +34,7 @@ export class FavouriteBookService {
       );
     }
 
-    const book = await this.bookService.findOne(bookId);
+    const book = await this.bookService.findOneWithoutUserData(bookId);
     const favouriteBook = new FavouriteBook();
 
     favouriteBook.userId = user.id;

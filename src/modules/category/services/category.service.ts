@@ -7,7 +7,7 @@ import {
 
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { CategorySearchDto } from '@/modules/category/dto/category-search.dto';
-import { Category } from '@/modules/category/entities/category.entity';
+import { CategoryDto } from '@/modules/category/dto/category.dto';
 import { CategoryRepository } from '@/modules/category/repositories/category.repository';
 
 import { CreateCategoryDto } from '../dto/create-category.dto';
@@ -21,25 +21,25 @@ export class CategoryService {
 
   async create(
     createCategoryDto: CreateCategoryDto,
-  ): Promise<SuccessResponse<Category>> {
+  ): Promise<SuccessResponse<CategoryDto>> {
     const category =
       await this.categoryRepository.createCategory(createCategoryDto);
 
     return {
-      data: category,
+      data: CategoryDto.fromCategory(category),
     };
   }
 
   async findAll(
     categorySearchDto: CategorySearchDto,
-  ): Promise<SuccessResponse<Category[]>> {
+  ): Promise<SuccessResponse<CategoryDto[]>> {
     const { page, pageSize } = categorySearchDto;
     const [categories, total] =
       await this.categoryRepository.findAllAndCount(categorySearchDto);
     const totalPage = Math.ceil(total / pageSize);
 
     return {
-      data: categories,
+      data: categories.map(CategoryDto.fromCategory),
       pagination: {
         total,
         page,

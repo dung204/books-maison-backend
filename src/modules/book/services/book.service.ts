@@ -25,7 +25,7 @@ export class BookService {
     authorIds,
     categoryIds,
     ...createBookDto
-  }: CreateBookDto): Promise<SuccessResponse<Book>> {
+  }: CreateBookDto): Promise<SuccessResponse<BookDto>> {
     const book = new Book();
     const categories =
       categoryIds &&
@@ -45,7 +45,7 @@ export class BookService {
     });
 
     return {
-      data: await this.bookRepository.save(book),
+      data: BookDto.fromBook(await this.bookRepository.save(book)),
     };
   }
 
@@ -61,7 +61,7 @@ export class BookService {
     const totalPage = Math.ceil(total / pageSize);
 
     return {
-      data: books,
+      data: books.map(BookDto.fromBook),
       pagination: {
         total,
         page,
@@ -81,11 +81,23 @@ export class BookService {
     return book;
   }
 
+  async findOneWithoutUserData(id: string) {
+    const book = await this.bookRepository.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (!book) throw new NotFoundException('Book not found.');
+
+    return book;
+  }
+
   async update(
     id: string,
     { authorIds, categoryIds, ...updateBookDto }: UpdateBookDto,
   ) {
-    const book = await this.findOne(id);
+    const book = await this.findOneWithoutUserData(id);
 
     const categories =
       !categoryIds || categoryIds.length === 0
@@ -100,7 +112,7 @@ export class BookService {
             authorIds.map((id) => this.authorService.findAuthorById(id)),
           );
 
-    Object.assign<Book, DeepPartial<Book>>(book, {
+    Object.assign(book, {
       authors,
       categories,
       ...updateBookDto,

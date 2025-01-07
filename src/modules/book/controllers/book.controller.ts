@@ -24,7 +24,6 @@ import { Admin } from '@/modules/auth/decorators/admin.decorator';
 import { OptionalAuth } from '@/modules/auth/decorators/optional-auth.decorator';
 import { BookSearchDto } from '@/modules/book/dto/book-search.dto';
 import { BookDto } from '@/modules/book/dto/book.dto';
-import { Book } from '@/modules/book/entities/book.entity';
 import { BookService } from '@/modules/book/services/book.service';
 
 import { CreateBookDto } from '../dto/create-book.dto';
@@ -44,7 +43,7 @@ export class BookController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.CREATED,
-    schema: Book,
+    schema: BookDto,
     isArray: false,
     description: 'Successful book creation',
   })
@@ -84,7 +83,7 @@ export class BookController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
-    schema: Book,
+    schema: BookDto,
     isArray: false,
     description: 'Book is retrieved successfully',
   })
@@ -95,7 +94,7 @@ export class BookController {
   async findOne(
     @Request() req: CustomRequest,
     @Param('id') id: string,
-  ): Promise<SuccessResponse<Book>> {
+  ): Promise<SuccessResponse<BookDto>> {
     const currentUser = req.user;
     return {
       data: await this.bookService.findOne(id, currentUser),
@@ -108,7 +107,7 @@ export class BookController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
-    schema: Book,
+    schema: BookDto,
     isArray: false,
   })
   @Patch(':id')
@@ -116,9 +115,9 @@ export class BookController {
   async update(
     @Param('id') id: string,
     @Body() updateBookDto: UpdateBookDto,
-  ): Promise<SuccessResponse<Book>> {
+  ): Promise<SuccessResponse<BookDto>> {
     return {
-      data: await this.bookService.update(id, updateBookDto),
+      data: BookDto.fromBook(await this.bookService.update(id, updateBookDto)),
     };
   }
 }

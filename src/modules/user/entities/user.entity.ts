@@ -1,5 +1,7 @@
 import {
   Column,
+  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   OneToOne,
@@ -40,9 +42,15 @@ export class User {
   @Column('enum', { enum: Role, default: Role.USER })
   role: Role;
 
-  @Column('timestamp with time zone', { default: () => 'CURRENT_TIMESTAMP' })
-  createdTimestamp: Date;
-
   @Column('character varying', { nullable: true })
   googleId: string;
+
+  @CreateDateColumn({
+    type: 'timestamp with time zone',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdTimestamp: Date;
+
+  @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
+  deletedTimestamp: Date;
 }

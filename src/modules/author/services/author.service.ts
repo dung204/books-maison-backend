@@ -7,9 +7,9 @@ import {
 
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { AuthorSearchDto } from '@/modules/author/dto/author-search.dto';
-import { Author } from '@/modules/author/entities/author.entity';
 import { AuthorRepository } from '@/modules/author/repositories/author.repository';
 
+import { AuthorDto } from '../dto/author.dto';
 import { CreateAuthorDto } from '../dto/create-author.dto';
 import { UpdateAuthorDto } from '../dto/update-author.dto';
 
@@ -21,24 +21,24 @@ export class AuthorService {
 
   async create(
     createAuthorDto: CreateAuthorDto,
-  ): Promise<SuccessResponse<Author>> {
+  ): Promise<SuccessResponse<AuthorDto>> {
     const author = await this.authorRepository.createAuthor(createAuthorDto);
 
     return {
-      data: author,
+      data: AuthorDto.fromAuthor(author),
     };
   }
 
   async findAll(
     authorSearchDto: AuthorSearchDto,
-  ): Promise<SuccessResponse<Author[]>> {
+  ): Promise<SuccessResponse<AuthorDto[]>> {
     const { page, pageSize } = authorSearchDto;
     const [authors, total] =
       await this.authorRepository.findAllAndCount(authorSearchDto);
     const totalPage = Math.ceil(total / pageSize);
 
     return {
-      data: authors,
+      data: authors.map(AuthorDto.fromAuthor),
       pagination: {
         total,
         page,

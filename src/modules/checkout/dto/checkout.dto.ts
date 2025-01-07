@@ -1,57 +1,49 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  ManyToOne,
-  PrimaryColumn,
-} from 'typeorm';
+import { Exclude, Expose, Transform, plainToInstance } from 'class-transformer';
 
-import { Book } from '@/modules/book/entities/book.entity';
+import { BookDto } from '@/modules/book/dto/book.dto';
+import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 import { CheckoutStatus } from '@/modules/checkout/enums/checkout-status.enum';
 import { UserDto } from '@/modules/user/dto/user.dto';
-import { User } from '@/modules/user/entities/user.entity';
 
-@Entity({ schema: 'public', name: 'checkouts' })
-export class Checkout {
+@Exclude()
+export class CheckoutDto {
   @ApiProperty({
     description: 'The ID of the checkout (format: `BM_CH_${Date.now()}`)',
     example: 'BM_CH_1722579024486',
   })
-  @PrimaryColumn('character varying')
+  @Expose()
   id: string;
 
   @ApiProperty({
     description: 'The user who performs the checkout',
     type: UserDto,
   })
-  @ManyToOne(() => User)
+  @Expose()
+  @Transform(({ value }) => UserDto.fromUser(value))
   user: UserDto;
 
   @ApiProperty({
     description: 'The book checked out by the user',
-    type: Book,
+    type: BookDto,
   })
-  @ManyToOne(() => Book)
-  book: Book;
+  @Expose()
+  @Transform(({ value }) => BookDto.fromBook(value))
+  book: BookDto;
 
   @ApiProperty({
     description: 'The status of the checkout',
     enum: CheckoutStatus,
     enumName: 'CheckoutStatus',
   })
-  @Column('enum', { enum: CheckoutStatus, default: CheckoutStatus.BORROWING })
+  @Expose()
   status: CheckoutStatus;
 
   @ApiProperty({
     description: 'The timestamp indicating when the checkout is created',
     example: '2024-06-24T16:34:45.109Z',
   })
-  @CreateDateColumn({
-    type: 'timestamp with time zone',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
+  @Expose()
   createdTimestamp: Date;
 
   @ApiProperty({
@@ -59,7 +51,7 @@ export class Checkout {
       'The timestamp indicating when the book is due to be returned (14 days after the checkout is created)',
     example: '2024-07-08T16:34:45.109Z',
   })
-  @Column('timestamp with time zone')
+  @Expose()
   dueTimestamp: Date;
 
   @ApiProperty({
@@ -68,7 +60,7 @@ export class Checkout {
     required: false,
     nullable: false,
   })
-  @Column('timestamp with time zone', { nullable: true })
+  @Expose()
   returnedTimestamp?: Date;
 
   @ApiProperty({
@@ -76,9 +68,10 @@ export class Checkout {
     required: false,
     nullable: true,
   })
-  @Column('text', { nullable: true })
+  @Expose()
   note?: string;
 
-  @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
-  deletedTimestamp: Date;
+  public static fromCheckout(checkout: Checkout) {
+    return plainToInstance(CheckoutDto, checkout);
+  }
 }

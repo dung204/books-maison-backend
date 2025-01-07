@@ -14,6 +14,7 @@ import { SuccessResponse } from '@/base/common/responses/success.response';
 import { BookService } from '@/modules/book/services/book.service';
 import { AdminCreateCheckoutDto } from '@/modules/checkout/dto/admin-create-checkout.dto';
 import { CheckoutSearchDto } from '@/modules/checkout/dto/checkout-search.dto';
+import { CheckoutDto } from '@/modules/checkout/dto/checkout.dto';
 import { MarkReturnedCheckoutDto } from '@/modules/checkout/dto/mark-returned-checkout.dto';
 import { UpdateCheckoutNoteDto } from '@/modules/checkout/dto/update-checkout-note.dto';
 import { UserCheckoutSearchDto } from '@/modules/checkout/dto/user-checkout-search.dto';
@@ -41,7 +42,7 @@ export class CheckoutService {
   async createCheckoutUsingCurrentUser(
     user: User,
     { bookId }: UserCreateCheckoutDto,
-  ): Promise<SuccessResponse<Checkout>> {
+  ): Promise<SuccessResponse<CheckoutDto>> {
     const rentingCheckout =
       await this.checkoutRepository.findRentingCheckoutByUserIdAndBookId(
         user.id,
@@ -51,7 +52,7 @@ export class CheckoutService {
     if (rentingCheckout)
       throw new ConflictException('User has already rented this book.');
 
-    const book = await this.bookService.findOne(bookId);
+    const book = await this.bookService.findOneWithoutUserData(bookId);
 
     if (book.quantity === 0)
       throw new BadRequestException('This book is currently out of stock.');
@@ -69,14 +70,16 @@ export class CheckoutService {
     checkout.dueTimestamp = dueTimestamp;
 
     return {
-      data: await this.checkoutRepository.save(checkout),
+      data: CheckoutDto.fromCheckout(
+        await this.checkoutRepository.save(checkout),
+      ),
     };
   }
 
   async createCheckoutUsingAdminUser({
     userId,
     bookId,
-  }: AdminCreateCheckoutDto) {
+  }: AdminCreateCheckoutDto): Promise<SuccessResponse<CheckoutDto>> {
     const rentingCheckout =
       await this.checkoutRepository.findRentingCheckoutByUserIdAndBookId(
         userId,
@@ -87,7 +90,7 @@ export class CheckoutService {
       throw new ConflictException('User has already rented this book.');
 
     const user = await this.userService.findUserById(userId);
-    const book = await this.bookService.findOne(bookId);
+    const book = await this.bookService.findOneWithoutUserData(bookId);
 
     if (book.quantity === 0)
       throw new BadRequestException('This book is currently out of stock.');
@@ -107,20 +110,22 @@ export class CheckoutService {
     await this.bookService.update(bookId, { quantity: book.quantity - 1 });
 
     return {
-      data: await this.checkoutRepository.save(checkout),
+      data: CheckoutDto.fromCheckout(
+        await this.checkoutRepository.save(checkout),
+      ),
     };
   }
 
   async findAll(
     checkoutSearchDto: CheckoutSearchDto,
-  ): Promise<SuccessResponse<Checkout[]>> {
+  ): Promise<SuccessResponse<CheckoutDto[]>> {
     const { page, pageSize } = checkoutSearchDto;
     const [checkouts, total] =
       await this.checkoutRepository.findAllAndCount(checkoutSearchDto);
     const totalPage = Math.ceil(total / pageSize);
 
     return {
-      data: checkouts,
+      data: checkouts.map(CheckoutDto.fromCheckout),
       pagination: {
         total,
         page,
@@ -147,7 +152,7 @@ export class CheckoutService {
   async findAllCheckoutsOfCurrentUser(
     user: User,
     userCheckoutSearchDto: UserCheckoutSearchDto,
-  ) {
+  ): Promise<SuccessResponse<CheckoutDto[]>> {
     const { page, pageSize } = userCheckoutSearchDto;
     const [checkouts, total] = await this.checkoutRepository.findAllAndCount({
       userId: user.id,
@@ -156,7 +161,7 @@ export class CheckoutService {
     const totalPage = Math.ceil(total / pageSize);
 
     return {
-      data: checkouts,
+      data: checkouts.map(CheckoutDto.fromCheckout),
       pagination: {
         total,
         page,
@@ -171,7 +176,7 @@ export class CheckoutService {
   async markCheckoutAsReturned(
     checkoutId: string,
     markReturnedCheckoutDto: MarkReturnedCheckoutDto,
-  ): Promise<SuccessResponse<Checkout>> {
+  ): Promise<SuccessResponse<CheckoutDto>> {
     const checkout = await this.checkoutRepository.findById(checkoutId);
 
     if (!checkout) throw new NotFoundException('Checkout not found.');
@@ -192,21 +197,25 @@ export class CheckoutService {
     checkout.returnedTimestamp = new Date();
 
     return {
-      data: await this.checkoutRepository.save(checkout),
+      data: CheckoutDto.fromCheckout(
+        await this.checkoutRepository.save(checkout),
+      ),
     };
   }
 
   async updateCheckoutNote(
     checkoutId: string,
     { note }: UpdateCheckoutNoteDto,
-  ) {
+  ): Promise<SuccessResponse<CheckoutDto>> {
     const checkout = await this.checkoutRepository.findById(checkoutId);
 
     if (!checkout) throw new NotFoundException('Checkout not found.');
 
     checkout.note = note;
     return {
-      data: await this.checkoutRepository.save(checkout),
+      data: CheckoutDto.fromCheckout(
+        await this.checkoutRepository.save(checkout),
+      ),
     };
   }
 

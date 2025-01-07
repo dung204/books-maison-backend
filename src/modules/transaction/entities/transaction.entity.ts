@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryColumn,
+} from 'typeorm';
 
 import { TransactionMethod } from '@/modules/transaction/enums/transaction-method.enum';
 import { UserDto } from '@/modules/user/dto/user.dto';
@@ -43,9 +50,12 @@ export class Transaction {
     description: 'The created timestamp of the transaction',
     example: '2024-07-04T06:10:02.679Z',
   })
-  @Column('timestamp with time zone', {
+  @CreateDateColumn({
+    type: 'timestamp with time zone',
     default: () => 'CURRENT_TIMESTAMP',
-    nullable: true,
   })
   createdTimestamp: Date;
+
+  @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
+  deletedTimestamp: Date;
 }

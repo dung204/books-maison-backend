@@ -26,9 +26,9 @@ import { Admin } from '@/modules/auth/decorators/admin.decorator';
 import { Private } from '@/modules/auth/decorators/private.decorator';
 import { AdminCreateCheckoutDto } from '@/modules/checkout/dto/admin-create-checkout.dto';
 import { CheckoutSearchDto } from '@/modules/checkout/dto/checkout-search.dto';
+import { CheckoutDto } from '@/modules/checkout/dto/checkout.dto';
 import { MarkReturnedCheckoutDto } from '@/modules/checkout/dto/mark-returned-checkout.dto';
 import { UpdateCheckoutNoteDto } from '@/modules/checkout/dto/update-checkout-note.dto';
-import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 import { CheckoutService } from '@/modules/checkout/services/checkout.service';
 
 @ApiBearerAuth('JWT')
@@ -43,7 +43,7 @@ export class CheckoutController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.CREATED,
-    schema: Checkout,
+    schema: CheckoutDto,
     isArray: false,
     description: 'Successful checkout creation.',
   })
@@ -68,7 +68,7 @@ export class CheckoutController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.CREATED,
-    schema: Checkout,
+    schema: CheckoutDto,
     isArray: false,
     description: 'Checkout is marked as returned successfully.',
   })
@@ -95,7 +95,7 @@ export class CheckoutController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.CREATED,
-    schema: Checkout,
+    schema: CheckoutDto,
     isArray: false,
     description: 'Checkout note updated successfully.',
   })
@@ -119,7 +119,7 @@ export class CheckoutController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
-    schema: Checkout,
+    schema: CheckoutDto,
     isArray: true,
     pagination: true,
     description:
@@ -138,7 +138,7 @@ export class CheckoutController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
-    schema: Checkout,
+    schema: CheckoutDto,
     isArray: false,
     description: 'Checkout is retrieved successfully.',
   })
@@ -153,11 +153,13 @@ export class CheckoutController {
   async findOne(
     @Request() req: CustomRequest,
     @Param('id') id: string,
-  ): Promise<SuccessResponse<Checkout>> {
+  ): Promise<SuccessResponse<CheckoutDto>> {
     const currentUser = req.user;
 
     return {
-      data: await this.checkoutService.findOne(currentUser, id),
+      data: CheckoutDto.fromCheckout(
+        await this.checkoutService.findOne(currentUser, id),
+      ),
     };
   }
 }

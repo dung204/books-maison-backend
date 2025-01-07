@@ -62,7 +62,7 @@ export class BookRepository extends Repository<Book> {
   async findAllAndCount(
     bookSearchDto: BookSearchDto,
     user?: User,
-  ): Promise<[Book[], number]> {
+  ): Promise<[BookDto[], number]> {
     const actualOrderBy = Object.values(BookOrderableField).includes(
       bookSearchDto.orderBy,
     )

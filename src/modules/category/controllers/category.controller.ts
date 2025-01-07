@@ -21,7 +21,7 @@ import { SuccessResponse } from '@/base/common/responses/success.response';
 import { Admin } from '@/modules/auth/decorators/admin.decorator';
 import { Public } from '@/modules/auth/decorators/public.decorator';
 import { CategorySearchDto } from '@/modules/category/dto/category-search.dto';
-import { Category } from '@/modules/category/entities/category.entity';
+import { CategoryDto } from '@/modules/category/dto/category.dto';
 
 import { CreateCategoryDto } from '../dto/create-category.dto';
 import { UpdateCategoryDto } from '../dto/update-category.dto';
@@ -41,7 +41,7 @@ export class CategoryController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.CREATED,
-    schema: Category,
+    schema: CategoryDto,
     isArray: false,
     description: 'Successful category creation',
   })
@@ -56,7 +56,7 @@ export class CategoryController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
-    schema: Category,
+    schema: CategoryDto,
     isArray: true,
     pagination: true,
     description:
@@ -73,7 +73,7 @@ export class CategoryController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
-    schema: Category,
+    schema: CategoryDto,
     isArray: false,
     description: 'Category is retrieved successfully',
   })
@@ -81,9 +81,13 @@ export class CategoryController {
     description: 'Category is not found.',
   })
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<SuccessResponse<Category>> {
+  async findOne(
+    @Param('id') id: string,
+  ): Promise<SuccessResponse<CategoryDto>> {
     return {
-      data: await this.categoryService.findCategoryById(id),
+      data: CategoryDto.fromCategory(
+        await this.categoryService.findCategoryById(id),
+      ),
     };
   }
 
@@ -93,7 +97,7 @@ export class CategoryController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
-    schema: Category,
+    schema: CategoryDto,
     isArray: false,
   })
   @Patch(':id')
@@ -101,9 +105,11 @@ export class CategoryController {
   async update(
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
-  ): Promise<SuccessResponse<Category>> {
+  ): Promise<SuccessResponse<CategoryDto>> {
     return {
-      data: await this.categoryService.update(id, updateCategoryDto),
+      data: CategoryDto.fromCategory(
+        await this.categoryService.update(id, updateCategoryDto),
+      ),
     };
   }
 }

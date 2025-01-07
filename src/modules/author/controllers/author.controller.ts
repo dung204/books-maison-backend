@@ -23,6 +23,7 @@ import { AuthorSearchDto } from '@/modules/author/dto/author-search.dto';
 import { Author } from '@/modules/author/entities/author.entity';
 import { AuthorService } from '@/modules/author/services/author.service';
 
+import { AuthorDto } from '../dto/author.dto';
 import { CreateAuthorDto } from '../dto/create-author.dto';
 import { UpdateAuthorDto } from '../dto/update-author.dto';
 
@@ -37,7 +38,7 @@ export class AuthorController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.CREATED,
-    schema: Author,
+    schema: AuthorDto,
     isArray: false,
     description: 'Successful author creation',
   })
@@ -55,7 +56,7 @@ export class AuthorController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
-    schema: Author,
+    schema: AuthorDto,
     isArray: true,
     pagination: true,
     description:
@@ -72,7 +73,7 @@ export class AuthorController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
-    schema: Author,
+    schema: AuthorDto,
     isArray: false,
     description: 'Author is retrieved successfully',
   })
@@ -80,9 +81,9 @@ export class AuthorController {
     description: 'Author is not found',
   })
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<SuccessResponse<Author>> {
+  async findOne(@Param('id') id: string): Promise<SuccessResponse<AuthorDto>> {
     return {
-      data: await this.authorService.findAuthorById(id),
+      data: AuthorDto.fromAuthor(await this.authorService.findAuthorById(id)),
     };
   }
 
@@ -92,7 +93,7 @@ export class AuthorController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
-    schema: Author,
+    schema: AuthorDto,
     isArray: false,
     description: 'Successful author update',
   })
