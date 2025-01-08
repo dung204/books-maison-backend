@@ -86,7 +86,7 @@ export class CategoryService {
     await this.categoryRepository.softRemove(category);
   }
 
-  async recoverCategory(id: string) {
+  async recoverCategory(id: string): Promise<SuccessResponse<CategoryDto>> {
     const category = await this.categoryRepository.findOne({
       where: { id },
       withDeleted: true,
@@ -97,8 +97,10 @@ export class CategoryService {
         'Category is not found or has already been marked as deleted.',
       );
 
-    return CategoryDto.fromCategory(
-      await this.categoryRepository.softRemove(category),
-    );
+    return {
+      data: CategoryDto.fromCategory(
+        await this.categoryRepository.softRemove(category),
+      ),
+    };
   }
 }

@@ -85,7 +85,7 @@ export class AuthorService {
     await this.authorRepository.softRemove(author);
   }
 
-  async recoverAuthor(id: string) {
+  async recoverAuthor(id: string): Promise<SuccessResponse<AuthorDto>> {
     const author = await this.authorRepository.findOne({
       where: { id },
       withDeleted: true,
@@ -96,6 +96,8 @@ export class AuthorService {
         'Author is not found or has already been deleted.',
       );
 
-    return AuthorDto.fromAuthor(await this.authorRepository.recover(author));
+    return {
+      data: AuthorDto.fromAuthor(await this.authorRepository.recover(author)),
+    };
   }
 }

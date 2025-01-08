@@ -135,7 +135,7 @@ export class BookService {
     await this.bookRepository.softRemove(book);
   }
 
-  async recoverBook(id: string) {
+  async recoverBook(id: string): Promise<SuccessResponse<BookDto>> {
     const book = await this.bookRepository.findOne({
       where: { id },
       relations: {
@@ -153,6 +153,8 @@ export class BookService {
         'Book not found or book has already been recovered.',
       );
 
-    return BookDto.fromBook(await this.bookRepository.recover(book));
+    return {
+      data: BookDto.fromBook(await this.bookRepository.recover(book)),
+    };
   }
 }
