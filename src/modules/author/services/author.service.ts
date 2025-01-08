@@ -71,4 +71,37 @@ export class AuthorService {
 
     return this.authorRepository.findById(id);
   }
+
+  async deleteAuthor(id: string) {
+    const author = await this.authorRepository.findOne({
+      where: { id },
+      relations: {
+        books: true,
+      },
+    });
+
+    if (!author)
+      throw new NotFoundException(
+        'Author is not found or has already been deleted.',
+      );
+
+    await this.authorRepository.softRemove(author);
+  }
+
+  async recoverAuthor(id: string) {
+    const author = await this.authorRepository.findOne({
+      where: { id },
+      relations: {
+        books: true,
+      },
+      withDeleted: true,
+    });
+
+    if (!author)
+      throw new NotFoundException(
+        'Author is not found or has already been deleted.',
+      );
+
+    return AuthorDto.fromAuthor(await this.authorRepository.recover(author));
+  }
 }

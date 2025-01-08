@@ -30,7 +30,7 @@ export class Book {
   @JoinTable()
   categories: Category[];
 
-  @ManyToMany(() => Author, { onDelete: 'CASCADE' })
+  @ManyToMany(() => Author, (author) => author.books, { onDelete: 'CASCADE' })
   @JoinTable()
   authors: Author[];
 

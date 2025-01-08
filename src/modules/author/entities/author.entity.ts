@@ -41,7 +41,7 @@ export class Author {
   @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
   deletedTimestamp: Date;
 
-  @ManyToMany(() => Book, {
+  @ManyToMany(() => Book, (book) => book.authors, {
     cascade: ['remove', 'soft-remove', 'recover'],
   })
   books: Book[];
