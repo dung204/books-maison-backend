@@ -116,4 +116,43 @@ export class BookService {
 
     return this.bookRepository.save(book);
   }
+
+  async deleteBook(id: string) {
+    const book = await this.bookRepository.findOne({
+      where: { id },
+      relations: {
+        checkouts: {
+          fine: true,
+        },
+      },
+    });
+
+    if (!book)
+      throw new NotFoundException(
+        'Book not found or book has already been marked as deleted.',
+      );
+
+    await this.bookRepository.softRemove(book);
+  }
+
+  async recoverBook(id: string) {
+    const book = await this.bookRepository.findOne({
+      where: { id },
+      relations: {
+        categories: true,
+        authors: true,
+        checkouts: {
+          fine: true,
+        },
+      },
+      withDeleted: true,
+    });
+
+    if (!book)
+      throw new NotFoundException(
+        'Book not found or book has already been recovered.',
+      );
+
+    return BookDto.fromBook(await this.bookRepository.recover(book));
+  }
 }

@@ -5,11 +5,13 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
 import { Author } from '@/modules/author/entities/author.entity';
 import { Category } from '@/modules/category/entities/category.entity';
+import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 
 @Entity({ schema: 'public', name: 'books' })
 export class Book {
@@ -61,4 +63,9 @@ export class Book {
 
   @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
   deletedTimestamp: Date;
+
+  @OneToMany(() => Checkout, (checkout) => checkout.book, {
+    cascade: ['soft-remove', 'remove', 'recover'],
+  })
+  checkouts: Checkout[];
 }

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -12,6 +13,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBody,
+  ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOperation,
   ApiTags,
@@ -119,5 +121,43 @@ export class BookController {
     return {
       data: BookDto.fromBook(await this.bookService.update(id, updateBookDto)),
     };
+  }
+
+  @Admin()
+  @ApiOperation({
+    summary: 'Mark a book as deleted (for ADMIN only)',
+    description:
+      'The corresponding checkouts, fines, favourite books items will also be marked as deleted.',
+  })
+  @ApiNoContentResponse({
+    description: 'The book is marked as deleted successfully',
+  })
+  @ApiNotFoundResponse({
+    description: 'Book not found or book has already been marked as deleted',
+  })
+  @Delete('/delete/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteBook(@Param('id') id: string) {
+    return this.bookService.deleteBook(id);
+  }
+
+  @Admin()
+  @ApiOperation({
+    summary: 'Recover a book from the deleted (for ADMIN only)',
+    description:
+      'The corresponding checkouts, fines, favourite books items will also be recovered.',
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: BookDto,
+    isArray: false,
+    description: 'The book is recovered successfully',
+  })
+  @ApiNotFoundResponse({
+    description: 'Book not found or book has already been recovered',
+  })
+  @Patch('/recover/:id')
+  async recoverBook(@Param('id') id: string) {
+    return this.bookService.recoverBook(id);
   }
 }
