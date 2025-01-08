@@ -7,6 +7,7 @@ import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 
 import { IS_OPTIONAL_AUTH_KEY } from '@/modules/auth/decorators/optional-auth.decorator';
+import { User } from '@/modules/user/entities/user.entity';
 
 @Injectable()
 export class JwtAccessGuard extends AuthGuard('jwt') {
@@ -14,7 +15,7 @@ export class JwtAccessGuard extends AuthGuard('jwt') {
     super();
   }
 
-  handleRequest<TUser>(
+  handleRequest<TUser extends User>(
     err: any,
     user: TUser,
     info: any,
@@ -30,6 +31,11 @@ export class JwtAccessGuard extends AuthGuard('jwt') {
 
       throw new UnauthorizedException('User login is required.');
     }
+
+    if (user.deletedTimestamp) {
+      throw new UnauthorizedException('User is currently deactivated.');
+    }
+
     return user;
   }
 }

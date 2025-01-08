@@ -50,18 +50,26 @@ export class UserRepository extends Repository<User> {
     return query.getManyAndCount();
   }
 
-  findByEmail(email: string) {
+  findByEmail(email: string, includeDeleted = false) {
     const query = this.createQueryBuilder('user')
       .leftJoinAndSelect('user.avatar', 'avatar')
       .where('user.email = :email', { email });
 
+    if (includeDeleted) {
+      query.withDeleted();
+    }
+
     return query.getOne();
   }
 
-  findById(id: string) {
+  findById(id: string, includeDeleted = false) {
     const query = this.createQueryBuilder('user')
       .leftJoinAndSelect('user.avatar', 'avatar')
       .where('user.id = :id', { id });
+
+    if (includeDeleted) {
+      query.withDeleted();
+    }
 
     return query.getOne();
   }

@@ -17,7 +17,8 @@ export function Private(options?: PrivateDecoratorOptions) {
     Public(options),
     ApiBearerAuth('JWT'),
     ApiUnauthorizedResponse({
-      description: 'User login is required',
+      description:
+        'Due to one of the following reasons:\n\n- User login is required\n- User is currently deactivated',
     }),
     UseGuards(JwtAccessGuard),
   );
