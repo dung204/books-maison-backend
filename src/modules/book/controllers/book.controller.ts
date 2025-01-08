@@ -139,7 +139,7 @@ export class BookController {
   @Delete('/delete/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBook(@Param('id') id: string) {
-    return this.bookService.deleteBook(id);
+    return this.bookService.softDeleteBook(id);
   }
 
   @Admin()

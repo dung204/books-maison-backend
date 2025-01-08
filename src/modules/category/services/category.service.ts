@@ -1,9 +1,10 @@
 import {
   ConflictException,
-  Inject,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { CategorySearchDto } from '@/modules/category/dto/category-search.dto';
@@ -15,9 +16,9 @@ import { UpdateCategoryDto } from '../dto/update-category.dto';
 
 @Injectable()
 export class CategoryService {
-  constructor(
-    @Inject(CategoryRepository) private categoryRepository: CategoryRepository,
-  ) {}
+  private readonly logger: Logger = new Logger(CategoryService.name);
+
+  constructor(private categoryRepository: CategoryRepository) {}
 
   async create(
     createCategoryDto: CreateCategoryDto,
@@ -102,5 +103,18 @@ export class CategoryService {
         await this.categoryRepository.softRemove(category),
       ),
     };
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async deleteCategories() {
+    const deleteResult = await this.categoryRepository
+      .createQueryBuilder()
+      .delete()
+      .where('(CURRENT_TIMESTAMP::date - deletedTimestamp ::date) >= 30')
+      .execute();
+
+    this.logger.log(
+      `${deleteResult.affected} categories have been deleted successfully.`,
+    );
   }
 }

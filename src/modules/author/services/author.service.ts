@@ -2,8 +2,10 @@ import {
   ConflictException,
   Inject,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { AuthorSearchDto } from '@/modules/author/dto/author-search.dto';
@@ -15,8 +17,11 @@ import { UpdateAuthorDto } from '../dto/update-author.dto';
 
 @Injectable()
 export class AuthorService {
+  private readonly logger: Logger = new Logger(AuthorService.name);
+
   constructor(
-    @Inject(AuthorRepository) private authorRepository: AuthorRepository,
+    @Inject(AuthorRepository)
+    private readonly authorRepository: AuthorRepository,
   ) {}
 
   async create(
@@ -72,7 +77,7 @@ export class AuthorService {
     return this.authorRepository.findById(id);
   }
 
-  async deleteAuthor(id: string) {
+  async softDeleteAuthor(id: string) {
     const author = await this.authorRepository.findOne({
       where: { id },
     });
@@ -99,5 +104,18 @@ export class AuthorService {
     return {
       data: AuthorDto.fromAuthor(await this.authorRepository.recover(author)),
     };
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async deleteAuthors() {
+    const deleteResult = await this.authorRepository
+      .createQueryBuilder()
+      .delete()
+      .where('(CURRENT_TIMESTAMP::date - deletedTimestamp ::date) >= 30')
+      .execute();
+
+    this.logger.log(
+      `${deleteResult.affected} authors have been deleted successfully.`,
+    );
   }
 }

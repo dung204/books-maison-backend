@@ -1,4 +1,5 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { DeepPartial } from 'typeorm';
 
 import { SuccessResponse } from '@/base/common/responses/success.response';
@@ -15,10 +16,12 @@ import { UpdateBookDto } from '../dto/update-book.dto';
 
 @Injectable()
 export class BookService {
+  private readonly logger: Logger = new Logger(BookService.name);
+
   constructor(
-    @Inject(BookRepository) private bookRepository: BookRepository,
-    private categoryService: CategoryService,
-    private authorService: AuthorService,
+    private readonly bookRepository: BookRepository,
+    private readonly categoryService: CategoryService,
+    private readonly authorService: AuthorService,
   ) {}
 
   async create({
@@ -121,7 +124,7 @@ export class BookService {
     return this.bookRepository.save(book);
   }
 
-  async deleteBook(id: string) {
+  async softDeleteBook(id: string) {
     const book = await this.bookRepository.findOne({
       where: { id },
       relations: {
@@ -160,5 +163,18 @@ export class BookService {
     return {
       data: BookDto.fromBook(await this.bookRepository.recover(book)),
     };
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async deleteBooks() {
+    const deleteResult = await this.bookRepository
+      .createQueryBuilder()
+      .delete()
+      .where('(CURRENT_TIMESTAMP::date - deletedTimestamp ::date) >= 30')
+      .execute();
+
+    this.logger.log(
+      `${deleteResult.affected} books have been deleted successfully.`,
+    );
   }
 }

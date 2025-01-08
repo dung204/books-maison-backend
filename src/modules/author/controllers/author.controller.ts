@@ -126,7 +126,7 @@ export class AuthorController {
   @Delete('/delete/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteAuthor(@Param('id') id: string) {
-    return this.authorService.deleteAuthor(id);
+    return this.authorService.softDeleteAuthor(id);
   }
 
   @Admin()
