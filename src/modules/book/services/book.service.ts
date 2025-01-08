@@ -73,7 +73,7 @@ export class BookService {
     };
   }
 
-  async findOne(id: string, user?: User): Promise<BookDto> {
+  async findOne(id: string, user?: User) {
     const book = await this.bookRepository.findById(id, user);
 
     if (!book) throw new NotFoundException('Book not found.');

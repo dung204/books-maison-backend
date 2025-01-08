@@ -116,8 +116,6 @@ export class AuthorController {
   @Admin()
   @ApiOperation({
     summary: 'Mark an author as deleted (for ADMIN only)',
-    description:
-      'There are two cases for handling books when an author is deleted:\n\n- If a book has the deleted author as **the only author**, the book will also be marked as deleted.\n- If a book has **one of the authors**, then the deleted author will be **temporarily removed** from the book',
   })
   @ApiNoContentResponse({
     description: 'The author is marked as deleted successfully',
@@ -134,8 +132,6 @@ export class AuthorController {
   @Admin()
   @ApiOperation({
     summary: 'Recover an author from the deleted (for ADMIN only)',
-    description:
-      'If a corresponding book is currently marked as deleted, it will also be recovered.',
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,

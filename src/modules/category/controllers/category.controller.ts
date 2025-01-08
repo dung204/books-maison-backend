@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -11,6 +12,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBody,
+  ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOperation,
   ApiTags,
@@ -111,5 +113,39 @@ export class CategoryController {
         await this.categoryService.update(id, updateCategoryDto),
       ),
     };
+  }
+
+  @Admin()
+  @ApiOperation({
+    summary: 'Mark an category as deleted (for ADMIN only)',
+  })
+  @ApiNoContentResponse({
+    description: 'The category is marked as deleted successfully',
+  })
+  @ApiNotFoundResponse({
+    description: 'The category is not found or has already marked as deleted',
+  })
+  @Delete('/delete/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteCategory(@Param('id') id: string) {
+    return this.categoryService.deleteCategory(id);
+  }
+
+  @Admin()
+  @ApiOperation({
+    summary: 'Recover an category from the deleted (for ADMIN only)',
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: CategoryDto,
+    isArray: false,
+    description: 'The category is marked as deleted successfully',
+  })
+  @ApiNotFoundResponse({
+    description: 'The category is not found or has already marked as deleted',
+  })
+  @Patch('/recover/:id')
+  async recovercategory(@Param('id') id: string) {
+    return this.categoryService.recoverCategory(id);
   }
 }

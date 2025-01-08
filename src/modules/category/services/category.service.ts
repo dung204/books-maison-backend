@@ -72,4 +72,33 @@ export class CategoryService {
 
     return this.categoryRepository.findById(id);
   }
+
+  async deleteCategory(id: string) {
+    const category = await this.categoryRepository.findOne({
+      where: { id },
+    });
+
+    if (!category)
+      throw new NotFoundException(
+        'Category is not found or has already been marked as deleted.',
+      );
+
+    await this.categoryRepository.softRemove(category);
+  }
+
+  async recoverCategory(id: string) {
+    const category = await this.categoryRepository.findOne({
+      where: { id },
+      withDeleted: true,
+    });
+
+    if (!category)
+      throw new NotFoundException(
+        'Category is not found or has already been marked as deleted.',
+      );
+
+    return CategoryDto.fromCategory(
+      await this.categoryRepository.softRemove(category),
+    );
+  }
 }

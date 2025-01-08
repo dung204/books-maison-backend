@@ -75,9 +75,6 @@ export class AuthorService {
   async deleteAuthor(id: string) {
     const author = await this.authorRepository.findOne({
       where: { id },
-      relations: {
-        books: true,
-      },
     });
 
     if (!author)
@@ -91,9 +88,6 @@ export class AuthorService {
   async recoverAuthor(id: string) {
     const author = await this.authorRepository.findOne({
       where: { id },
-      relations: {
-        books: true,
-      },
       withDeleted: true,
     });
 

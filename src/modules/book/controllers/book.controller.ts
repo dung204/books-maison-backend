@@ -99,7 +99,7 @@ export class BookController {
   ): Promise<SuccessResponse<BookDto>> {
     const currentUser = req.user;
     return {
-      data: await this.bookService.findOne(id, currentUser),
+      data: BookDto.fromBook(await this.bookService.findOne(id, currentUser)),
     };
   }
 

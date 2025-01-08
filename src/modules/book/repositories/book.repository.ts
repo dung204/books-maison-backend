@@ -32,29 +32,32 @@ export class BookRepository extends Repository<Book> {
 
     if (rawResults.length === 0) return null;
 
-    const result = rawToEntity(BookDto, rawResults[0], 'book');
+    const result = rawToEntity(Book, rawResults[0], 'book');
     result.categories = [];
     result.authors = [];
-
-    if (user) {
-      result.userData = {
-        isBorrowing: rawResults[0].isBorrowing,
-        isFavouring: rawResults[0].isFavouring,
-      };
-    }
 
     rawResults.forEach((item) => {
       const categoryId = item['category_id'];
       const authorId = item['author_id'];
 
-      if (!result.categories.find((c) => c.id === categoryId)) {
+      if (categoryId && !result.categories.find((c) => c.id === categoryId)) {
         result.categories.push(rawToEntity(Category, item, 'category'));
       }
 
-      if (!result.authors.find((c) => c.id === authorId)) {
+      if (authorId && !result.authors.find((c) => c.id === authorId)) {
         result.authors.push(rawToEntity(Author, item, 'author'));
       }
     });
+
+    if (user) {
+      return {
+        ...result,
+        userData: {
+          isBorrowing: rawResults[0].isBorrowing,
+          isFavouring: rawResults[0].isFavouring,
+        },
+      };
+    }
 
     return result;
   }
@@ -101,13 +104,19 @@ export class BookRepository extends Repository<Book> {
       const authorId = book['author_id'];
 
       if (mappedBooks[bookId]) {
-        if (!mappedBooks[bookId].categories.find((c) => c.id === categoryId)) {
+        if (
+          categoryId &&
+          !mappedBooks[bookId].categories.find((c) => c.id === categoryId)
+        ) {
           mappedBooks[bookId].categories.push(
             rawToEntity(Category, book, 'category'),
           );
         }
 
-        if (!mappedBooks[bookId].authors.find((c) => c.id === authorId)) {
+        if (
+          authorId &&
+          !mappedBooks[bookId].authors.find((c) => c.id === authorId)
+        ) {
           mappedBooks[bookId].authors.push(rawToEntity(Author, book, 'author'));
         }
 
