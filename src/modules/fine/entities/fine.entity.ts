@@ -1,5 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryColumn,
+} from 'typeorm';
 
 import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 import { FineStatus } from '@/modules/fine/enums/fine-status.enum';
@@ -18,7 +26,7 @@ export class Fine {
     description: 'The corresponding checkout of the fine',
     type: Checkout,
   })
-  @OneToOne(() => Checkout)
+  @OneToOne(() => Checkout, { onDelete: 'CASCADE' })
   @JoinColumn()
   checkout: Checkout;
 
@@ -44,9 +52,12 @@ export class Fine {
     description: 'The created timestamp of the fine',
     example: '2024-06-30T13:46:54.405Z',
   })
-  @Column('timestamp with time zone', {
+  @CreateDateColumn({
+    type: 'timestamp with time zone',
     default: () => 'CURRENT_TIMESTAMP',
-    nullable: true,
   })
   createdTimestamp: Date;
+
+  @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
+  deletedTimestamp: Date;
 }

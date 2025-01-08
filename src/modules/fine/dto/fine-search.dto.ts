@@ -8,11 +8,11 @@ import {
   IsUUID,
 } from 'class-validator';
 
-import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
+import { CommonQueryDto } from '@/base/common/dto/common-query.dto';
 import { FineOrderableField } from '@/modules/fine/enums/fine-orderable-field.enum';
 import { FineStatus } from '@/modules/fine/enums/fine-status.enum';
 
-export class FineSearchDto extends OmitType(PaginationQueryDto, ['orderBy']) {
+export class FineSearchDto extends OmitType(CommonQueryDto, ['orderBy']) {
   @ApiProperty({
     description: 'The field to order the results by',
     enum: FineOrderableField,

@@ -21,6 +21,7 @@ export class UserRepository extends Repository<User> {
     address,
     firstName,
     lastName,
+    deletedOnly,
   }: UserSearchDto) {
     const skip = (page - 1) * pageSize;
     const query = this.createQueryBuilder('user')
@@ -47,21 +48,33 @@ export class UserRepository extends Repository<User> {
       });
     }
 
+    if (deletedOnly) {
+      query.withDeleted().andWhere('user.deletedTimestamp IS NOT NULL');
+    }
+
     return query.getManyAndCount();
   }
 
-  findByEmail(email: string) {
+  findByEmail(email: string, includeDeleted = false) {
     const query = this.createQueryBuilder('user')
       .leftJoinAndSelect('user.avatar', 'avatar')
       .where('user.email = :email', { email });
 
+    if (includeDeleted) {
+      query.withDeleted();
+    }
+
     return query.getOne();
   }
 
-  findById(id: string) {
+  findById(id: string, includeDeleted = false) {
     const query = this.createQueryBuilder('user')
       .leftJoinAndSelect('user.avatar', 'avatar')
       .where('user.id = :id', { id });
+
+    if (includeDeleted) {
+      query.withDeleted();
+    }
 
     return query.getOne();
   }

@@ -63,7 +63,6 @@ export class UserDto {
   googleId: string;
 
   public static fromUser(user: User): UserDto {
-    const userDto = plainToInstance(UserDto, user);
-    return userDto;
+    return plainToInstance(UserDto, user);
   }
 }

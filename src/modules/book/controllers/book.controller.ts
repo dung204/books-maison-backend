@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -12,6 +13,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBody,
+  ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOperation,
   ApiTags,
@@ -24,7 +26,6 @@ import { Admin } from '@/modules/auth/decorators/admin.decorator';
 import { OptionalAuth } from '@/modules/auth/decorators/optional-auth.decorator';
 import { BookSearchDto } from '@/modules/book/dto/book-search.dto';
 import { BookDto } from '@/modules/book/dto/book.dto';
-import { Book } from '@/modules/book/entities/book.entity';
 import { BookService } from '@/modules/book/services/book.service';
 
 import { CreateBookDto } from '../dto/create-book.dto';
@@ -44,7 +45,7 @@ export class BookController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.CREATED,
-    schema: Book,
+    schema: BookDto,
     isArray: false,
     description: 'Successful book creation',
   })
@@ -76,6 +77,27 @@ export class BookController {
     return this.bookService.findAll(bookSearchDto, currentUser);
   }
 
+  @Admin()
+  @ApiOperation({
+    summary: 'Get all deleted books (for ADMIN only)',
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: BookDto,
+    isArray: true,
+    pagination: true,
+    description:
+      'Get all deleted books information successfully (with pagination metadata).',
+  })
+  @Get('/deleted')
+  findAllDeletedOnly(
+    @Request() req: CustomRequest,
+    @Query() bookSearchDto: BookSearchDto,
+  ) {
+    const currentUser = req.user;
+    return this.bookService.findAllDeletedOnly(bookSearchDto, currentUser);
+  }
+
   @OptionalAuth()
   @ApiOperation({
     summary: 'Get a book by ID',
@@ -84,7 +106,7 @@ export class BookController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
-    schema: Book,
+    schema: BookDto,
     isArray: false,
     description: 'Book is retrieved successfully',
   })
@@ -95,10 +117,10 @@ export class BookController {
   async findOne(
     @Request() req: CustomRequest,
     @Param('id') id: string,
-  ): Promise<SuccessResponse<Book>> {
+  ): Promise<SuccessResponse<BookDto>> {
     const currentUser = req.user;
     return {
-      data: await this.bookService.findOne(id, currentUser),
+      data: BookDto.fromBook(await this.bookService.findOne(id, currentUser)),
     };
   }
 
@@ -108,7 +130,7 @@ export class BookController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
-    schema: Book,
+    schema: BookDto,
     isArray: false,
   })
   @Patch(':id')
@@ -116,9 +138,47 @@ export class BookController {
   async update(
     @Param('id') id: string,
     @Body() updateBookDto: UpdateBookDto,
-  ): Promise<SuccessResponse<Book>> {
+  ): Promise<SuccessResponse<BookDto>> {
     return {
-      data: await this.bookService.update(id, updateBookDto),
+      data: BookDto.fromBook(await this.bookService.update(id, updateBookDto)),
     };
+  }
+
+  @Admin()
+  @ApiOperation({
+    summary: 'Mark a book as deleted (for ADMIN only)',
+    description:
+      'The corresponding checkouts, fines, favourite books items will also be marked as deleted.',
+  })
+  @ApiNoContentResponse({
+    description: 'The book is marked as deleted successfully',
+  })
+  @ApiNotFoundResponse({
+    description: 'Book not found or book has already been marked as deleted',
+  })
+  @Delete('/delete/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteBook(@Param('id') id: string) {
+    return this.bookService.softDeleteBook(id);
+  }
+
+  @Admin()
+  @ApiOperation({
+    summary: 'Recover a book from the deleted (for ADMIN only)',
+    description:
+      'The corresponding checkouts, fines, favourite books items will also be recovered.',
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: BookDto,
+    isArray: false,
+    description: 'The book is recovered successfully',
+  })
+  @ApiNotFoundResponse({
+    description: 'Book not found or book has already been recovered',
+  })
+  @Patch('/recover/:id')
+  async recoverBook(@Param('id') id: string) {
+    return this.bookService.recoverBook(id);
   }
 }

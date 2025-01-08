@@ -7,13 +7,11 @@ import {
   IsUUID,
 } from 'class-validator';
 
-import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
+import { CommonQueryDto } from '@/base/common/dto/common-query.dto';
 import { CheckoutOrderableField } from '@/modules/checkout/enums/checkout-orderable-field.enum';
 import { CheckoutStatus } from '@/modules/checkout/enums/checkout-status.enum';
 
-export class CheckoutSearchDto extends OmitType(PaginationQueryDto, [
-  'orderBy',
-]) {
+export class CheckoutSearchDto extends OmitType(CommonQueryDto, ['orderBy']) {
   @ApiProperty({
     description: 'The field to order the results by',
     enum: CheckoutOrderableField,

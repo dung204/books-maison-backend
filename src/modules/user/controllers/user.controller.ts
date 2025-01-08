@@ -1,5 +1,19 @@
-import { Controller, Get, HttpStatus, Param, Query } from '@nestjs/common';
-import { ApiNotFoundResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Query,
+} from '@nestjs/common';
+import {
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
 import { SuccessResponse } from '@/base/common/responses/success.response';
@@ -30,6 +44,21 @@ export class UserController {
   }
 
   @Admin()
+  @ApiOperation({ summary: 'Get all deleted users (for ADMIN only)' })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: UserDto,
+    isArray: true,
+    pagination: true,
+    description:
+      'Get all deleted users information successfully (with pagination metadata).',
+  })
+  @Get('/deleted')
+  findAllDeletedOnly(@Query() userSearchDto: UserSearchDto) {
+    return this.userService.findAllDeletedOnly(userSearchDto);
+  }
+
+  @Admin()
   @ApiOperation({ summary: 'Get a user by id (for ADMIN only)' })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
@@ -47,5 +76,35 @@ export class UserController {
     return {
       data: UserDto.fromUser(user),
     };
+  }
+
+  @Admin()
+  @ApiOperation({ summary: 'Deactivate a user by user id (for ADMIN only)' })
+  @ApiNoContentResponse({
+    description: 'User is deactivated successfully.',
+  })
+  @ApiNotFoundResponse({
+    description: 'User is not found or is already deactivated.',
+  })
+  @Delete('/deactivate/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deactivateUser(@Param('id') userId: string) {
+    return this.userService.deactivateUserById(userId);
+  }
+
+  @Admin()
+  @ApiOperation({ summary: 'Reactivate a user by user id (for ADMIN only)' })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: UserDto,
+    isArray: false,
+    description: 'User is reactivated successfully.',
+  })
+  @ApiNotFoundResponse({
+    description: 'User is not found or is not currently deactivated.',
+  })
+  @Patch('/reactivate/:id')
+  async reactivateUser(@Param('id') userId: string) {
+    return this.userService.reactivateUserById(userId);
   }
 }

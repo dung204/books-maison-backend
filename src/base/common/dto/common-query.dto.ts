@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
+import { Exclude, Transform } from 'class-transformer';
 import {
   IsEnum,
   IsInt,
@@ -10,7 +10,7 @@ import {
 
 import { Order } from '@/base/common/enum/order.enum';
 
-export class PaginationQueryDto {
+export class CommonQueryDto {
   @ApiProperty({
     description: 'The current page number',
     default: 1,
@@ -55,4 +55,7 @@ export class PaginationQueryDto {
     message: `Order must be one of these values: ${Object.values(Order).join(', ')}`,
   })
   order?: Order = Order.DESC;
+
+  @Exclude()
+  deletedOnly?: boolean = false;
 }

@@ -27,7 +27,6 @@ import { CreateTransactionDto } from '@/modules/transaction/dto/create-transacti
 import { MomoNotifyDto } from '@/modules/transaction/dto/momo-notify.dto';
 import { TransactionSearchDto } from '@/modules/transaction/dto/transaction-search.dto';
 import { TransactionDto } from '@/modules/transaction/dto/transaction.dto';
-import { Transaction } from '@/modules/transaction/entities/transaction.entity';
 import { TransactionService } from '@/modules/transaction/services/transaction.service';
 
 @ApiTags('transactions')
@@ -41,7 +40,7 @@ export class TransactionController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
-    schema: Transaction,
+    schema: TransactionDto,
     isArray: false,
     pagination: true,
     description:
@@ -60,7 +59,7 @@ export class TransactionController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
-    schema: Transaction,
+    schema: TransactionDto,
     isArray: false,
     description: 'Transaction is retrieved successfully.',
   })
@@ -96,7 +95,7 @@ export class TransactionController {
   async createCashTransaction(
     @Request() req: CustomRequest,
     @Body() createTransactionDto: CreateTransactionDto,
-  ): Promise<SuccessResponse<Transaction>> {
+  ): Promise<SuccessResponse<TransactionDto>> {
     const currentUser = req.user;
 
     return {

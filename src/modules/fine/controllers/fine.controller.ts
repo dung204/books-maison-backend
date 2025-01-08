@@ -24,7 +24,6 @@ import { Private } from '@/modules/auth/decorators/private.decorator';
 import { FineSearchDto } from '@/modules/fine/dto/fine-search.dto';
 import { FineDto } from '@/modules/fine/dto/fine.dto';
 import { PayFineDto } from '@/modules/fine/dto/pay-fine.dto';
-import { Fine } from '@/modules/fine/entities/fine.entity';
 import { FineStatus } from '@/modules/fine/enums/fine-status.enum';
 import { FineService } from '@/modules/fine/services/fine.service';
 import { TransactionMethod } from '@/modules/transaction/enums/transaction-method.enum';
@@ -40,7 +39,7 @@ export class FineController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
-    schema: Fine,
+    schema: FineDto,
     isArray: true,
     pagination: true,
     description:
@@ -59,7 +58,7 @@ export class FineController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
-    schema: Fine,
+    schema: FineDto,
     isArray: false,
     description: 'Fine is retrieved successfully.',
   })
@@ -83,7 +82,7 @@ export class FineController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.CREATED,
-    schema: Fine,
+    schema: FineDto,
     isArray: false,
     description: 'A money transaction to pay the fine is created successfully.',
   })

@@ -25,12 +25,12 @@ import { ApiSuccessResponse } from '@/base/common/decorators/api-success-respons
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { CustomRequest } from '@/base/common/types/custom-request.type';
 import { Private } from '@/modules/auth/decorators/private.decorator';
-import { Book } from '@/modules/book/entities/book.entity';
+import { BookSearchDto } from '@/modules/book/dto/book-search.dto';
+import { BookDto } from '@/modules/book/dto/book.dto';
+import { CheckoutDto } from '@/modules/checkout/dto/checkout.dto';
 import { UserCheckoutSearchDto } from '@/modules/checkout/dto/user-checkout-search.dto';
 import { UserCreateCheckoutDto } from '@/modules/checkout/dto/user-create-checkout.dto';
-import { Checkout } from '@/modules/checkout/entities/checkout.entity';
 import { CheckoutService } from '@/modules/checkout/services/checkout.service';
-import { FavouriteBookSearchDto } from '@/modules/favourite-book/dto/favourite-book-search.dto';
 import { FavouriteBookService } from '@/modules/favourite-book/services/favourite-book.service';
 import { FineDto } from '@/modules/fine/dto/fine.dto';
 import UserFineSearchDto from '@/modules/fine/dto/user-fine-search.dto';
@@ -38,8 +38,8 @@ import { FineService } from '@/modules/fine/services/fine.service';
 import { AvatarDto } from '@/modules/me/dtos/avatar.dto';
 import { SetAvatarDto } from '@/modules/me/dtos/set-avatar.dto';
 import { AvatarService } from '@/modules/me/services/avatar.service';
+import { TransactionDto } from '@/modules/transaction/dto/transaction.dto';
 import { UserTransactionSearchDto } from '@/modules/transaction/dto/user-transaction-search.dto';
-import { Transaction } from '@/modules/transaction/entities/transaction.entity';
 import { TransactionService } from '@/modules/transaction/services/transaction.service';
 import { ChangePasswordDto } from '@/modules/user/dto/change-password.dto';
 import { UserDto } from '@/modules/user/dto/user.dto';
@@ -145,7 +145,7 @@ export class MeController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
-    schema: Book,
+    schema: BookDto,
     isArray: true,
     pagination: true,
     description:
@@ -154,12 +154,12 @@ export class MeController {
   @Get('/books/favourite')
   getAllFavouriteBooks(
     @Request() req: CustomRequest,
-    @Query() favouriteBookSearchDto: FavouriteBookSearchDto,
+    @Query() bookSearchDto: BookSearchDto,
   ) {
     const currentUser = req.user;
     return this.favouriteBookService.getAllFavouriteBooks(
       currentUser,
-      favouriteBookSearchDto,
+      bookSearchDto,
     );
   }
 
@@ -210,7 +210,7 @@ export class MeController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
-    schema: Checkout,
+    schema: CheckoutDto,
     isArray: true,
     pagination: true,
     description:
@@ -234,7 +234,7 @@ export class MeController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.CREATED,
-    schema: Checkout,
+    schema: CheckoutDto,
     isArray: false,
     description: 'Successful checkout creation.',
   })
@@ -285,7 +285,7 @@ export class MeController {
   })
   @ApiSuccessResponse({
     status: HttpStatus.OK,
-    schema: Transaction,
+    schema: TransactionDto,
     isArray: false,
     pagination: true,
     description:
@@ -301,5 +301,35 @@ export class MeController {
       userId: currentUser.id,
       ...userTransactionSearchDto,
     });
+  }
+
+  @Private()
+  @ApiOperation({ summary: 'Deactivate a user by user id (for ADMIN only)' })
+  @ApiNoContentResponse({
+    description: 'User is deactivated successfully.',
+  })
+  @ApiNotFoundResponse({
+    description: 'User is not found or is already deactivated.',
+  })
+  @Delete('/deactivate/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deactivateUser(@Request() req: CustomRequest) {
+    return this.userService.deactivateUser(req.user);
+  }
+
+  @Private()
+  @ApiOperation({ summary: 'Reactivate a user by user id (for ADMIN only)' })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: UserDto,
+    isArray: false,
+    description: 'User is reactivated successfully.',
+  })
+  @ApiNotFoundResponse({
+    description: 'User is not found or is not currently deactivated.',
+  })
+  @Patch('/reactivate/:id')
+  async reactivateUser(@Request() req: CustomRequest) {
+    return this.userService.reactivateUser(req.user);
   }
 }

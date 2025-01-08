@@ -26,7 +26,6 @@ import { TransactionEvents } from '@/modules/transaction/enums/transaction-event
 import { TransactionMethod } from '@/modules/transaction/enums/transaction-method.enum';
 import { TransactionRepository } from '@/modules/transaction/repositories/transaction.repository';
 import { CreateMomoLinkSuccessResponse } from '@/modules/transaction/responses/create-momo-link-success.response';
-import { UserDto } from '@/modules/user/dto/user.dto';
 import { User } from '@/modules/user/entities/user.entity';
 import { UserService } from '@/modules/user/services/user.service';
 
@@ -50,14 +49,14 @@ export class TransactionService {
 
   async findAll(
     transactionSearchDto: TransactionSearchDto,
-  ): Promise<SuccessResponse<Transaction[]>> {
+  ): Promise<SuccessResponse<TransactionDto[]>> {
     const { page, pageSize } = transactionSearchDto;
     const [transactions, total] =
       await this.transactionRepository.findAllAndCount(transactionSearchDto);
     const totalPage = Math.ceil(total / pageSize);
 
     return {
-      data: transactions,
+      data: transactions.map(TransactionDto.fromTransaction),
       pagination: {
         total,
         page,
@@ -72,7 +71,7 @@ export class TransactionService {
   async findById(
     user: User,
     id: string,
-  ): Promise<SuccessResponse<Transaction>> {
+  ): Promise<SuccessResponse<TransactionDto>> {
     const transaction = await this.transactionRepository.findById(id);
 
     if (!transaction) throw new NotFoundException('Fine not found.');
@@ -82,7 +81,7 @@ export class TransactionService {
       throw new ForbiddenException();
 
     return {
-      data: transaction,
+      data: TransactionDto.fromTransaction(transaction),
     };
   }
 
@@ -116,7 +115,7 @@ export class TransactionService {
 
     const transaction = new Transaction();
     transaction.id = `BM_TR_${Date.now()}`;
-    transaction.user = UserDto.fromUser(user);
+    transaction.user = user;
     transaction.amount = amount;
     transaction.method = transactionMethod;
 
@@ -127,7 +126,7 @@ export class TransactionService {
         TransactionEvents.SAVED,
         new SavedTransactionEventDto(savedTransaction, extraData),
       );
-      return savedTransaction;
+      return TransactionDto.fromTransaction(savedTransaction);
     }
 
     transaction.createdTimestamp = new Date();
@@ -149,7 +148,7 @@ export class TransactionService {
         ),
       );
       return {
-        ...transaction,
+        ...TransactionDto.fromTransaction(transaction),
         purchaseUrl,
       };
     }

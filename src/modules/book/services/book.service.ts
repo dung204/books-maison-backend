@@ -1,4 +1,5 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { DeepPartial } from 'typeorm';
 
 import { SuccessResponse } from '@/base/common/responses/success.response';
@@ -15,17 +16,19 @@ import { UpdateBookDto } from '../dto/update-book.dto';
 
 @Injectable()
 export class BookService {
+  private readonly logger: Logger = new Logger(BookService.name);
+
   constructor(
-    @Inject(BookRepository) private bookRepository: BookRepository,
-    private categoryService: CategoryService,
-    private authorService: AuthorService,
+    private readonly bookRepository: BookRepository,
+    private readonly categoryService: CategoryService,
+    private readonly authorService: AuthorService,
   ) {}
 
   async create({
     authorIds,
     categoryIds,
     ...createBookDto
-  }: CreateBookDto): Promise<SuccessResponse<Book>> {
+  }: CreateBookDto): Promise<SuccessResponse<BookDto>> {
     const book = new Book();
     const categories =
       categoryIds &&
@@ -45,7 +48,7 @@ export class BookService {
     });
 
     return {
-      data: await this.bookRepository.save(book),
+      data: BookDto.fromBook(await this.bookRepository.save(book)),
     };
   }
 
@@ -61,7 +64,7 @@ export class BookService {
     const totalPage = Math.ceil(total / pageSize);
 
     return {
-      data: books,
+      data: books.map(BookDto.fromBook),
       pagination: {
         total,
         page,
@@ -71,6 +74,14 @@ export class BookService {
         hasPreviousPage: page > 1,
       },
     };
+  }
+
+  async findAllDeletedOnly(bookSearchDto: BookSearchDto, user?: User) {
+    return this.findAll({ ...bookSearchDto, deletedOnly: true }, user);
+  }
+
+  async findAllFavouriteBooks(user: User, bookSearchDto: BookSearchDto) {
+    return this.findAll({ ...bookSearchDto, filterFavourite: true }, user);
   }
 
   async findOne(id: string, user?: User) {
@@ -100,12 +111,66 @@ export class BookService {
             authorIds.map((id) => this.authorService.findAuthorById(id)),
           );
 
-    Object.assign<Book, DeepPartial<Book>>(book, {
+    Object.assign(book, {
       authors,
       categories,
       ...updateBookDto,
     });
 
     return this.bookRepository.save(book);
+  }
+
+  async softDeleteBook(id: string) {
+    const book = await this.bookRepository.findOne({
+      where: { id },
+      relations: {
+        checkouts: {
+          fine: true,
+        },
+      },
+    });
+
+    if (!book)
+      throw new NotFoundException(
+        'Book not found or book has already been marked as deleted.',
+      );
+
+    await this.bookRepository.softRemove(book);
+  }
+
+  async recoverBook(id: string): Promise<SuccessResponse<BookDto>> {
+    const book = await this.bookRepository.findOne({
+      where: { id },
+      relations: {
+        categories: true,
+        authors: true,
+        checkouts: {
+          fine: true,
+        },
+      },
+      withDeleted: true,
+    });
+
+    if (!book)
+      throw new NotFoundException(
+        'Book not found or book has already been recovered.',
+      );
+
+    return {
+      data: BookDto.fromBook(await this.bookRepository.recover(book)),
+    };
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async deleteBooks() {
+    const deleteResult = await this.bookRepository
+      .createQueryBuilder()
+      .delete()
+      .where('(CURRENT_TIMESTAMP::date - deletedTimestamp ::date) >= 30')
+      .execute();
+
+    this.logger.log(
+      `${deleteResult.affected} books have been deleted successfully.`,
+    );
   }
 }

@@ -32,43 +32,54 @@ export class BookRepository extends Repository<Book> {
 
     if (rawResults.length === 0) return null;
 
-    const result = rawToEntity(BookDto, rawResults[0], 'book');
+    const result = rawToEntity(Book, rawResults[0], 'book');
     result.categories = [];
     result.authors = [];
-
-    if (user) {
-      result.userData = {
-        isBorrowing: rawResults[0].isBorrowing,
-        isFavouring: rawResults[0].isFavouring,
-      };
-    }
 
     rawResults.forEach((item) => {
       const categoryId = item['category_id'];
       const authorId = item['author_id'];
 
-      if (!result.categories.find((c) => c.id === categoryId)) {
+      if (categoryId && !result.categories.find((c) => c.id === categoryId)) {
         result.categories.push(rawToEntity(Category, item, 'category'));
       }
 
-      if (!result.authors.find((c) => c.id === authorId)) {
+      if (authorId && !result.authors.find((c) => c.id === authorId)) {
         result.authors.push(rawToEntity(Author, item, 'author'));
       }
     });
 
+    if (user) {
+      return {
+        ...result,
+        userData: {
+          isBorrowing: rawResults[0].isBorrowing,
+          isFavouring: rawResults[0].isFavouring,
+        },
+      };
+    }
+
     return result;
+  }
+
+  async findByIdWithoutUserData(id: string) {
+    return this.createQueryBuilder('book')
+      .leftJoinAndSelect('book.authors', 'author')
+      .leftJoinAndSelect('book.categories', 'category')
+      .where('book.id = :id', { id })
+      .getOne();
   }
 
   async findAllAndCount(
     bookSearchDto: BookSearchDto,
     user?: User,
-  ): Promise<[Book[], number]> {
+  ): Promise<[BookDto[], number]> {
     const actualOrderBy = Object.values(BookOrderableField).includes(
       bookSearchDto.orderBy,
     )
       ? bookSearchDto.orderBy
       : BookOrderableField.CREATED_TIMESTAMP;
-    const subQuery = await this.findAllSubQuery(bookSearchDto);
+    const subQuery = await this.findAllSubQuery(bookSearchDto, user);
 
     const query = this.createQueryBuilder('book')
       .leftJoinAndSelect('book.authors', 'author')
@@ -80,7 +91,7 @@ export class BookRepository extends Repository<Book> {
       .leftJoinAndSelect('book.authors', 'author')
       .leftJoinAndSelect('book.categories', 'category');
 
-    await this.setFindAllFilter(countQuery, bookSearchDto);
+    await this.setFindAllFilter(countQuery, bookSearchDto, user);
 
     this.addSelectUserData(query, user);
 
@@ -93,13 +104,19 @@ export class BookRepository extends Repository<Book> {
       const authorId = book['author_id'];
 
       if (mappedBooks[bookId]) {
-        if (!mappedBooks[bookId].categories.find((c) => c.id === categoryId)) {
+        if (
+          categoryId &&
+          !mappedBooks[bookId].categories.find((c) => c.id === categoryId)
+        ) {
           mappedBooks[bookId].categories.push(
             rawToEntity(Category, book, 'category'),
           );
         }
 
-        if (!mappedBooks[bookId].authors.find((c) => c.id === authorId)) {
+        if (
+          authorId &&
+          !mappedBooks[bookId].authors.find((c) => c.id === authorId)
+        ) {
           mappedBooks[bookId].authors.push(rawToEntity(Author, book, 'author'));
         }
 
@@ -122,7 +139,7 @@ export class BookRepository extends Repository<Book> {
     return [Object.values(mappedBooks), await countQuery.getCount()];
   }
 
-  private async findAllSubQuery(bookSearchDto: BookSearchDto) {
+  private async findAllSubQuery(bookSearchDto: BookSearchDto, user?: User) {
     const { page, pageSize, orderBy, order } = bookSearchDto;
     const skip = (page - 1) * pageSize;
     const actualOrderBy = Object.values(BookOrderableField).includes(orderBy)
@@ -133,7 +150,7 @@ export class BookRepository extends Repository<Book> {
       .leftJoinAndSelect('book.authors', 'author')
       .leftJoinAndSelect('book.categories', 'category');
 
-    await this.setFindAllFilter(subQuery1, bookSearchDto);
+    await this.setFindAllFilter(subQuery1, bookSearchDto, user);
 
     const subQuery2 = this.dataSource
       .createQueryBuilder()
@@ -208,6 +225,7 @@ export class BookRepository extends Repository<Book> {
   private async setFindAllFilter(
     query: SelectQueryBuilder<Book>,
     {
+      deletedOnly,
       authorName,
       title,
       publisher,
@@ -217,8 +235,14 @@ export class BookRepository extends Repository<Book> {
       publishedYearFrom,
       publishedYearTo,
       categoryId: categoryIds,
+      filterFavourite,
     }: BookSearchDto,
+    user?: User,
   ) {
+    if (deletedOnly) {
+      query.andWhere('book.deletedTimestamp IS NOT NULL');
+    }
+
     if (title) {
       query.andWhere(`LOWER(book.title) LIKE LOWER('%${title}%')`);
     }
@@ -263,6 +287,16 @@ export class BookRepository extends Repository<Book> {
           `book.id IN (${bookIds.map((id) => `'${id}'`).join(',')})`,
         );
       }
+    }
+
+    if (filterFavourite && user) {
+      query
+        .leftJoin(
+          FavouriteBook,
+          'favouriteBook',
+          'book.id = favouriteBook.bookId',
+        )
+        .andWhere(`favouriteBook.userId = '${user.id}'`);
     }
   }
 

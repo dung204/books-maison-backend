@@ -1,10 +1,11 @@
 import {
   ConflictException,
-  Inject,
   Injectable,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { PasswordUtils } from '@/base/utils/password.utils';
@@ -19,10 +20,9 @@ import { UpdateUserDto } from '../dto/update-user.dto';
 
 @Injectable()
 export class UserService {
-  constructor(
-    @Inject(UserRepository)
-    private userRepository: UserRepository,
-  ) {}
+  private readonly logger: Logger = new Logger(UserRepository.name);
+
+  constructor(private readonly userRepository: UserRepository) {}
 
   async create(
     createUserDto: CreateUserDto,
@@ -53,6 +53,10 @@ export class UserService {
         hasPreviousPage: page > 1,
       },
     };
+  }
+
+  async findAllDeletedOnly(userSearchDto: UserSearchDto) {
+    return this.findAll({ ...userSearchDto, deletedOnly: true });
   }
 
   async findUserById(id: string) {
@@ -118,5 +122,68 @@ export class UserService {
       throw new ConflictException(
         'Conflicted! Cannot change password of current user.',
       );
+  }
+
+  async deactivateUserById(id: string) {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: {
+        checkouts: {
+          fine: true,
+        },
+        transactions: true,
+      },
+    });
+
+    if (!user)
+      throw new NotFoundException(
+        'User not found or user is already deactivated.',
+      );
+
+    return this.deactivateUser(user);
+  }
+
+  async deactivateUser(user: User) {
+    await this.userRepository.softRemove(user);
+  }
+
+  async reactivateUserById(id: string) {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: {
+        checkouts: {
+          fine: true,
+        },
+        transactions: true,
+      },
+      withDeleted: true,
+    });
+
+    if (!user) {
+      throw new NotFoundException(
+        'User not found or user is not currently deactivated.',
+      );
+    }
+
+    return this.reactivateUser(user);
+  }
+
+  async reactivateUser(user: User): Promise<SuccessResponse<UserDto>> {
+    return {
+      data: UserDto.fromUser(await this.userRepository.recover(user)),
+    };
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async deleteCategories() {
+    const deleteResult = await this.userRepository
+      .createQueryBuilder()
+      .delete()
+      .where('(CURRENT_TIMESTAMP::date - deletedTimestamp ::date) >= 30')
+      .execute();
+
+    this.logger.log(
+      `${deleteResult.affected} categories have been deleted successfully.`,
+    );
   }
 }
