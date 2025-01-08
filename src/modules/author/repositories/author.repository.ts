@@ -18,6 +18,7 @@ export class AuthorRepository extends Repository<Author> {
     pageSize,
     order,
     orderBy,
+    deletedOnly,
     name,
     nationality,
     yearOfBirthFrom,
@@ -33,6 +34,10 @@ export class AuthorRepository extends Repository<Author> {
       .orderBy(`author.${actualOrderBy}`, order)
       .skip(skip)
       .take(pageSize);
+
+    if (deletedOnly) {
+      query.withDeleted().andWhere('author.deletedTimestamp IS NOT NULL');
+    }
 
     if (name) {
       query.andWhere('LOWER(author.name) LIKE LOWER(:name)', {

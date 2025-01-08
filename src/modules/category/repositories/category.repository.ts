@@ -13,7 +13,14 @@ export class CategoryRepository extends Repository<Category> {
     super(Category, dataSource.createEntityManager());
   }
 
-  findAllAndCount({ page, pageSize, orderBy, order, name }: CategorySearchDto) {
+  findAllAndCount({
+    page,
+    pageSize,
+    orderBy,
+    order,
+    deletedOnly,
+    name,
+  }: CategorySearchDto) {
     const skip = (page - 1) * pageSize;
     const actualOrderBy = Object.values(CategoryOrderableField).includes(
       orderBy,
@@ -24,6 +31,10 @@ export class CategoryRepository extends Repository<Category> {
       .orderBy(`category.${actualOrderBy}`, order)
       .skip(skip)
       .take(pageSize);
+
+    if (deletedOnly) {
+      query.withDeleted().andWhere('category.deletedTimestamp IS NOT NULL');
+    }
 
     if (name) {
       query.andWhere('LOWER(category.name) LIKE LOWER(:name)', {

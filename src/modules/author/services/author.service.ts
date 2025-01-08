@@ -55,6 +55,10 @@ export class AuthorService {
     };
   }
 
+  async findAllDeletedOnly(authorSearchDto: AuthorSearchDto) {
+    return this.findAll({ ...authorSearchDto, deletedOnly: true });
+  }
+
   async findAuthorById(id: string) {
     const author = await this.authorRepository.findById(id);
 

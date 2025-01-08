@@ -21,6 +21,7 @@ export class UserRepository extends Repository<User> {
     address,
     firstName,
     lastName,
+    deletedOnly,
   }: UserSearchDto) {
     const skip = (page - 1) * pageSize;
     const query = this.createQueryBuilder('user')
@@ -45,6 +46,10 @@ export class UserRepository extends Repository<User> {
       query.andWhere('LOWER(user.address) LIKE LOWER(:address)', {
         address: `%${address}%`,
       });
+    }
+
+    if (deletedOnly) {
+      query.withDeleted().andWhere('user.deletedTimestamp IS NOT NULL');
     }
 
     return query.getManyAndCount();

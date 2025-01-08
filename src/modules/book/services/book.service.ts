@@ -76,6 +76,10 @@ export class BookService {
     };
   }
 
+  async findAllDeletedOnly(bookSearchDto: BookSearchDto, user?: User) {
+    return this.findAll({ ...bookSearchDto, deletedOnly: true }, user);
+  }
+
   async findAllFavouriteBooks(user: User, bookSearchDto: BookSearchDto) {
     return this.findAll({ ...bookSearchDto, filterFavourite: true }, user);
   }
@@ -88,19 +92,11 @@ export class BookService {
     return book;
   }
 
-  async findOneWithoutUserData(id: string): Promise<Book> {
-    const book = await this.bookRepository.findByIdWithoutUserData(id);
-
-    if (!book) throw new NotFoundException('Book not found.');
-
-    return book;
-  }
-
   async update(
     id: string,
     { authorIds, categoryIds, ...updateBookDto }: UpdateBookDto,
   ) {
-    const book = await this.findOneWithoutUserData(id);
+    const book = await this.findOne(id);
 
     const categories =
       !categoryIds || categoryIds.length === 0

@@ -51,7 +51,7 @@ export class CheckoutService {
     if (rentingCheckout)
       throw new ConflictException('User has already rented this book.');
 
-    const book = await this.bookService.findOneWithoutUserData(bookId);
+    const book = await this.bookService.findOne(bookId);
 
     if (book.quantity === 0)
       throw new BadRequestException('This book is currently out of stock.');
@@ -89,7 +89,7 @@ export class CheckoutService {
       throw new ConflictException('User has already rented this book.');
 
     const user = await this.userService.findUserById(userId);
-    const book = await this.bookService.findOneWithoutUserData(bookId);
+    const book = await this.bookService.findOne(bookId);
 
     if (book.quantity === 0)
       throw new BadRequestException('This book is currently out of stock.');

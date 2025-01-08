@@ -44,6 +44,21 @@ export class UserController {
   }
 
   @Admin()
+  @ApiOperation({ summary: 'Get all deleted users (for ADMIN only)' })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: UserDto,
+    isArray: true,
+    pagination: true,
+    description:
+      'Get all deleted users information successfully (with pagination metadata).',
+  })
+  @Get('/deleted')
+  findAllDeletedOnly(@Query() userSearchDto: UserSearchDto) {
+    return this.userService.findAllDeletedOnly(userSearchDto);
+  }
+
+  @Admin()
   @ApiOperation({ summary: 'Get a user by id (for ADMIN only)' })
   @ApiSuccessResponse({
     status: HttpStatus.OK,

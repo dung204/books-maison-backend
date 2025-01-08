@@ -8,10 +8,10 @@ import {
   IsUUID,
 } from 'class-validator';
 
-import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
+import { CommonQueryDto } from '@/base/common/dto/common-query.dto';
 import { BookOrderableField } from '@/modules/book/enums/book-orderable-field.enum';
 
-export class BookSearchDto extends OmitType(PaginationQueryDto, ['orderBy']) {
+export class BookSearchDto extends OmitType(CommonQueryDto, ['orderBy']) {
   @ApiProperty({
     description: 'The field to order the books by',
     enum: BookOrderableField,

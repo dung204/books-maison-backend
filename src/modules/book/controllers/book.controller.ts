@@ -73,9 +73,29 @@ export class BookController {
     @Request() req: CustomRequest,
     @Query() bookSearchDto: BookSearchDto,
   ) {
-    console.log(bookSearchDto.filterFavourite);
     const currentUser = req.user;
     return this.bookService.findAll(bookSearchDto, currentUser);
+  }
+
+  @Admin()
+  @ApiOperation({
+    summary: 'Get all deleted books (for ADMIN only)',
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: BookDto,
+    isArray: true,
+    pagination: true,
+    description:
+      'Get all deleted books information successfully (with pagination metadata).',
+  })
+  @Get('/deleted')
+  findAllDeletedOnly(
+    @Request() req: CustomRequest,
+    @Query() bookSearchDto: BookSearchDto,
+  ) {
+    const currentUser = req.user;
+    return this.bookService.findAllDeletedOnly(bookSearchDto, currentUser);
   }
 
   @OptionalAuth()

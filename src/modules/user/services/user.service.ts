@@ -55,6 +55,10 @@ export class UserService {
     };
   }
 
+  async findAllDeletedOnly(userSearchDto: UserSearchDto) {
+    return this.findAll({ ...userSearchDto, deletedOnly: true });
+  }
+
   async findUserById(id: string) {
     const user = await this.userRepository.findById(id);
 

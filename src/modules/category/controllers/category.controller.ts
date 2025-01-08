@@ -69,6 +69,23 @@ export class CategoryController {
     return this.categoryService.findAll(categorySearchDto);
   }
 
+  @Admin()
+  @ApiOperation({
+    summary: 'Get all deleted categories (for ADMIN only)',
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: CategoryDto,
+    isArray: true,
+    pagination: true,
+    description:
+      'Get all deleted categories information successfully (with pagination metadata).',
+  })
+  @Get('/deleted')
+  findAllDeletedOnly(@Query() categorySearchDto: CategorySearchDto) {
+    return this.categoryService.findAllDeletedOnly(categorySearchDto);
+  }
+
   @Public()
   @ApiOperation({
     summary: 'Get a category by ID',

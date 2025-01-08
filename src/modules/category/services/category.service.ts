@@ -52,6 +52,10 @@ export class CategoryService {
     };
   }
 
+  async findAllDeletedOnly(categorySearchDto: CategorySearchDto) {
+    return this.findAll({ ...categorySearchDto, deletedOnly: true });
+  }
+
   async findCategoryById(id: string) {
     const category = await this.categoryRepository.findById(id);
 

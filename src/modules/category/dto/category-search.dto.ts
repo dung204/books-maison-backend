@@ -1,12 +1,10 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 
-import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
+import { CommonQueryDto } from '@/base/common/dto/common-query.dto';
 import { CategoryOrderableField } from '@/modules/category/enums/category-orderable-field.enum';
 
-export class CategorySearchDto extends OmitType(PaginationQueryDto, [
-  'orderBy',
-]) {
+export class CategorySearchDto extends OmitType(CommonQueryDto, ['orderBy']) {
   @ApiProperty({
     description: 'The field to order the categories by',
     enum: CategoryOrderableField,

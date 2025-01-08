@@ -70,6 +70,23 @@ export class AuthorController {
     return this.authorService.findAll(authorSearchDto);
   }
 
+  @Admin()
+  @ApiOperation({
+    summary: 'Get all deleted authors (for ADMIN only)',
+  })
+  @ApiSuccessResponse({
+    status: HttpStatus.OK,
+    schema: AuthorDto,
+    isArray: true,
+    pagination: true,
+    description:
+      'Get all deleted authors information successfully (with pagination metadata).',
+  })
+  @Get('/deleted')
+  findAllDeletedOnly(@Query() authorSearchDto: AuthorSearchDto) {
+    return this.authorService.findAllDeletedOnly(authorSearchDto);
+  }
+
   @Public()
   @ApiOperation({
     summary: 'Get an author by ID',

@@ -2,11 +2,11 @@ import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
 
-import { PaginationQueryDto } from '@/base/common/dto/pagination-query.dto';
+import { CommonQueryDto } from '@/base/common/dto/common-query.dto';
 import { TransactionMethod } from '@/modules/transaction/enums/transaction-method.enum';
 import { TransactionOrderableField } from '@/modules/transaction/enums/transaction-orderable-field.enum';
 
-export class TransactionSearchDto extends OmitType(PaginationQueryDto, [
+export class TransactionSearchDto extends OmitType(CommonQueryDto, [
   'orderBy',
 ]) {
   @ApiProperty({

@@ -225,6 +225,7 @@ export class BookRepository extends Repository<Book> {
   private async setFindAllFilter(
     query: SelectQueryBuilder<Book>,
     {
+      deletedOnly,
       authorName,
       title,
       publisher,
@@ -238,6 +239,10 @@ export class BookRepository extends Repository<Book> {
     }: BookSearchDto,
     user?: User,
   ) {
+    if (deletedOnly) {
+      query.andWhere('book.deletedTimestamp IS NOT NULL');
+    }
+
     if (title) {
       query.andWhere(`LOWER(book.title) LIKE LOWER('%${title}%')`);
     }
