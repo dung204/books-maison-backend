@@ -25,12 +25,12 @@ import { ApiSuccessResponse } from '@/base/common/decorators/api-success-respons
 import { SuccessResponse } from '@/base/common/responses/success.response';
 import { CustomRequest } from '@/base/common/types/custom-request.type';
 import { Private } from '@/modules/auth/decorators/private.decorator';
+import { BookSearchDto } from '@/modules/book/dto/book-search.dto';
 import { BookDto } from '@/modules/book/dto/book.dto';
 import { CheckoutDto } from '@/modules/checkout/dto/checkout.dto';
 import { UserCheckoutSearchDto } from '@/modules/checkout/dto/user-checkout-search.dto';
 import { UserCreateCheckoutDto } from '@/modules/checkout/dto/user-create-checkout.dto';
 import { CheckoutService } from '@/modules/checkout/services/checkout.service';
-import { FavouriteBookSearchDto } from '@/modules/favourite-book/dto/favourite-book-search.dto';
 import { FavouriteBookService } from '@/modules/favourite-book/services/favourite-book.service';
 import { FineDto } from '@/modules/fine/dto/fine.dto';
 import UserFineSearchDto from '@/modules/fine/dto/user-fine-search.dto';
@@ -154,12 +154,12 @@ export class MeController {
   @Get('/books/favourite')
   getAllFavouriteBooks(
     @Request() req: CustomRequest,
-    @Query() favouriteBookSearchDto: FavouriteBookSearchDto,
+    @Query() bookSearchDto: BookSearchDto,
   ) {
     const currentUser = req.user;
     return this.favouriteBookService.getAllFavouriteBooks(
       currentUser,
-      favouriteBookSearchDto,
+      bookSearchDto,
     );
   }
 

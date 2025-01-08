@@ -73,6 +73,10 @@ export class BookService {
     };
   }
 
+  async findAllFavouriteBooks(user: User, bookSearchDto: BookSearchDto) {
+    return this.findAll({ ...bookSearchDto, filterFavourite: true }, user);
+  }
+
   async findOne(id: string, user?: User) {
     const book = await this.bookRepository.findById(id, user);
 

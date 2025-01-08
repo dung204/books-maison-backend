@@ -79,7 +79,7 @@ export class BookRepository extends Repository<Book> {
     )
       ? bookSearchDto.orderBy
       : BookOrderableField.CREATED_TIMESTAMP;
-    const subQuery = await this.findAllSubQuery(bookSearchDto);
+    const subQuery = await this.findAllSubQuery(bookSearchDto, user);
 
     const query = this.createQueryBuilder('book')
       .leftJoinAndSelect('book.authors', 'author')
@@ -91,7 +91,7 @@ export class BookRepository extends Repository<Book> {
       .leftJoinAndSelect('book.authors', 'author')
       .leftJoinAndSelect('book.categories', 'category');
 
-    await this.setFindAllFilter(countQuery, bookSearchDto);
+    await this.setFindAllFilter(countQuery, bookSearchDto, user);
 
     this.addSelectUserData(query, user);
 
@@ -139,7 +139,7 @@ export class BookRepository extends Repository<Book> {
     return [Object.values(mappedBooks), await countQuery.getCount()];
   }
 
-  private async findAllSubQuery(bookSearchDto: BookSearchDto) {
+  private async findAllSubQuery(bookSearchDto: BookSearchDto, user?: User) {
     const { page, pageSize, orderBy, order } = bookSearchDto;
     const skip = (page - 1) * pageSize;
     const actualOrderBy = Object.values(BookOrderableField).includes(orderBy)
@@ -150,7 +150,7 @@ export class BookRepository extends Repository<Book> {
       .leftJoinAndSelect('book.authors', 'author')
       .leftJoinAndSelect('book.categories', 'category');
 
-    await this.setFindAllFilter(subQuery1, bookSearchDto);
+    await this.setFindAllFilter(subQuery1, bookSearchDto, user);
 
     const subQuery2 = this.dataSource
       .createQueryBuilder()
@@ -234,7 +234,9 @@ export class BookRepository extends Repository<Book> {
       publishedYearFrom,
       publishedYearTo,
       categoryId: categoryIds,
+      filterFavourite,
     }: BookSearchDto,
+    user?: User,
   ) {
     if (title) {
       query.andWhere(`LOWER(book.title) LIKE LOWER('%${title}%')`);
@@ -280,6 +282,16 @@ export class BookRepository extends Repository<Book> {
           `book.id IN (${bookIds.map((id) => `'${id}'`).join(',')})`,
         );
       }
+    }
+
+    if (filterFavourite && user) {
+      query
+        .leftJoin(
+          FavouriteBook,
+          'favouriteBook',
+          'book.id = favouriteBook.bookId',
+        )
+        .andWhere(`favouriteBook.userId = '${user.id}'`);
     }
   }
 

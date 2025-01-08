@@ -73,6 +73,7 @@ export class BookController {
     @Request() req: CustomRequest,
     @Query() bookSearchDto: BookSearchDto,
   ) {
+    console.log(bookSearchDto.filterFavourite);
     const currentUser = req.user;
     return this.bookService.findAll(bookSearchDto, currentUser);
   }

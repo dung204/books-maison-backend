@@ -1,5 +1,5 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
+import { Exclude, Transform } from 'class-transformer';
 import {
   IsInt,
   IsOptional,
@@ -118,4 +118,7 @@ export class BookSearchDto extends OmitType(PaginationQueryDto, ['orderBy']) {
     message: 'Category IDs must be an array of UUID v4',
   })
   categoryId?: string[];
+
+  @Exclude()
+  filterFavourite?: boolean = false;
 }

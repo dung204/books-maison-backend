@@ -6,9 +6,9 @@ import {
 } from '@nestjs/common';
 
 import { SuccessResponse } from '@/base/common/responses/success.response';
-import { Book } from '@/modules/book/entities/book.entity';
+import { BookSearchDto } from '@/modules/book/dto/book-search.dto';
+import { BookDto } from '@/modules/book/dto/book.dto';
 import { BookService } from '@/modules/book/services/book.service';
-import { FavouriteBookSearchDto } from '@/modules/favourite-book/dto/favourite-book-search.dto';
 import { FavouriteBook } from '@/modules/favourite-book/entities/favourite-book.entity';
 import { FavouriteBookRepository } from '@/modules/favourite-book/repositories/favourite-book.repository';
 import { User } from '@/modules/user/entities/user.entity';
@@ -48,27 +48,12 @@ export class FavouriteBookService {
 
   async getAllFavouriteBooks(
     user: User,
-    favouriteBookSearchDto: FavouriteBookSearchDto,
-  ): Promise<SuccessResponse<Book[]>> {
-    const { page, pageSize } = favouriteBookSearchDto;
-    const [books, total] =
-      await this.favouriteBookRepository.findAllByUserIdAndCount(
-        user.id,
-        favouriteBookSearchDto,
-      );
-    const totalPage = Math.ceil(total / pageSize);
-
-    return {
-      data: books,
-      pagination: {
-        total,
-        page,
-        pageSize,
-        totalPage,
-        hasNextPage: page < totalPage,
-        hasPreviousPage: page > 1,
-      },
-    };
+    bookSearchDto: BookSearchDto,
+  ): Promise<SuccessResponse<BookDto[]>> {
+    return this.bookService.findAll(
+      { ...bookSearchDto, filterFavourite: true },
+      user,
+    );
   }
 
   async deleteFavouriteBook(user: User, bookId: string) {
