@@ -189,7 +189,6 @@ export class CheckoutService {
 
     const book = checkout.book;
     checkout.book = await this.bookService.update(book.id, {
-      ...book,
       quantity: book.quantity + 1,
     });
 

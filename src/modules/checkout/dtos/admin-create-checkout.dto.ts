@@ -10,5 +10,5 @@ export class AdminCreateCheckoutDto extends UserCreateCheckoutDto {
   })
   @IsNotEmpty()
   @IsUUID(4, { message: 'Book ID must be a valid UUID v4' })
-  userId: string;
+  userId!: string;
 }

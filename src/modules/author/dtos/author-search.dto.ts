@@ -14,7 +14,7 @@ export class AuthorSearchDto extends OmitType(CommonQueryDto, ['orderBy']) {
   })
   @IsOptional()
   @IsString({ message: 'Order by must be a string' })
-  orderBy?: AuthorOrderableField = AuthorOrderableField.CREATED_TIMESTAMP;
+  orderBy: AuthorOrderableField = AuthorOrderableField.CREATED_TIMESTAMP;
 
   @ApiProperty({
     description:

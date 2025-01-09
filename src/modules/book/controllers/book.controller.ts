@@ -120,7 +120,7 @@ export class BookController {
   ): Promise<SuccessResponse<BookDto>> {
     const currentUser = req.user;
     return {
-      data: BookDto.fromBook(await this.bookService.findOne(id, currentUser)),
+      data: BookDto.convert(await this.bookService.findOne(id, currentUser)),
     };
   }
 
@@ -140,7 +140,7 @@ export class BookController {
     @Body() updateBookDto: UpdateBookDto,
   ): Promise<SuccessResponse<BookDto>> {
     return {
-      data: BookDto.fromBook(await this.bookService.update(id, updateBookDto)),
+      data: BookDto.convert(await this.bookService.update(id, updateBookDto)),
     };
   }
 

@@ -23,7 +23,7 @@ export class CheckoutSearchDto extends OmitType(CommonQueryDto, ['orderBy']) {
   })
   @IsOptional()
   @IsString({ message: 'Order by must be a string' })
-  orderBy?: CheckoutOrderableField = CheckoutOrderableField.CREATED_TIMESTAMP;
+  orderBy: CheckoutOrderableField = CheckoutOrderableField.CREATED_TIMESTAMP;
 
   @ApiProperty({
     description: 'Every checkouts of this user will be returned',

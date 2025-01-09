@@ -20,7 +20,7 @@ export class CommonQueryDto {
   @IsInt({ message: 'Page must be an integer' })
   @IsPositive({ message: 'Page must be a positive integer' })
   @IsOptional()
-  page?: number = 1;
+  page: number = 1;
 
   @ApiProperty({
     description: 'The number of items in a page',
@@ -31,7 +31,7 @@ export class CommonQueryDto {
   @IsInt({ message: 'Page size must be an integer' })
   @IsPositive({ message: 'Page size must be a positive integer' })
   @IsOptional()
-  pageSize?: number = 10;
+  pageSize: number = 10;
 
   @ApiProperty({
     description: 'The field to order the results by',
@@ -40,7 +40,7 @@ export class CommonQueryDto {
   })
   @IsOptional()
   @IsString({ message: 'Order by must be a string' })
-  orderBy?: string = 'createdTimestamp';
+  orderBy: string = 'createdTimestamp';
 
   @ApiProperty({
     description: 'The order to sort the results',
@@ -54,8 +54,8 @@ export class CommonQueryDto {
   @IsEnum(Order, {
     message: `Order must be one of these values: ${Object.values(Order).join(', ')}`,
   })
-  order?: Order = Order.DESC;
+  order: Order = Order.DESC;
 
   @Exclude()
-  deletedOnly?: boolean = false;
+  deletedOnly: boolean = false;
 }

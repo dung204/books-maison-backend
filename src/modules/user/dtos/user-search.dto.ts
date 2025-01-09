@@ -14,7 +14,7 @@ export class UserSearchDto extends OmitType(CommonQueryDto, ['orderBy']) {
   })
   @IsOptional()
   @IsString({ message: 'Order by must be a string' })
-  orderBy?: UserOrderableField = UserOrderableField.CREATED_TIMESTAMP;
+  orderBy: UserOrderableField = UserOrderableField.CREATED_TIMESTAMP;
 
   @ApiProperty({
     description:

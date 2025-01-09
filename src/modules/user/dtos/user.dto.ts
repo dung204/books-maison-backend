@@ -11,56 +11,57 @@ export class UserDto {
     example: '7d7ccb57-da6e-42c8-b427-1487abd89a0a',
   })
   @Expose()
-  id: string;
+  id!: string;
 
   @ApiProperty({
     description: 'The email of the user',
     example: 'email@example.com',
   })
   @Expose()
-  email: string;
+  email!: string;
 
   @ApiProperty({
     description: 'The first name of the user',
     example: 'John',
   })
   @Expose()
-  firstName: string;
+  firstName!: string;
 
   @ApiProperty({
     description: 'The last name of the user',
     example: 'Doe',
   })
   @Expose()
-  lastName: string;
+  lastName!: string;
 
   @ApiProperty({
     description: 'The address of the user',
     example: 'Hanoi, Vietnam',
   })
   @Expose()
-  address: string;
+  address!: string;
 
   @ApiProperty({
     description: 'Metadata related to the avatar of the user',
     type: AvatarDto,
   })
   @Expose()
-  avatar: AvatarDto;
+  avatar!: AvatarDto | null;
 
   @ApiProperty({
     description: 'The timestamp indicating when the user is created',
     example: '2024-05-12T07:47:36.958Z',
   })
   @Expose()
-  createdTimestamp: Date;
+  createdTimestamp!: Date;
 
   @ApiProperty({
     description: 'The corresponding user ID from Google',
     example: '108821624331579292243',
+    type: String,
   })
   @Expose()
-  googleId: string;
+  googleId!: string | null;
 
   public static fromUser(user: User): UserDto {
     return plainToInstance(UserDto, user);

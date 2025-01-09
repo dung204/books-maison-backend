@@ -31,7 +31,7 @@ export class CreateTransactionDto {
   @IsNotEmpty({ message: 'Money amount is required' })
   @IsInt({ message: 'Money amount must be an integer' })
   @IsPositive({ message: 'Money amount must be a positive integer' })
-  amount: number;
+  amount!: number;
 
   @ApiProperty({
     description: 'The method that the transaction is performed',
@@ -42,7 +42,7 @@ export class CreateTransactionDto {
   @IsEnum(TransactionMethod, {
     message: `Transaction method must be one these values: ${Object.values(TransactionMethod).join(', ')}`,
   })
-  method: TransactionMethod;
+  method!: TransactionMethod;
 
   @ApiProperty({
     description:
@@ -53,7 +53,7 @@ export class CreateTransactionDto {
   @Transform(({ value }) => value || '')
   @IsOptional()
   @IsUrl({}, { message: 'Redirect URL must be a valid URL.' })
-  redirectUrl: string;
+  redirectUrl?: string;
 
   @ApiProperty({
     description: 'The extra data for the transaction',

@@ -17,6 +17,8 @@ export class CustomFileValidator extends FileValidator {
       case 'audio':
       case 'video':
         return file.size <= FileUtils.MAX_VIDEO_FILE_SIZE_IN_BYTES;
+      default:
+        return false;
     }
   }
   buildErrorMessage(file: IFile): string {
@@ -29,6 +31,8 @@ export class CustomFileValidator extends FileValidator {
       case 'audio':
       case 'video':
         return 'Video/Audio file size must not exceed 100MB';
+      default:
+        return 'Unknown error';
     }
   }
 }

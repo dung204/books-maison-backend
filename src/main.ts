@@ -44,9 +44,9 @@ async function bootstrap() {
 
   httpService.axiosRef.interceptors.response.use(
     (response) => response,
-    (error: AxiosError) => {
+    (error: AxiosError<string | Record<string, any>>) => {
       const response = error.response;
-      throw new HttpException(error.response.data, response.status);
+      throw new HttpException(response!.data, response!.status);
     },
   );
 

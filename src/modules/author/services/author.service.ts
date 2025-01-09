@@ -14,6 +14,7 @@ import {
   CreateAuthorDto,
   UpdateAuthorDto,
 } from '@/modules/author/dtos';
+import { Author } from '@/modules/author/entities';
 import { AuthorRepository } from '@/modules/author/repositories';
 
 @Injectable()
@@ -79,7 +80,7 @@ export class AuthorService {
     if (updateStatus !== 1)
       throw new ConflictException('Conflicted! Cannot update author.');
 
-    return this.authorRepository.findById(id);
+    return this.authorRepository.findById(id) as Promise<Author>;
   }
 
   async softDeleteAuthor(id: string) {

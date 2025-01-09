@@ -35,8 +35,10 @@ import { UserModule } from '@/modules/user';
     RedisModule.forRootAsync(
       {
         inject: [ConfigService],
-        useFactory: (configService: ConfigService) =>
-          configService.getOrThrow<RedisModuleOptions>('redis'),
+        useFactory: (configService) =>
+          (configService as ConfigService).getOrThrow<RedisModuleOptions>(
+            'redis',
+          ),
       },
       true,
     ),

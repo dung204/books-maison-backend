@@ -13,7 +13,7 @@ export class CheckoutDto {
     example: 'BM_CH_1722579024486',
   })
   @Expose()
-  id: string;
+  id!: string;
 
   @ApiProperty({
     description: 'The user who performs the checkout',
@@ -21,15 +21,15 @@ export class CheckoutDto {
   })
   @Expose()
   @Transform(({ value }) => UserDto.fromUser(value))
-  user: UserDto;
+  user!: UserDto;
 
   @ApiProperty({
     description: 'The book checked out by the user',
     type: BookDto,
   })
   @Expose()
-  @Transform(({ value }) => BookDto.fromBook(value))
-  book: BookDto;
+  @Transform(({ value }) => BookDto.convert(value))
+  book!: BookDto;
 
   @ApiProperty({
     description: 'The status of the checkout',
@@ -37,14 +37,14 @@ export class CheckoutDto {
     enumName: 'CheckoutStatus',
   })
   @Expose()
-  status: CheckoutStatus;
+  status!: CheckoutStatus;
 
   @ApiProperty({
     description: 'The timestamp indicating when the checkout is created',
     example: '2024-06-24T16:34:45.109Z',
   })
   @Expose()
-  createdTimestamp: Date;
+  createdTimestamp!: Date;
 
   @ApiProperty({
     description:
@@ -52,7 +52,7 @@ export class CheckoutDto {
     example: '2024-07-08T16:34:45.109Z',
   })
   @Expose()
-  dueTimestamp: Date;
+  dueTimestamp!: Date;
 
   @ApiProperty({
     description: 'The timestamp indicating when the user returned the book',
@@ -61,7 +61,7 @@ export class CheckoutDto {
     nullable: false,
   })
   @Expose()
-  returnedTimestamp?: Date;
+  returnedTimestamp!: Date | null;
 
   @ApiProperty({
     description: 'Additional note for the checkout',

@@ -10,14 +10,14 @@ export class AuthorDto {
     example: 'fa406dbf-8045-5f45-b23e-599d8cf4f2b9',
   })
   @Expose()
-  id: string;
+  id!: string;
 
   @ApiProperty({
     description: 'The name of the author',
     example: 'J.K.Rowling',
   })
   @Expose()
-  name: string;
+  name!: string;
 
   @ApiProperty({
     description: 'The birth year of the author',
@@ -25,7 +25,7 @@ export class AuthorDto {
     required: false,
   })
   @Expose()
-  yearOfBirth: number;
+  yearOfBirth!: number | null;
 
   @ApiProperty({
     description: 'The death year of the author',
@@ -33,7 +33,7 @@ export class AuthorDto {
     required: false,
   })
   @Expose()
-  yearOfDeath: number;
+  yearOfDeath!: number | null;
 
   @ApiProperty({
     description: 'The nationality of the author',
@@ -41,7 +41,7 @@ export class AuthorDto {
     required: false,
   })
   @Expose()
-  nationality: string;
+  nationality!: string | null;
 
   @ApiProperty({
     description: 'The image URL of the author',
@@ -49,7 +49,7 @@ export class AuthorDto {
     required: false,
   })
   @Expose()
-  imageUrl: string;
+  imageUrl!: string | null;
 
   @ApiProperty({
     description: 'The biography of the author',
@@ -58,14 +58,14 @@ export class AuthorDto {
     required: false,
   })
   @Expose()
-  biography: string;
+  biography!: string | null;
 
   @ApiProperty({
     description: 'The timestamp indicating when the author is created',
     example: '2024-05-12T07:47:36.958Z',
   })
   @Expose()
-  createdTimestamp: Date;
+  createdTimestamp!: Date;
 
   public static fromAuthor(author: Author): AuthorDto {
     return plainToInstance(AuthorDto, author);

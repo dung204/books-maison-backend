@@ -15,7 +15,7 @@ export class FineDto {
     example: 'BM_FI_1722579577171',
   })
   @Expose()
-  id: string;
+  id!: string;
 
   @ApiProperty({
     description: 'The corresponding checkout of the fine',
@@ -23,7 +23,7 @@ export class FineDto {
   })
   @Expose()
   @Transform(({ value }) => CheckoutDto.fromCheckout(value))
-  checkout: CheckoutDto;
+  checkout!: CheckoutDto;
 
   @ApiProperty({
     description: 'The status of the fine',
@@ -32,21 +32,21 @@ export class FineDto {
     default: FineStatus.ISSUED,
   })
   @Expose()
-  status: FineStatus;
+  status!: FineStatus;
 
   @ApiProperty({
     description: 'The created timestamp of the fine',
     example: '2024-06-30T13:46:54.405Z',
   })
   @Expose()
-  createdTimestamp: Date;
+  createdTimestamp!: Date;
 
   @ApiProperty({
     description: 'The money amount that the user has to pay for this fine',
     example: 50_000,
   })
   @Expose()
-  amount: number;
+  amount!: number;
 
   public static fromFine(fine: Fine) {
     const fineDto = plainToInstance(FineDto, fine);

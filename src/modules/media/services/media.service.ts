@@ -37,9 +37,9 @@ export class MediaService {
     >((resolve) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         { transformation, resource_type: 'auto', folder },
-        (error: UploadApiErrorResponse, result: UploadApiResponse) => {
+        (error?: UploadApiErrorResponse, result?: UploadApiResponse) => {
           if (error) resolve([null, error]);
-          resolve([result, null]);
+          resolve([result!, null]);
         },
       );
 
@@ -53,8 +53,8 @@ export class MediaService {
     return {
       data: {
         originalName: file.originalname,
-        name: result.public_id,
-        url: result.secure_url,
+        name: result!.public_id,
+        url: result!.secure_url,
       },
     };
   }
@@ -72,7 +72,7 @@ export class MediaService {
         },
       });
       return result;
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException(error.message, error.http_code);
     }
   }

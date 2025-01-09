@@ -9,7 +9,7 @@ export class DeleteMediaDto {
   @NotContains('/', {
     message: `'name' must not contains illegal '/' character`,
   })
-  name: string;
+  name!: string;
 
   @ApiProperty({
     description: 'The folder containing the file to delete',

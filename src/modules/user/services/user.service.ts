@@ -68,7 +68,7 @@ export class UserService {
     return user;
   }
 
-  async findUserByEmail(email: string): Promise<User> {
+  async findUserByEmail(email: string) {
     return this.userRepository.findByEmail(email);
   }
 
@@ -79,11 +79,13 @@ export class UserService {
     if (!this.userRepository.isExistedById(id))
       throw new NotFoundException('User not found.');
 
-    const existedUserByEmail = await this.userRepository.findByEmail(
-      updateUserDto.email,
-    );
-    if (existedUserByEmail?.id !== id)
-      throw new ConflictException('Email already taken');
+    if (updateUserDto.email) {
+      const existedUserByEmail = await this.userRepository.findByEmail(
+        updateUserDto.email,
+      );
+      if (existedUserByEmail?.id !== id)
+        throw new ConflictException('Email already taken');
+    }
 
     const updateStatus = await this.userRepository.updateUserById(
       id,
@@ -93,14 +95,14 @@ export class UserService {
       throw new ConflictException('Conflicted! Cannot update user.');
 
     return {
-      data: UserDto.fromUser(await this.userRepository.findById(id)),
+      data: UserDto.fromUser((await this.userRepository.findById(id)) as User),
     };
   }
 
   async changePassword(user: User, changePasswordDto: ChangePasswordDto) {
     const passwordMatched = await PasswordUtils.isPasswordMatched(
       changePasswordDto.password,
-      user.password,
+      user.password!,
     );
 
     if (!passwordMatched)

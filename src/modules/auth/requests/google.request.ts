@@ -10,7 +10,7 @@ export class GoogleRequest {
       '4/0AanRRrsW0MyRmIrp4e-89quX3bMMZRK8_QW4efAGdcIwjr2bHwPs8ozJokN9fSqO5Mg9BQ',
   })
   @IsString()
-  code: string;
+  code!: string;
 
   @ApiProperty({
     description:
@@ -21,5 +21,5 @@ export class GoogleRequest {
   @IsEnum(OAuthAction, {
     message: `The OAuth action must be one of these values: ${Object.values(OAuthAction).join(', ')}`,
   })
-  action: OAuthAction;
+  action!: OAuthAction;
 }

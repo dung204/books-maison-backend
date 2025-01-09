@@ -20,7 +20,7 @@ export class TransactionSearchDto extends OmitType(CommonQueryDto, [
   })
   @IsOptional()
   @IsString({ message: 'Order by must be a string' })
-  orderBy?: TransactionOrderableField =
+  orderBy: TransactionOrderableField =
     TransactionOrderableField.CREATED_TIMESTAMP;
 
   @ApiProperty({

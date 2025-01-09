@@ -17,22 +17,22 @@ import { Transaction } from '@/modules/transaction/entities';
 @Entity({ schema: 'public', name: 'users' })
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column('character varying', { length: 100, unique: true })
-  email: string;
+  email!: string;
 
   @Column('character varying', { length: 100, nullable: true })
-  password: string;
+  password!: string | null;
 
   @Column('character varying', { length: 100 })
-  firstName: string;
+  firstName!: string;
 
   @Column('character varying', { length: 100 })
-  lastName: string;
+  lastName!: string;
 
   @Column('character varying', { length: 256, nullable: true })
-  address: string;
+  address!: string;
 
   @OneToOne(() => Avatar, {
     cascade: true,
@@ -40,30 +40,30 @@ export class User {
     onDelete: 'SET NULL',
   })
   @JoinColumn()
-  avatar: Avatar;
+  avatar!: Avatar | null;
 
   @Column('enum', { enum: Role, default: Role.USER })
-  role: Role;
+  role!: Role;
 
   @Column('character varying', { nullable: true })
-  googleId: string;
+  googleId!: string | null;
 
   @CreateDateColumn({
     type: 'timestamp with time zone',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  createdTimestamp: Date;
+  createdTimestamp!: Date;
 
   @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
-  deletedTimestamp: Date;
+  deletedTimestamp!: Date | null;
 
   @OneToMany(() => Checkout, (checkout) => checkout.user, {
     cascade: ['soft-remove', 'remove', 'recover'],
   })
-  checkouts: Checkout[];
+  checkouts!: Checkout[];
 
   @OneToMany(() => Transaction, (transaction) => transaction.user, {
     cascade: ['soft-remove', 'remove', 'recover'],
   })
-  transactions: Transaction[];
+  transactions!: Transaction[];
 }

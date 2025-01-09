@@ -9,17 +9,17 @@ import {
 @Entity({ schema: 'public', name: 'categories' })
 export class Category {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column('character varying', { length: 100, nullable: false })
-  name: string;
+  name!: string;
 
   @CreateDateColumn({
     type: 'timestamp with time zone',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  createdTimestamp: Date;
+  createdTimestamp!: Date;
 
   @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
-  deletedTimestamp: Date;
+  deletedTimestamp!: Date | null;
 }

@@ -18,7 +18,7 @@ export class CreateBookDto {
     required: false,
   })
   @IsOptional()
-  @IsISBN(null, { message: 'ISBN must be a valid ISBN-10 or ISBN-13' })
+  @IsISBN(undefined, { message: 'ISBN must be a valid ISBN-10 or ISBN-13' })
   isbn?: string;
 
   @ApiProperty({
@@ -28,7 +28,7 @@ export class CreateBookDto {
   @IsNotEmpty()
   @IsString({ message: 'Title must be a string' })
   @MaxLength(256, { message: 'Title must have a maximum length of 256' })
-  title: string;
+  title!: string;
 
   @ApiProperty({
     description: 'The IDs of categories for the book',

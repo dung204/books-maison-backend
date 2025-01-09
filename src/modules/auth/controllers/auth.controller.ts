@@ -80,7 +80,7 @@ export class AuthController {
   @Post('/login')
   @HttpCode(HttpStatus.OK)
   async login(@Request() req: CustomRequest) {
-    return this.authService.login(req.user);
+    return this.authService.login(req.user!);
   }
 
   @Public()
@@ -117,8 +117,8 @@ export class AuthController {
   @Delete('/logout')
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@Request() req: CustomRequest) {
-    const accessToken = req.headers.authorization.replaceAll('Bearer ', '');
-    await this.authService.logout(req.user, accessToken);
+    const accessToken = req.headers.authorization!.replaceAll('Bearer ', '');
+    await this.authService.logout(req.user!, accessToken);
   }
 
   @Public()

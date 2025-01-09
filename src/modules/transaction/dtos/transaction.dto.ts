@@ -12,7 +12,7 @@ export class TransactionDto {
     example: 'af119453-910b-5d5a-9c21-706cb677539d',
   })
   @Expose()
-  id: string;
+  id!: string;
 
   @ApiProperty({
     description: 'The user who performs the transaction',
@@ -20,14 +20,14 @@ export class TransactionDto {
   })
   @Expose()
   @Transform(({ value }) => UserDto.fromUser(value))
-  user: UserDto;
+  user!: UserDto;
 
   @ApiProperty({
     description: 'The money amount of the transaction',
     example: 100_000,
   })
   @Expose()
-  amount: number;
+  amount!: number;
 
   @ApiProperty({
     description: 'The method that the transaction is performed',
@@ -35,14 +35,14 @@ export class TransactionDto {
     enumName: 'TransactionMethod',
   })
   @Expose()
-  method: TransactionMethod;
+  method!: TransactionMethod;
 
   @ApiProperty({
     description: 'The created timestamp of the transaction',
     example: '2024-07-04T06:10:02.679Z',
   })
   @Expose()
-  createdTimestamp: Date;
+  createdTimestamp!: Date;
 
   @ApiProperty({
     description: 'The URL which user can enter and perform the purchase',

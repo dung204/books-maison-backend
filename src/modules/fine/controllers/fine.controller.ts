@@ -69,7 +69,7 @@ export class FineController {
   @Get(':id')
   findOne(@Request() req: CustomRequest, @Param('id') id: string) {
     const currentUser = req.user;
-    return this.fineService.findOne(currentUser, id);
+    return this.fineService.findOne(currentUser!, id);
   }
 
   @Private()
@@ -101,7 +101,7 @@ export class FineController {
     @Body() payFineDto: PayFineDto,
   ) {
     const currentUser = req.user;
-    return this.fineService.handlePayFine(currentUser, fineId, payFineDto);
+    return this.fineService.handlePayFine(currentUser!, fineId, payFineDto);
   }
 
   @Admin()

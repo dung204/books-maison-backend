@@ -94,7 +94,7 @@ export class BookRepository extends Repository<Book> {
     this.addSelectUserData(query, user);
 
     const rawBooks = await query.getRawMany();
-    const mappedBooks: Record<string, BookDto> = {};
+    const mappedBooks: Record<string, Book | BookDto> = {};
 
     rawBooks.forEach((book) => {
       const bookId = book['book_id'];

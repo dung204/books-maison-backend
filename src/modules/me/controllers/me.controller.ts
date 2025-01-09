@@ -71,7 +71,7 @@ export class MeController {
     @Request() req: CustomRequest,
   ): Promise<SuccessResponse<UserDto>> {
     return {
-      data: UserDto.fromUser(req.user),
+      data: UserDto.fromUser(req.user!),
     };
   }
 
@@ -93,7 +93,7 @@ export class MeController {
     @Body() updateProfileRequest: UpdateProfileRequest,
   ) {
     const currentUser = req.user;
-    return this.userService.update(currentUser.id, updateProfileRequest);
+    return this.userService.update(currentUser!.id, updateProfileRequest);
   }
 
   @Private()
@@ -118,7 +118,7 @@ export class MeController {
     @Request() req: CustomRequest,
     @Body() setAvatarDto: SetAvatarDto,
   ) {
-    return this.avatarService.setAvatar(req.user, setAvatarDto);
+    return this.avatarService.setAvatar(req.user!, setAvatarDto);
   }
 
   @Private()
@@ -137,7 +137,7 @@ export class MeController {
     @Body() changePasswordDto: ChangePasswordDto,
   ) {
     const currentUser = req.user;
-    return this.userService.changePassword(currentUser, changePasswordDto);
+    return this.userService.changePassword(currentUser!, changePasswordDto);
   }
 
   @Private()
@@ -159,7 +159,7 @@ export class MeController {
   ) {
     const currentUser = req.user;
     return this.favouriteBookService.getAllFavouriteBooks(
-      currentUser,
+      currentUser!,
       bookSearchDto,
     );
   }
@@ -181,7 +181,7 @@ export class MeController {
   @HttpCode(HttpStatus.NO_CONTENT)
   addFavouriteBook(@Request() req: CustomRequest, @Param('id') bookId: string) {
     const currentUser = req.user;
-    return this.favouriteBookService.addFavouriteBook(currentUser, bookId);
+    return this.favouriteBookService.addFavouriteBook(currentUser!, bookId);
   }
 
   @Private()
@@ -202,7 +202,7 @@ export class MeController {
     @Param('id') bookId: string,
   ) {
     const currentUser = req.user;
-    return this.favouriteBookService.deleteFavouriteBook(currentUser, bookId);
+    return this.favouriteBookService.deleteFavouriteBook(currentUser!, bookId);
   }
 
   @Private()
@@ -224,7 +224,7 @@ export class MeController {
   ) {
     const currentUser = req.user;
     return this.checkoutService.findAllCheckoutsOfCurrentUser(
-      currentUser,
+      currentUser!,
       userCheckoutSearchDto,
     );
   }
@@ -252,7 +252,7 @@ export class MeController {
   ) {
     const currentUser = req.user;
     return this.checkoutService.createCheckoutUsingCurrentUser(
-      currentUser,
+      currentUser!,
       userCreateCheckoutDto,
     );
   }
@@ -275,7 +275,7 @@ export class MeController {
   ) {
     const currentUser = req.user;
     return this.fineService.findAllFinesOfCurrentUser(
-      currentUser,
+      currentUser!,
       userFineSearchDto,
     );
   }
@@ -299,7 +299,7 @@ export class MeController {
   ) {
     const currentUser = req.user;
     return this.transactionService.findAll({
-      userId: currentUser.id,
+      userId: currentUser!.id,
       ...userTransactionSearchDto,
     });
   }
@@ -315,7 +315,7 @@ export class MeController {
   @Delete('/deactivate/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deactivateUser(@Request() req: CustomRequest) {
-    return this.userService.deactivateUser(req.user);
+    return this.userService.deactivateUser(req.user!);
   }
 
   @Private()
@@ -331,6 +331,6 @@ export class MeController {
   })
   @Patch('/reactivate/:id')
   async reactivateUser(@Request() req: CustomRequest) {
-    return this.userService.reactivateUser(req.user);
+    return this.userService.reactivateUser(req.user!);
   }
 }

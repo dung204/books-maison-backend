@@ -73,7 +73,7 @@ export class TransactionController {
   @Get(':id')
   async findById(@Request() req: CustomRequest, @Param('id') id: string) {
     const currentUser = req.user;
-    return this.transactionService.findById(currentUser, id);
+    return this.transactionService.findById(currentUser!, id);
   }
 
   @Private()
@@ -100,7 +100,7 @@ export class TransactionController {
 
     return {
       data: await this.transactionService.createTransaction(
-        currentUser,
+        currentUser!,
         createTransactionDto,
       ),
     };

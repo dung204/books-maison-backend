@@ -8,7 +8,7 @@ export class CreateUserDto {
     example: 'email@example.com',
   })
   @IsEmail({}, { message: 'Email is not a valid email' })
-  email: string;
+  email!: string;
 
   @ApiProperty({
     description: 'The password of the user (requires strong password)',
@@ -16,21 +16,21 @@ export class CreateUserDto {
   })
   @MinLength(6, { message: 'Password must contain at least 6 characters' })
   @MaxLength(100, { message: 'Password must not exceed 100 characters' })
-  password: string;
+  password!: string;
 
   @ApiProperty({
     description: 'The first name of the user',
     example: 'John',
   })
   @IsString({ message: 'First name must be a string' })
-  firstName: string;
+  firstName!: string;
 
   @ApiProperty({
     description: 'The last name of the user',
     example: 'Doe',
   })
   @IsString({ message: 'Last name must be a string' })
-  lastName: string;
+  lastName!: string;
 
   @ApiProperty({
     description: 'The last name of the user',

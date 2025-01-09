@@ -10,7 +10,7 @@ export class AvatarDto {
     example: 'metpk6lemi4eccrgzosm',
   })
   @Expose()
-  id: string;
+  id!: string;
 
   @ApiProperty({
     description:
@@ -18,7 +18,7 @@ export class AvatarDto {
     example: 200,
   })
   @Expose()
-  offsetX: number;
+  offsetX!: number;
 
   @ApiProperty({
     description:
@@ -26,7 +26,7 @@ export class AvatarDto {
     example: 200,
   })
   @Expose()
-  offsetY: number;
+  offsetY!: number;
 
   @ApiProperty({
     description:
@@ -34,7 +34,7 @@ export class AvatarDto {
     example: 1,
   })
   @Expose()
-  zoom: number;
+  zoom!: number;
 
   @ApiProperty({
     description:
@@ -42,7 +42,7 @@ export class AvatarDto {
     example: 300,
   })
   @Expose()
-  baseDimension: number;
+  baseDimension!: number;
 
   public static fromAvatar(avatar: Avatar) {
     return plainToInstance(AvatarDto, avatar);

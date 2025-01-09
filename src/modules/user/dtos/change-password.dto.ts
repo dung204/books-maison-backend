@@ -7,7 +7,7 @@ export class ChangePasswordDto {
     example: 'fVs))^vue{lbwIH',
   })
   @IsNotEmpty({ message: 'Password is required' })
-  password: string;
+  password!: string;
 
   @ApiProperty({
     description: 'The new password of the user',
@@ -16,5 +16,5 @@ export class ChangePasswordDto {
   @IsNotEmpty()
   @MinLength(6, { message: 'New password must contain at least 6 characters' })
   @MaxLength(100, { message: 'New password must not exceed 100 characters' })
-  newPassword: string;
+  newPassword!: string;
 }

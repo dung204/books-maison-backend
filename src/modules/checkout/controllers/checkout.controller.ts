@@ -159,7 +159,7 @@ export class CheckoutController {
 
     return {
       data: CheckoutDto.fromCheckout(
-        await this.checkoutService.findOne(currentUser, id),
+        await this.checkoutService.findOne(currentUser!, id),
       ),
     };
   }

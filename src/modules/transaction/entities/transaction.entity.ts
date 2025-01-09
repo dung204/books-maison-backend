@@ -13,26 +13,26 @@ import { User } from '@/modules/user/entities';
 @Entity({ schema: 'public', name: 'transactions' })
 export class Transaction {
   @PrimaryColumn('character varying')
-  id: string;
+  id!: string;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  user: User;
+  user!: User;
 
   @Column('integer')
-  amount: number;
+  amount!: number;
 
   @Column({
     enum: TransactionMethod,
     enumName: 'TransactionMethod',
   })
-  method: TransactionMethod;
+  method!: TransactionMethod;
 
   @CreateDateColumn({
     type: 'timestamp with time zone',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  createdTimestamp: Date;
+  createdTimestamp!: Date;
 
   @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
-  deletedTimestamp: Date;
+  deletedTimestamp!: Date;
 }

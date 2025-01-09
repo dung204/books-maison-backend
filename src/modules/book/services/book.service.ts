@@ -49,7 +49,7 @@ export class BookService {
     });
 
     return {
-      data: BookDto.fromBook(await this.bookRepository.save(book)),
+      data: BookDto.convert(await this.bookRepository.save(book)),
     };
   }
 
@@ -65,7 +65,7 @@ export class BookService {
     const totalPage = Math.ceil(total / pageSize);
 
     return {
-      data: books.map(BookDto.fromBook),
+      data: books.map(BookDto.convert),
       pagination: {
         total,
         page,
@@ -158,7 +158,7 @@ export class BookService {
       );
 
     return {
-      data: BookDto.fromBook(await this.bookRepository.recover(book)),
+      data: BookDto.convert(await this.bookRepository.recover(book)),
     };
   }
 

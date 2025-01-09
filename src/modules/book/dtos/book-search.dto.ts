@@ -21,7 +21,7 @@ export class BookSearchDto extends OmitType(CommonQueryDto, ['orderBy']) {
   })
   @IsOptional()
   @IsString({ message: 'Order by must be a string' })
-  orderBy?: BookOrderableField = BookOrderableField.CREATED_TIMESTAMP;
+  orderBy: BookOrderableField = BookOrderableField.CREATED_TIMESTAMP;
 
   @ApiProperty({
     description:
@@ -120,5 +120,5 @@ export class BookSearchDto extends OmitType(CommonQueryDto, ['orderBy']) {
   categoryId?: string[];
 
   @Exclude()
-  filterFavourite?: boolean = false;
+  filterFavourite: boolean = false;
 }

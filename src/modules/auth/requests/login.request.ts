@@ -7,12 +7,12 @@ export class LoginRequest {
     example: 'email@example.com',
   })
   @IsEmail({}, { message: 'Email is not a valid email' })
-  email: string;
+  email!: string;
 
   @ApiProperty({
     description: 'The password of the user',
     example: 'fVs))^vue{lbwIH',
   })
   @IsString()
-  password: string;
+  password!: string;
 }

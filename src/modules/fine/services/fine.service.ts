@@ -1,32 +1,31 @@
 import {
   ConflictException,
   ForbiddenException,
-  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 
-import { Role } from '@/base/common/enum/role.enum';
-import { SuccessResponse } from '@/base/common/responses/success.response';
-import { Checkout } from '@/modules/checkout/entities/checkout.entity';
-import { CheckoutStatus } from '@/modules/checkout/enums/checkout-status.enum';
-import { FineSearchDto } from '@/modules/fine/dtos/fine-search.dto';
-import { FineDto } from '@/modules/fine/dtos/fine.dto';
-import { PayFineDto } from '@/modules/fine/dtos/pay-fine.dto';
+import { Role } from '@/base/common/enum';
+import { SuccessResponse } from '@/base/common/responses';
+import { Checkout } from '@/modules/checkout/entities';
+import { CheckoutStatus } from '@/modules/checkout/enums';
+import { FineDto, FineSearchDto, PayFineDto } from '@/modules/fine/dtos';
 import UserFineSearchDto from '@/modules/fine/dtos/user-fine-search.dto';
-import { Fine } from '@/modules/fine/entities/fine.entity';
-import { FineStatus } from '@/modules/fine/enums/fine-status.enum';
-import { FineRepository } from '@/modules/fine/repositories/fine.repository';
-import { SavedTransactionEventDto } from '@/modules/transaction/dtos/saved-transaction-event.dto';
-import { TransactionDto } from '@/modules/transaction/dtos/transaction.dto';
-import { TransactionService } from '@/modules/transaction/services/transaction.service';
-import { User } from '@/modules/user/entities/user.entity';
+import { Fine } from '@/modules/fine/entities';
+import { FineStatus } from '@/modules/fine/enums';
+import { FineRepository } from '@/modules/fine/repositories';
+import {
+  SavedTransactionEventDto,
+  TransactionDto,
+} from '@/modules/transaction/dtos';
+import { TransactionService } from '@/modules/transaction/services';
+import { User } from '@/modules/user/entities';
 
 @Injectable()
 export class FineService {
   constructor(
-    @Inject(FineRepository) private readonly fineRepository: FineRepository,
+    private readonly fineRepository: FineRepository,
     private readonly transactionService: TransactionService,
   ) {}
 

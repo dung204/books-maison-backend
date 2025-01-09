@@ -8,5 +8,5 @@ export class UserCreateCheckoutDto {
   })
   @IsNotEmpty()
   @IsUUID(4, { message: 'Book ID must be a valid UUID v4' })
-  bookId: string;
+  bookId!: string;
 }

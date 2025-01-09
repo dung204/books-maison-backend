@@ -6,16 +6,16 @@ import { User } from '@/modules/user/entities';
 @Entity({ schema: 'public', name: 'favourite_books' })
 export class FavouriteBook {
   @PrimaryColumn()
-  userId: string;
+  userId!: string;
 
   @PrimaryColumn()
-  bookId: string;
+  bookId!: string;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user!: User;
 
   @ManyToOne(() => Book, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'book_id' })
-  book: Book;
+  book!: Book;
 }

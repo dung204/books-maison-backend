@@ -1,4 +1,3 @@
-import { ApiProperty } from '@nestjs/swagger';
 import {
   Column,
   CreateDateColumn,
@@ -15,49 +14,26 @@ import { Transaction } from '@/modules/transaction/entities';
 
 @Entity({ schema: 'public', name: 'fines' })
 export class Fine {
-  @ApiProperty({
-    description: 'The ID of the fine (format: `BM_FI_${Date.now()}`)',
-    example: 'BM_FI_1722579577171',
-  })
   @PrimaryColumn('character varying')
-  id: string;
+  id!: string;
 
-  @ApiProperty({
-    description: 'The corresponding checkout of the fine',
-    type: Checkout,
-  })
   @OneToOne(() => Checkout, { onDelete: 'CASCADE' })
   @JoinColumn()
-  checkout: Checkout;
+  checkout!: Checkout;
 
-  @ApiProperty({
-    description: 'The status of the fine',
-    enum: FineStatus,
-    enumName: 'FineStatus',
-    default: FineStatus.ISSUED,
-  })
   @Column({ enum: FineStatus, default: FineStatus.ISSUED })
-  status: FineStatus;
+  status!: FineStatus;
 
-  @ApiProperty({
-    description: 'The corresponding transaction of the fine',
-    type: Transaction,
-    nullable: true,
-  })
   @OneToOne(() => Transaction)
   @JoinColumn()
-  transaction: Transaction;
+  transaction!: Transaction | null;
 
-  @ApiProperty({
-    description: 'The created timestamp of the fine',
-    example: '2024-06-30T13:46:54.405Z',
-  })
   @CreateDateColumn({
     type: 'timestamp with time zone',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  createdTimestamp: Date;
+  createdTimestamp!: Date;
 
   @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
-  deletedTimestamp: Date;
+  deletedTimestamp!: Date | null;
 }

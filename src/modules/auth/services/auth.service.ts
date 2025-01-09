@@ -3,6 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import {
   ConflictException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -65,12 +66,12 @@ export class AuthService {
     };
   }
 
-  async validateUser(email: string, password: string): Promise<User> {
+  async validateUser(email: string, password: string): Promise<User | null> {
     const user = await this.userRepository.findByEmail(email, true);
 
     if (
       user &&
-      (await PasswordUtils.isPasswordMatched(password, user.password))
+      (await PasswordUtils.isPasswordMatched(password, user.password!))
     )
       return user;
 
@@ -98,15 +99,17 @@ export class AuthService {
     const { sub: userId } = this.jwtService.verify<JwtPayload>(refreshToken, {
       secret: refreshSecret,
     });
-    const { id, role } = await this.userRepository.findById(userId);
+    const user = await this.userRepository.findById(userId);
+
+    if (!user) throw new NotFoundException('User not found.');
 
     await this.blacklistToken(refreshToken);
 
     return {
       data: {
-        id,
-        role,
-        ...(await this.getTokens(id, role)),
+        id: user.id,
+        role: user.role,
+        ...(await this.getTokens(user.id, user.role)),
       },
     };
   }
@@ -115,7 +118,8 @@ export class AuthService {
     const refreshToken = await this.redis.getdel(id);
 
     await this.blacklistToken(accessToken);
-    await this.blacklistToken(refreshToken);
+
+    if (refreshToken) await this.blacklistToken(refreshToken);
   }
 
   async getTokens(userId: string, role: Role) {
@@ -152,7 +156,7 @@ export class AuthService {
 
   async blacklistToken(token: string) {
     const { exp } = this.jwtService.decode<JwtPayload>(token);
-    await this.redis.set(token, this.BLACKLISTED, 'EXAT', exp);
+    await this.redis.set(token, this.BLACKLISTED, 'EXAT', exp!);
   }
 
   async isTokenBlacklisted(token: string) {
@@ -191,6 +195,8 @@ export class AuthService {
         return this.login(existingUser);
 
       case OAuthAction.LINK:
+        if (!existingUser) throw new NotFoundException('User not found.');
+
         if (existingUser.googleId) {
           throw new ConflictException(
             'Can not link because a user already linked to Google has been found.',
@@ -202,6 +208,8 @@ export class AuthService {
         return this.login(linkedUser);
 
       case OAuthAction.OVERRIDE:
+        if (!existingUser) throw new NotFoundException('User not found.');
+
         const overriddenUser = await this.handleGoogleOverride(
           existingUser,
           googleUserInfo,

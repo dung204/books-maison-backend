@@ -9,5 +9,5 @@ export class CreateCategoryDto {
   @IsNotEmpty({ message: 'Category name must not be empty.' })
   @IsString({ message: 'Category name must be a string' })
   @MaxLength(100)
-  name: string;
+  name!: string;
 }

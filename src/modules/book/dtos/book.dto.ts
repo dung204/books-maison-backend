@@ -13,21 +13,21 @@ export class BookDto {
     example: '5070f8e2-6c6e-50d2-a5df-b9a03f2bebf4',
   })
   @Expose()
-  id: string;
+  id!: string;
 
   @ApiProperty({
     description: 'The ISBN-10 or ISBN-13 of the book',
     example: '978-5-9153-5274-1',
   })
   @Expose()
-  isbn: string;
+  isbn!: string | null;
 
   @ApiProperty({
     description: 'The title of the book',
     example: 'Harry Potter',
   })
   @Expose()
-  title: string;
+  title!: string;
 
   @ApiProperty({
     description: 'The categories of the book',
@@ -35,7 +35,7 @@ export class BookDto {
   })
   @Expose()
   @Transform(({ value }) => value.map(CategoryDto.fromCategory))
-  categories: CategoryDto[];
+  categories!: CategoryDto[];
 
   @ApiProperty({
     description: 'The authors of the book',
@@ -43,42 +43,42 @@ export class BookDto {
   })
   @Expose()
   @Transform(({ value }) => value.map(AuthorDto.fromAuthor))
-  authors: AuthorDto[];
+  authors!: AuthorDto[];
 
   @ApiProperty({
     description: 'The published year of the book',
     example: '1998',
   })
   @Expose()
-  publishedYear: number;
+  publishedYear!: number | null;
 
   @ApiProperty({
     description: 'The publisher of the book',
     example: 'Dk-Multimedia',
   })
   @Expose()
-  publisher: string;
+  publisher!: string | null;
 
   @ApiProperty({
     description: 'The language of the book',
     example: 'English',
   })
   @Expose()
-  language: string;
+  language!: string | null;
 
   @ApiProperty({
     description: 'The number of pages for the book',
     example: '230',
   })
   @Expose()
-  numberOfPages: number;
+  numberOfPages!: number | null;
 
   @ApiProperty({
     description: 'The image URL of the book',
     example: 'http://vikgil.ai/wawhemwat',
   })
   @Expose()
-  imageUrl: string;
+  imageUrl!: string | null;
 
   @ApiProperty({
     description: 'The description of the book',
@@ -86,7 +86,7 @@ export class BookDto {
       'cookies score unit dead beautiful was return post source driving people suit mirror heading until pet fine vessels we fallen struck also four knowledge',
   })
   @Expose()
-  description: string;
+  description!: string | null;
 
   @ApiProperty({
     description: 'The available quantity in the stock of the book',
@@ -95,14 +95,14 @@ export class BookDto {
     default: 0,
   })
   @Expose()
-  quantity: number;
+  quantity!: number;
 
   @ApiProperty({
     description: 'The timestamp indicating when the book is created',
     example: '2024-05-12T07:47:36.958Z',
   })
   @Expose()
-  createdTimestamp: Date;
+  createdTimestamp!: Date;
 
   @ApiProperty({
     description:
@@ -111,7 +111,7 @@ export class BookDto {
   @Expose()
   userData?: BookUserDataDto;
 
-  public static fromBook(book: Book) {
+  public static convert(book: Book | BookDto) {
     return plainToInstance(BookDto, book);
   }
 }

@@ -20,7 +20,7 @@ export class JwtAccessGuard extends AuthGuard('jwt') {
     user: TUser,
     info: any,
     context: ExecutionContext,
-  ): TUser {
+  ): TUser | null {
     const isOptionalAuth = this.reflector.getAllAndOverride<boolean>(
       IS_OPTIONAL_AUTH_KEY,
       [context.getHandler()],

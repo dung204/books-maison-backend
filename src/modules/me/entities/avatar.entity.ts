@@ -5,21 +5,21 @@ import { User } from '@/modules/user/entities';
 @Entity({ schema: 'public', name: 'avatars' })
 export class Avatar {
   @PrimaryColumn('character varying')
-  id: string;
+  id!: string;
 
   @OneToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn()
-  user: User;
+  user!: User;
 
   @Column('decimal')
-  offsetX: number;
+  offsetX!: number;
 
   @Column('decimal')
-  offsetY: number;
+  offsetY!: number;
 
   @Column('decimal')
-  zoom: number;
+  zoom!: number;
 
   @Column('decimal')
-  baseDimension: number;
+  baseDimension!: number;
 }

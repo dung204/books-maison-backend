@@ -10,21 +10,21 @@ export class CategoryDto {
     example: '4309dc9f-07a9-5945-8063-d001cc7010fc',
   })
   @Expose()
-  id: string;
+  id!: string;
 
   @ApiProperty({
     description: 'The name of the category',
     example: 'Action/Adventure',
   })
   @Expose()
-  name: string;
+  name!: string;
 
   @ApiProperty({
     description: 'The timestamp indicating when the category is created',
     example: '2024-05-12T07:47:36.958Z',
   })
   @Expose()
-  createdTimestamp: Date;
+  createdTimestamp!: Date;
 
   public static fromCategory(category: Category) {
     return plainToInstance(CategoryDto, category);

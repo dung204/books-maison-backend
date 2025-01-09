@@ -16,7 +16,7 @@ export class CreateAuthorDto {
   @IsNotEmpty({ message: 'Author name must not be empty.' })
   @IsString({ message: 'Author name must be a string.' })
   @MaxLength(100)
-  name: string;
+  name!: string;
 
   @ApiProperty({
     description: 'The birth year of the author',

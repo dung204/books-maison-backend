@@ -132,28 +132,26 @@ export class TransactionService {
     }
 
     transaction.createdTimestamp = new Date();
-    if (transactionMethod === TransactionMethod.MOMO) {
-      const purchaseUrl = await this.generateMomoPurchaseLink(
-        transaction.id,
-        user,
-        amount,
-        redirectUrl,
-        extraData,
-      );
+    const purchaseUrl = await this.generateMomoPurchaseLink(
+      transaction.id,
+      user,
+      amount,
+      redirectUrl!,
+      extraData,
+    );
 
-      this.redis.set(
-        transaction.id,
-        JSON.stringify(transaction),
-        'EX',
-        minutesToSeconds(
-          +this.configService.getOrThrow<string>('MOMO_EXPIRE_TIME_MINUTES'),
-        ),
-      );
-      return {
-        ...TransactionDto.fromTransaction(transaction),
-        purchaseUrl,
-      };
-    }
+    this.redis.set(
+      transaction.id,
+      JSON.stringify(transaction),
+      'EX',
+      minutesToSeconds(
+        +this.configService.getOrThrow<string>('MOMO_EXPIRE_TIME_MINUTES'),
+      ),
+    );
+    return {
+      ...TransactionDto.fromTransaction(transaction),
+      purchaseUrl,
+    };
   }
 
   async handleMomoTransactionNotify({

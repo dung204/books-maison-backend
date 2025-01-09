@@ -21,7 +21,7 @@ export class FineSearchDto extends OmitType(CommonQueryDto, ['orderBy']) {
   })
   @IsOptional()
   @IsString({ message: 'Order by must be a string' })
-  orderBy?: FineOrderableField = FineOrderableField.CREATED_TIMESTAMP;
+  orderBy: FineOrderableField = FineOrderableField.CREATED_TIMESTAMP;
 
   @ApiProperty({
     description: 'Every fines of this user will be returned',
