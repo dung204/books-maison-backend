@@ -76,26 +76,16 @@ export class UserService {
     id: string,
     updateUserDto: UpdateUserDto,
   ): Promise<SuccessResponse<UserDto>> {
-    if (!this.userRepository.isExistedById(id))
-      throw new NotFoundException('User not found.');
-
-    if (updateUserDto.email) {
-      const existedUserByEmail = await this.userRepository.findByEmail(
-        updateUserDto.email,
-      );
-      if (existedUserByEmail?.id !== id)
-        throw new ConflictException('Email already taken');
-    }
-
-    const updateStatus = await this.userRepository.updateUserById(
+    const updatedUser = await this.userRepository.updateUserById(
       id,
       updateUserDto,
     );
-    if (updateStatus != 1)
+
+    if (!updatedUser)
       throw new ConflictException('Conflicted! Cannot update user.');
 
     return {
-      data: UserDto.fromUser((await this.userRepository.findById(id)) as User),
+      data: UserDto.fromUser(updatedUser),
     };
   }
 

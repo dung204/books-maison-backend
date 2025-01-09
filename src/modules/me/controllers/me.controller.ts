@@ -86,6 +86,9 @@ export class MeController {
   @ApiBadRequestResponse({
     description: 'Update information is invalid',
   })
+  @ApiConflictResponse({
+    description: 'Email has been already taken or other conflicts occur',
+  })
   @Patch('/profile')
   @HttpCode(HttpStatus.OK)
   async updateCurrentUserProfile(

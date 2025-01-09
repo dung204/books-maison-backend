@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
+import { rawToEntity } from '@/base/utils';
+import { Avatar } from '@/modules/me/entities';
 import { CreateUserDto } from '@/modules/user/dtos/create-user.dto';
 import { UpdateUserDto } from '@/modules/user/dtos/update-user.dto';
 import { UserSearchDto } from '@/modules/user/dtos/user-search.dto';
@@ -94,10 +96,45 @@ export class UserRepository extends Repository<User> {
     return this.existsBy({ email });
   }
 
-  async updateUserById(id: string, updateUserDto: UpdateUserDto) {
-    const updateResult = await this.update({ id }, updateUserDto);
+  async updateUserById(
+    id: string,
+    { firstName, lastName, email, address }: UpdateUserDto,
+  ) {
+    try {
+      const updateQuery = this.createQueryBuilder()
+        .update()
+        .set({
+          ...(firstName && { firstName: () => `'${firstName}'` }),
+          ...(lastName && { lastName: () => `'${lastName}'` }),
+          ...(email && { email: () => `'${email}'` }),
+          ...(address && { address: () => `'${address}'` }),
+        })
+        .where(`id = '${id}'`)
+        .returning('*')
+        .getQuery();
 
-    return updateResult.affected;
+      const selectQuery = this.createQueryBuilder('user')
+        .leftJoinAndSelect('user.avatar', 'avatar')
+        .getQuery()
+        .replaceAll(`"public"."users"`, `"updated_users"`);
+
+      const rawUpdatedUsers = (await this.query(
+        `WITH "updated_users" AS (${updateQuery}) ${selectQuery}`,
+      )) as any[];
+
+      if (rawUpdatedUsers.length === 0) return null;
+
+      const user = rawToEntity(User, rawUpdatedUsers[0], 'user');
+      const avatar = rawToEntity(Avatar, rawUpdatedUsers[0], 'avatar');
+
+      if (avatar.id) {
+        user.avatar = avatar;
+      }
+
+      return user;
+    } catch (err) {
+      return null;
+    }
   }
 
   private resolveOrderBy(orderBy: UserOrderableField) {

@@ -1,6 +1,11 @@
-import { Optional } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class CreateUserDto {
   @ApiProperty({
@@ -37,6 +42,6 @@ export class CreateUserDto {
     example: 'Hanoi, Vietnam',
   })
   @IsString({ message: 'Address must be a string' })
-  @Optional()
+  @IsOptional()
   address?: string;
 }
