@@ -1,10 +1,8 @@
 import { UseGuards, applyDecorators } from '@nestjs/common';
 import { ApiForbiddenResponse } from '@nestjs/swagger';
 
-import { AdminGuard } from '@/modules/auth/guards/admin.guard';
-import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
-
-import { Private, PrivateDecoratorOptions } from './private.decorator';
+import { Private, PrivateDecoratorOptions } from '@/modules/auth/decorators';
+import { AdminGuard, JwtAccessGuard } from '@/modules/auth/guards';
 
 type AdminDecoratorOptions = PrivateDecoratorOptions;
 

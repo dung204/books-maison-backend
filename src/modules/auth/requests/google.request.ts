@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsString } from 'class-validator';
 
-import { OAuthAction } from '@/modules/auth/enums/oauth-action.enum';
+import { OAuthAction } from '@/modules/auth/enums';
 
 export class GoogleRequest {
   @ApiProperty({

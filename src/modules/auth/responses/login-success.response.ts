@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { Role } from '@/base/common/enum/role.enum';
-import { SuccessResponse } from '@/base/common/responses/success.response';
+import { Role } from '@/base/common/enum';
+import { SuccessResponse } from '@/base/common/responses';
 
 export class LoginSuccessPayload {
   @ApiProperty({

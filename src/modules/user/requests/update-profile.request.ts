@@ -1,6 +1,6 @@
 import { OmitType, PartialType } from '@nestjs/swagger';
 
-import { RegisterRequest } from '@/modules/auth/requests/register.request';
+import { RegisterRequest } from '@/modules/auth/requests';
 
 export class UpdateProfileRequest extends PartialType(
   OmitType(RegisterRequest, ['password']),

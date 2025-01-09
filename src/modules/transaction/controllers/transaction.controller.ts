@@ -17,17 +17,17 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
-import { SuccessResponse } from '@/base/common/responses/success.response';
-import { CustomRequest } from '@/base/common/types/custom-request.type';
-import { Admin } from '@/modules/auth/decorators/admin.decorator';
-import { Private } from '@/modules/auth/decorators/private.decorator';
-import { Public } from '@/modules/auth/decorators/public.decorator';
-import { CreateTransactionDto } from '@/modules/transaction/dto/create-transaction.dto';
-import { MomoNotifyDto } from '@/modules/transaction/dto/momo-notify.dto';
-import { TransactionSearchDto } from '@/modules/transaction/dto/transaction-search.dto';
-import { TransactionDto } from '@/modules/transaction/dto/transaction.dto';
-import { TransactionService } from '@/modules/transaction/services/transaction.service';
+import { ApiSuccessResponse } from '@/base/common/decorators';
+import { SuccessResponse } from '@/base/common/responses';
+import { CustomRequest } from '@/base/common/types';
+import { Admin, Private, Public } from '@/modules/auth/decorators';
+import {
+  CreateTransactionDto,
+  MomoNotifyDto,
+  TransactionDto,
+  TransactionSearchDto,
+} from '@/modules/transaction/dtos';
+import { TransactionService } from '@/modules/transaction/services';
 
 @ApiTags('transactions')
 @Controller('transactions')

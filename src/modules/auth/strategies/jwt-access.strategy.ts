@@ -4,10 +4,10 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Request } from 'express';
 import { ExtractJwt, SecretOrKeyProvider, Strategy } from 'passport-jwt';
 
-import { AuthService } from '@/modules/auth/services/auth.service';
-import { JwtPayload } from '@/modules/auth/types/jwt-payload.type';
-import { User } from '@/modules/user/entities/user.entity';
-import { UserRepository } from '@/modules/user/repositories/user.repository';
+import { AuthService } from '@/modules/auth/services';
+import { JwtPayload } from '@/modules/auth/types';
+import { User } from '@/modules/user/entities';
+import { UserRepository } from '@/modules/user/repositories';
 
 @Injectable()
 export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt') {

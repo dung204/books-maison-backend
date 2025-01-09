@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose, plainToInstance } from 'class-transformer';
 
-import { Avatar } from '@/modules/me/entities/avatar.entity';
+import { Avatar } from '@/modules/me/entities';
 
 @Exclude()
 export class AvatarDto {

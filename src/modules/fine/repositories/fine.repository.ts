@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
-import { FineSearchDto } from '@/modules/fine/dto/fine-search.dto';
-import { Fine } from '@/modules/fine/entities/fine.entity';
-import { FineOrderableField } from '@/modules/fine/enums/fine-orderable-field.enum';
+import { FineSearchDto } from '@/modules/fine/dtos';
+import { Fine } from '@/modules/fine/entities';
+import { FineOrderableField } from '@/modules/fine/enums';
 
 @Injectable()
 export class FineRepository extends Repository<Fine> {

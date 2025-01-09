@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
-import { CheckoutSearchDto } from '@/modules/checkout/dto/checkout-search.dto';
-import { Checkout } from '@/modules/checkout/entities/checkout.entity';
-import { CheckoutOrderableField } from '@/modules/checkout/enums/checkout-orderable-field.enum';
-import { CheckoutStatus } from '@/modules/checkout/enums/checkout-status.enum';
+import { CheckoutSearchDto } from '@/modules/checkout/dtos';
+import { Checkout } from '@/modules/checkout/entities';
+import {
+  CheckoutOrderableField,
+  CheckoutStatus,
+} from '@/modules/checkout/enums';
 
 @Injectable()
 export class CheckoutRepository extends Repository<Checkout> {

@@ -9,10 +9,10 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-import { Role } from '@/base/common/enum/role.enum';
-import { Checkout } from '@/modules/checkout/entities/checkout.entity';
-import { Avatar } from '@/modules/me/entities/avatar.entity';
-import { Transaction } from '@/modules/transaction/entities/transaction.entity';
+import { Role } from '@/base/common/enum';
+import { Checkout } from '@/modules/checkout/entities';
+import { Avatar } from '@/modules/me/entities';
+import { Transaction } from '@/modules/transaction/entities';
 
 @Entity({ schema: 'public', name: 'users' })
 export class User {

@@ -1,18 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 
-import { rawToEntity } from '@/base/utils/raw-to-entity.util';
-import { StringUtils } from '@/base/utils/string.utils';
-import { Author } from '@/modules/author/entities/author.entity';
-import { BookSearchDto } from '@/modules/book/dto/book-search.dto';
-import { BookDto } from '@/modules/book/dto/book.dto';
-import { Book } from '@/modules/book/entities/book.entity';
-import { BookOrderableField } from '@/modules/book/enums/book-orderable-field.enum';
-import { Category } from '@/modules/category/entities/category.entity';
-import { Checkout } from '@/modules/checkout/entities/checkout.entity';
-import { CheckoutStatus } from '@/modules/checkout/enums/checkout-status.enum';
-import { FavouriteBook } from '@/modules/favourite-book/entities/favourite-book.entity';
-import { User } from '@/modules/user/entities/user.entity';
+import { StringUtils, rawToEntity } from '@/base/utils';
+import { Author } from '@/modules/author/entities';
+import { BookDto, BookSearchDto } from '@/modules/book/dtos';
+import { Book } from '@/modules/book/entities';
+import { BookOrderableField } from '@/modules/book/enums';
+import { Category } from '@/modules/category/entities';
+import { Checkout } from '@/modules/checkout/entities';
+import { CheckoutStatus } from '@/modules/checkout/enums';
+import { FavouriteBook } from '@/modules/favourite-book/entities';
+import { User } from '@/modules/user/entities';
 
 @Injectable()
 export class BookRepository extends Repository<Book> {

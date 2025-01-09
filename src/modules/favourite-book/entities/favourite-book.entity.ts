@@ -1,7 +1,7 @@
 import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 
-import { Book } from '@/modules/book/entities/book.entity';
-import { User } from '@/modules/user/entities/user.entity';
+import { Book } from '@/modules/book/entities';
+import { User } from '@/modules/user/entities';
 
 @Entity({ schema: 'public', name: 'favourite_books' })
 export class FavouriteBook {

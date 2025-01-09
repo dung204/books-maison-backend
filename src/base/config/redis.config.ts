@@ -1,7 +1,7 @@
 import { RedisModuleOptions } from '@liaoliaots/nestjs-redis';
 import { registerAs } from '@nestjs/config';
 
-export default registerAs(
+export const redisConfig = registerAs(
   'redis',
   (): RedisModuleOptions => ({
     config: {

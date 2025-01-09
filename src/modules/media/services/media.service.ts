@@ -7,10 +7,12 @@ import {
 } from 'cloudinary';
 import { Readable } from 'stream';
 
-import { SuccessResponse } from '@/base/common/responses/success.response';
-import { DeleteMediaDto } from '@/modules/media/dto/delete-media.dto';
-import { GetMediaDto } from '@/modules/media/dto/get-media.dto';
-import { UploadSuccessDto } from '@/modules/media/dto/upload-success.dto';
+import { SuccessResponse } from '@/base/common/responses';
+import {
+  DeleteMediaDto,
+  GetMediaDto,
+  UploadSuccessDto,
+} from '@/modules/media/dtos';
 
 @Injectable()
 export class MediaService {

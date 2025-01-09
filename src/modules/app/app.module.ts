@@ -6,22 +6,24 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 
-import databaseConfig from '@/base/config/database.config';
-import googleOauthConfig from '@/base/config/google-oauth.config';
-import jwtConfig from '@/base/config/jwt.config';
-import redisConfig from '@/base/config/redis.config';
-import { DatabaseModule } from '@/base/database/database.module';
-import { AuthModule } from '@/modules/auth/auth.module';
-import { AuthorModule } from '@/modules/author/author.module';
-import { BookModule } from '@/modules/book/book.module';
-import { CategoryModule } from '@/modules/category/category.module';
-import { CheckoutModule } from '@/modules/checkout/checkout.module';
-import { FavouriteBookModule } from '@/modules/favourite-book/favourite-book.module';
-import { FineModule } from '@/modules/fine/fine.module';
-import { MeModule } from '@/modules/me/me.module';
-import { MediaModule } from '@/modules/media/media.module';
-import { TransactionModule } from '@/modules/transaction/transaction.module';
-import { UserModule } from '@/modules/user/user.module';
+import {
+  databaseConfig,
+  googleOauthConfig,
+  jwtConfig,
+  redisConfig,
+} from '@/base/config';
+import { DatabaseModule } from '@/base/database';
+import { AuthModule } from '@/modules/auth';
+import { AuthorModule } from '@/modules/author';
+import { BookModule } from '@/modules/book';
+import { CategoryModule } from '@/modules/category';
+import { CheckoutModule } from '@/modules/checkout';
+import { FavouriteBookModule } from '@/modules/favourite-book';
+import { FineModule } from '@/modules/fine';
+import { MeModule } from '@/modules/me';
+import { MediaModule } from '@/modules/media';
+import { TransactionModule } from '@/modules/transaction';
+import { UserModule } from '@/modules/user';
 
 @Module({
   imports: [

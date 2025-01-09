@@ -18,16 +18,16 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
-import { SuccessResponse } from '@/base/common/responses/success.response';
-import { Admin } from '@/modules/auth/decorators/admin.decorator';
-import { Public } from '@/modules/auth/decorators/public.decorator';
-import { CategorySearchDto } from '@/modules/category/dto/category-search.dto';
-import { CategoryDto } from '@/modules/category/dto/category.dto';
-
-import { CreateCategoryDto } from '../dto/create-category.dto';
-import { UpdateCategoryDto } from '../dto/update-category.dto';
-import { CategoryService } from '../services/category.service';
+import { ApiSuccessResponse } from '@/base/common/decorators';
+import { SuccessResponse } from '@/base/common/responses';
+import { Admin, Public } from '@/modules/auth/decorators';
+import {
+  CategoryDto,
+  CategorySearchDto,
+  CreateCategoryDto,
+  UpdateCategoryDto,
+} from '@/modules/category/dtos';
+import { CategoryService } from '@/modules/category/services';
 
 @ApiTags('categories')
 @Controller('categories')

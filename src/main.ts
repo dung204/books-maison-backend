@@ -13,9 +13,8 @@ import {
   initializeTransactionalContext,
 } from 'typeorm-transactional';
 
-import { configSwagger } from '@/base/config/swagger.config';
-
-import { AppModule } from './modules/app/app.module';
+import { configSwagger } from '@/base/config';
+import { AppModule } from '@/modules/app';
 
 async function bootstrap() {
   const logger = new Logger(bootstrap.name);

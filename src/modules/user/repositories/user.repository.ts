@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
-import { CreateUserDto } from '@/modules/user/dto/create-user.dto';
-import { UpdateUserDto } from '@/modules/user/dto/update-user.dto';
-import { UserSearchDto } from '@/modules/user/dto/user-search.dto';
+import { CreateUserDto } from '@/modules/user/dtos/create-user.dto';
+import { UpdateUserDto } from '@/modules/user/dtos/update-user.dto';
+import { UserSearchDto } from '@/modules/user/dtos/user-search.dto';
 import { User } from '@/modules/user/entities/user.entity';
 import { UserOrderableField } from '@/modules/user/enums/user-orderable-field.enum';
 

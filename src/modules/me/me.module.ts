@@ -1,16 +1,16 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { CheckoutModule } from '@/modules/checkout/checkout.module';
-import { FavouriteBookModule } from '@/modules/favourite-book/favourite-book.module';
-import { FineModule } from '@/modules/fine/fine.module';
-import { MeController } from '@/modules/me/controllers/me.controller';
-import { Avatar } from '@/modules/me/entities/avatar.entity';
-import { AvatarRepository } from '@/modules/me/repositories/avatar.repository';
-import { AvatarService } from '@/modules/me/services/avatar.service';
-import { MediaModule } from '@/modules/media/media.module';
-import { TransactionModule } from '@/modules/transaction/transaction.module';
-import { UserModule } from '@/modules/user/user.module';
+import { CheckoutModule } from '@/modules/checkout';
+import { FavouriteBookModule } from '@/modules/favourite-book';
+import { FineModule } from '@/modules/fine';
+import { MeController } from '@/modules/me/controllers';
+import { Avatar } from '@/modules/me/entities';
+import { AvatarRepository } from '@/modules/me/repositories';
+import { AvatarService } from '@/modules/me/services';
+import { MediaModule } from '@/modules/media';
+import { TransactionModule } from '@/modules/transaction';
+import { UserModule } from '@/modules/user';
 
 @Module({
   imports: [

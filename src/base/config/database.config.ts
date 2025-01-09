@@ -2,7 +2,7 @@ import { registerAs } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
-export default registerAs(
+export const databaseConfig = registerAs(
   'database',
   (): TypeOrmModuleOptions => ({
     type: 'postgres',

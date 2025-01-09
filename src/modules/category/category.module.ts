@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { CategoryController } from '@/modules/category/controllers/category.controller';
-import { Category } from '@/modules/category/entities/category.entity';
-import { CategoryRepository } from '@/modules/category/repositories/category.repository';
-import { CategoryService } from '@/modules/category/services/category.service';
+import { CategoryController } from '@/modules/category/controllers';
+import { Category } from '@/modules/category/entities';
+import { CategoryRepository } from '@/modules/category/repositories';
+import { CategoryService } from '@/modules/category/services';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Category])],

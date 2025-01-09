@@ -7,7 +7,7 @@ export interface JwtConfigOptions {
   refreshExpiration: number;
 }
 
-export default registerAs(
+export const jwtConfig = registerAs(
   'jwt',
   (): JwtConfigOptions => ({
     accessSecret: process.env.JWT_ACCESS_SECRET,

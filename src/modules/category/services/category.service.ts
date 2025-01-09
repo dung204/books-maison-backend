@@ -6,13 +6,14 @@ import {
 } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
-import { SuccessResponse } from '@/base/common/responses/success.response';
-import { CategorySearchDto } from '@/modules/category/dto/category-search.dto';
-import { CategoryDto } from '@/modules/category/dto/category.dto';
-import { CategoryRepository } from '@/modules/category/repositories/category.repository';
-
-import { CreateCategoryDto } from '../dto/create-category.dto';
-import { UpdateCategoryDto } from '../dto/update-category.dto';
+import { SuccessResponse } from '@/base/common/responses';
+import {
+  CategoryDto,
+  CategorySearchDto,
+  CreateCategoryDto,
+  UpdateCategoryDto,
+} from '@/modules/category/dtos';
+import { CategoryRepository } from '@/modules/category/repositories';
 
 @Injectable()
 export class CategoryService {

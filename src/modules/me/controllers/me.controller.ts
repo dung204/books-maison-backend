@@ -21,30 +21,31 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
-import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
-import { SuccessResponse } from '@/base/common/responses/success.response';
-import { CustomRequest } from '@/base/common/types/custom-request.type';
-import { Private } from '@/modules/auth/decorators/private.decorator';
-import { BookSearchDto } from '@/modules/book/dto/book-search.dto';
-import { BookDto } from '@/modules/book/dto/book.dto';
-import { CheckoutDto } from '@/modules/checkout/dto/checkout.dto';
-import { UserCheckoutSearchDto } from '@/modules/checkout/dto/user-checkout-search.dto';
-import { UserCreateCheckoutDto } from '@/modules/checkout/dto/user-create-checkout.dto';
-import { CheckoutService } from '@/modules/checkout/services/checkout.service';
-import { FavouriteBookService } from '@/modules/favourite-book/services/favourite-book.service';
-import { FineDto } from '@/modules/fine/dto/fine.dto';
-import UserFineSearchDto from '@/modules/fine/dto/user-fine-search.dto';
-import { FineService } from '@/modules/fine/services/fine.service';
-import { AvatarDto } from '@/modules/me/dtos/avatar.dto';
-import { SetAvatarDto } from '@/modules/me/dtos/set-avatar.dto';
-import { AvatarService } from '@/modules/me/services/avatar.service';
-import { TransactionDto } from '@/modules/transaction/dto/transaction.dto';
-import { UserTransactionSearchDto } from '@/modules/transaction/dto/user-transaction-search.dto';
-import { TransactionService } from '@/modules/transaction/services/transaction.service';
-import { ChangePasswordDto } from '@/modules/user/dto/change-password.dto';
-import { UserDto } from '@/modules/user/dto/user.dto';
-import { UpdateProfileRequest } from '@/modules/user/requests/update-profile.request';
-import { UserService } from '@/modules/user/services/user.service';
+import { ApiSuccessResponse } from '@/base/common/decorators';
+import { SuccessResponse } from '@/base/common/responses';
+import { CustomRequest } from '@/base/common/types';
+import { Private } from '@/modules/auth/decorators';
+import { BookDto, BookSearchDto } from '@/modules/book/dtos';
+import {
+  CheckoutDto,
+  UserCheckoutSearchDto,
+  UserCreateCheckoutDto,
+} from '@/modules/checkout/dtos';
+import { CheckoutService } from '@/modules/checkout/services';
+import { FavouriteBookService } from '@/modules/favourite-book/services';
+import { FineDto } from '@/modules/fine/dtos';
+import UserFineSearchDto from '@/modules/fine/dtos/user-fine-search.dto';
+import { FineService } from '@/modules/fine/services';
+import { AvatarDto, SetAvatarDto } from '@/modules/me/dtos';
+import { AvatarService } from '@/modules/me/services';
+import {
+  TransactionDto,
+  UserTransactionSearchDto,
+} from '@/modules/transaction/dtos';
+import { TransactionService } from '@/modules/transaction/services';
+import { ChangePasswordDto, UserDto } from '@/modules/user/dtos';
+import { UpdateProfileRequest } from '@/modules/user/requests';
+import { UserService } from '@/modules/user/services';
 
 @ApiTags('me')
 @Controller('/me')

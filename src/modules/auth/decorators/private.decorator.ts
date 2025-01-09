@@ -1,11 +1,8 @@
 import { UseGuards, applyDecorators } from '@nestjs/common';
 import { ApiBearerAuth, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
-import {
-  Public,
-  PublicDecoratorOptions,
-} from '@/modules/auth/decorators/public.decorator';
-import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
+import { Public, PublicDecoratorOptions } from '@/modules/auth/decorators';
+import { JwtAccessGuard } from '@/modules/auth/guards';
 
 export type PrivateDecoratorOptions = PublicDecoratorOptions;
 

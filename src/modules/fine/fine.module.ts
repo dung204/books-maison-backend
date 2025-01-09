@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { Fine } from '@/modules/fine/entities/fine.entity';
-import { FineRepository } from '@/modules/fine/repositories/fine.repository';
-import { TransactionModule } from '@/modules/transaction/transaction.module';
-
-import { FineController } from './controllers/fine.controller';
-import { FineService } from './services/fine.service';
+import { FineController } from '@/modules/fine/controllers';
+import { Fine } from '@/modules/fine/entities';
+import { FineRepository } from '@/modules/fine/repositories';
+import { FineService } from '@/modules/fine/services';
+import { TransactionModule } from '@/modules/transaction';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Fine]), TransactionModule],

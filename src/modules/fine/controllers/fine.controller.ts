@@ -17,16 +17,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
-import { CustomRequest } from '@/base/common/types/custom-request.type';
-import { Admin } from '@/modules/auth/decorators/admin.decorator';
-import { Private } from '@/modules/auth/decorators/private.decorator';
-import { FineSearchDto } from '@/modules/fine/dto/fine-search.dto';
-import { FineDto } from '@/modules/fine/dto/fine.dto';
-import { PayFineDto } from '@/modules/fine/dto/pay-fine.dto';
-import { FineStatus } from '@/modules/fine/enums/fine-status.enum';
-import { FineService } from '@/modules/fine/services/fine.service';
-import { TransactionMethod } from '@/modules/transaction/enums/transaction-method.enum';
+import { ApiSuccessResponse } from '@/base/common/decorators';
+import { CustomRequest } from '@/base/common/types';
+import { Admin, Private } from '@/modules/auth/decorators';
+import { FineDto, FineSearchDto, PayFineDto } from '@/modules/fine/dtos';
+import { FineStatus } from '@/modules/fine/enums';
+import { FineService } from '@/modules/fine/services';
+import { TransactionMethod } from '@/modules/transaction/enums';
 
 @ApiTags('fines')
 @Controller('fines')

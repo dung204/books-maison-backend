@@ -2,17 +2,18 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { DeepPartial } from 'typeorm';
 
-import { SuccessResponse } from '@/base/common/responses/success.response';
-import { AuthorService } from '@/modules/author/services/author.service';
-import { BookSearchDto } from '@/modules/book/dto/book-search.dto';
-import { BookDto } from '@/modules/book/dto/book.dto';
-import { Book } from '@/modules/book/entities/book.entity';
-import { BookRepository } from '@/modules/book/repositories/book.repository';
-import { CategoryService } from '@/modules/category/services/category.service';
-import { User } from '@/modules/user/entities/user.entity';
-
-import { CreateBookDto } from '../dto/create-book.dto';
-import { UpdateBookDto } from '../dto/update-book.dto';
+import { SuccessResponse } from '@/base/common/responses';
+import { AuthorService } from '@/modules/author/services';
+import {
+  BookDto,
+  BookSearchDto,
+  CreateBookDto,
+  UpdateBookDto,
+} from '@/modules/book/dtos';
+import { Book } from '@/modules/book/entities';
+import { BookRepository } from '@/modules/book/repositories';
+import { CategoryService } from '@/modules/category/services';
+import { User } from '@/modules/user/entities';
 
 @Injectable()
 export class BookService {

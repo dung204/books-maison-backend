@@ -1,7 +1,7 @@
 import { FileValidator } from '@nestjs/common';
 import { IFile } from '@nestjs/common/pipes/file/interfaces';
 
-import { FileUtils } from '@/base/utils/file.utils';
+import { FileUtils } from '@/base/utils';
 
 export class CustomFileValidator extends FileValidator {
   constructor() {

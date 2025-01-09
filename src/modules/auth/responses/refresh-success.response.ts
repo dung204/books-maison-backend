@@ -1,5 +1,5 @@
-import { SuccessResponse } from '@/base/common/responses/success.response';
-import { LoginSuccessPayload } from '@/modules/auth/responses/login-success.response';
+import { SuccessResponse } from '@/base/common/responses';
+import { LoginSuccessPayload } from '@/modules/auth/responses';
 
 export class RefreshSuccessPayload extends LoginSuccessPayload {}
 

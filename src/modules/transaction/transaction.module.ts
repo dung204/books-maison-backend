@@ -3,12 +3,11 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { Transaction } from '@/modules/transaction/entities/transaction.entity';
-import { TransactionRepository } from '@/modules/transaction/repositories/transaction.repository';
-import { TransactionService } from '@/modules/transaction/services/transaction.service';
-import { UserModule } from '@/modules/user/user.module';
-
-import { TransactionController } from './controllers/transaction.controller';
+import { TransactionController } from '@/modules/transaction/controllers';
+import { Transaction } from '@/modules/transaction/entities';
+import { TransactionRepository } from '@/modules/transaction/repositories';
+import { TransactionService } from '@/modules/transaction/services';
+import { UserModule } from '@/modules/user';
 
 @Module({
   imports: [

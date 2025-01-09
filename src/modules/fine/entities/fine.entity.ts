@@ -9,9 +9,9 @@ import {
   PrimaryColumn,
 } from 'typeorm';
 
-import { Checkout } from '@/modules/checkout/entities/checkout.entity';
-import { FineStatus } from '@/modules/fine/enums/fine-status.enum';
-import { Transaction } from '@/modules/transaction/entities/transaction.entity';
+import { Checkout } from '@/modules/checkout/entities';
+import { FineStatus } from '@/modules/fine/enums';
+import { Transaction } from '@/modules/transaction/entities';
 
 @Entity({ schema: 'public', name: 'fines' })
 export class Fine {

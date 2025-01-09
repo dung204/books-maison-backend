@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
-import { CategorySearchDto } from '@/modules/category/dto/category-search.dto';
-import { CreateCategoryDto } from '@/modules/category/dto/create-category.dto';
-import { UpdateCategoryDto } from '@/modules/category/dto/update-category.dto';
-import { Category } from '@/modules/category/entities/category.entity';
-import { CategoryOrderableField } from '@/modules/category/enums/category-orderable-field.enum';
+import {
+  CategorySearchDto,
+  CreateCategoryDto,
+  UpdateCategoryDto,
+} from '@/modules/category/dtos';
+import { Category } from '@/modules/category/entities';
+import { CategoryOrderableField } from '@/modules/category/enums';
 
 @Injectable()
 export class CategoryRepository extends Repository<Category> {

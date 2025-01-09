@@ -7,16 +7,17 @@ import {
 } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
-import { SuccessResponse } from '@/base/common/responses/success.response';
-import { PasswordUtils } from '@/base/utils/password.utils';
-import { ChangePasswordDto } from '@/modules/user/dto/change-password.dto';
-import { UserSearchDto } from '@/modules/user/dto/user-search.dto';
-import { UserDto } from '@/modules/user/dto/user.dto';
-import { User } from '@/modules/user/entities/user.entity';
-import { UserRepository } from '@/modules/user/repositories/user.repository';
-
-import { CreateUserDto } from '../dto/create-user.dto';
-import { UpdateUserDto } from '../dto/update-user.dto';
+import { SuccessResponse } from '@/base/common/responses';
+import { PasswordUtils } from '@/base/utils';
+import {
+  ChangePasswordDto,
+  CreateUserDto,
+  UpdateUserDto,
+  UserDto,
+  UserSearchDto,
+} from '@/modules/user/dtos';
+import { User } from '@/modules/user/entities';
+import { UserRepository } from '@/modules/user/repositories';
 
 @Injectable()
 export class UserService {

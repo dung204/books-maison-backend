@@ -7,8 +7,8 @@ import {
   PrimaryColumn,
 } from 'typeorm';
 
-import { TransactionMethod } from '@/modules/transaction/enums/transaction-method.enum';
-import { User } from '@/modules/user/entities/user.entity';
+import { TransactionMethod } from '@/modules/transaction/enums';
+import { User } from '@/modules/user/entities';
 
 @Entity({ schema: 'public', name: 'transactions' })
 export class Transaction {

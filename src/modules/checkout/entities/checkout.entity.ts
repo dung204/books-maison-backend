@@ -8,10 +8,10 @@ import {
   PrimaryColumn,
 } from 'typeorm';
 
-import { Book } from '@/modules/book/entities/book.entity';
-import { CheckoutStatus } from '@/modules/checkout/enums/checkout-status.enum';
-import { Fine } from '@/modules/fine/entities/fine.entity';
-import { User } from '@/modules/user/entities/user.entity';
+import { Book } from '@/modules/book/entities';
+import { CheckoutStatus } from '@/modules/checkout/enums';
+import { Fine } from '@/modules/fine/entities';
+import { User } from '@/modules/user/entities';
 
 @Entity({ schema: 'public', name: 'checkouts' })
 export class Checkout {

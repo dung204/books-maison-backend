@@ -9,9 +9,9 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-import { Author } from '@/modules/author/entities/author.entity';
-import { Category } from '@/modules/category/entities/category.entity';
-import { Checkout } from '@/modules/checkout/entities/checkout.entity';
+import { Author } from '@/modules/author/entities';
+import { Category } from '@/modules/category/entities';
+import { Checkout } from '@/modules/checkout/entities';
 
 @Entity({ schema: 'public', name: 'books' })
 export class Book {

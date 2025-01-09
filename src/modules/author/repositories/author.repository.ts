@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
-import { AuthorSearchDto } from '@/modules/author/dto/author-search.dto';
-import { CreateAuthorDto } from '@/modules/author/dto/create-author.dto';
-import { UpdateAuthorDto } from '@/modules/author/dto/update-author.dto';
-import { Author } from '@/modules/author/entities/author.entity';
-import { AuthorOrderableField } from '@/modules/author/enums/author-orderable-field.enum';
+import {
+  AuthorSearchDto,
+  CreateAuthorDto,
+  UpdateAuthorDto,
+} from '@/modules/author/dtos';
+import { Author } from '@/modules/author/entities';
+import { AuthorOrderableField } from '@/modules/author/enums';
 
 @Injectable()
 export class AuthorRepository extends Repository<Author> {

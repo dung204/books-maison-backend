@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 
-import { User } from '@/modules/user/entities/user.entity';
+import { User } from '@/modules/user/entities';
 
 @Entity({ schema: 'public', name: 'avatars' })
 export class Avatar {
