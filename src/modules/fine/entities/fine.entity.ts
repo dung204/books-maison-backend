@@ -1,22 +1,12 @@
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  JoinColumn,
-  OneToOne,
-  PrimaryColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 
+import { IdNonGeneratedEntity } from '@/base/common/entities';
 import { Checkout } from '@/modules/checkout/entities';
 import { FineStatus } from '@/modules/fine/enums';
 import { Transaction } from '@/modules/transaction/entities';
 
 @Entity({ schema: 'public', name: 'fines' })
-export class Fine {
-  @PrimaryColumn('character varying')
-  id!: string;
-
+export class Fine extends IdNonGeneratedEntity {
   @OneToOne(() => Checkout, { onDelete: 'CASCADE' })
   @JoinColumn()
   checkout!: Checkout;
@@ -27,13 +17,4 @@ export class Fine {
   @OneToOne(() => Transaction)
   @JoinColumn()
   transaction!: Transaction | null;
-
-  @CreateDateColumn({
-    type: 'timestamp with time zone',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  createdTimestamp!: Date;
-
-  @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
-  deletedTimestamp!: Date | null;
 }

@@ -1,24 +1,13 @@
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  JoinColumn,
-  OneToMany,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 
+import { IdGeneratedEntity } from '@/base/common/entities';
 import { Role } from '@/base/common/enum';
 import { Checkout } from '@/modules/checkout/entities';
 import { Avatar } from '@/modules/me/entities';
 import { Transaction } from '@/modules/transaction/entities';
 
 @Entity({ schema: 'public', name: 'users' })
-export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-
+export class User extends IdGeneratedEntity {
   @Column('character varying', { length: 100, unique: true })
   email!: string;
 
@@ -47,15 +36,6 @@ export class User {
 
   @Column('character varying', { nullable: true })
   googleId!: string | null;
-
-  @CreateDateColumn({
-    type: 'timestamp with time zone',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  createdTimestamp!: Date;
-
-  @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
-  deletedTimestamp!: Date | null;
 
   @OneToMany(() => Checkout, (checkout) => checkout.user, {
     cascade: ['soft-remove', 'remove', 'recover'],

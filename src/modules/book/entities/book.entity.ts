@@ -1,23 +1,12 @@
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
 
+import { IdGeneratedEntity } from '@/base/common/entities';
 import { Author } from '@/modules/author/entities';
 import { Category } from '@/modules/category/entities';
 import { Checkout } from '@/modules/checkout/entities';
 
 @Entity({ schema: 'public', name: 'books' })
-export class Book {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-
+export class Book extends IdGeneratedEntity {
   @Column('character varying', { length: 20, nullable: true })
   isbn!: string | null;
 
@@ -52,15 +41,6 @@ export class Book {
 
   @Column('integer', { default: 0 })
   quantity!: number;
-
-  @CreateDateColumn({
-    type: 'timestamp with time zone',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  createdTimestamp!: Date;
-
-  @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
-  deletedTimestamp!: Date | null;
 
   @OneToMany(() => Checkout, (checkout) => checkout.book, {
     cascade: ['soft-remove', 'remove', 'recover'],
