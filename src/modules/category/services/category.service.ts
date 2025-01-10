@@ -13,7 +13,6 @@ import {
   CreateCategoryDto,
   UpdateCategoryDto,
 } from '@/modules/category/dtos';
-import { Category } from '@/modules/category/entities';
 import { CategoryRepository } from '@/modules/category/repositories';
 
 @Injectable()
@@ -70,14 +69,14 @@ export class CategoryService {
     if (!this.categoryRepository.isExistedById(id))
       throw new NotFoundException('Category not found.');
 
-    const updateStatus = await this.categoryRepository.updateCategoryById(
+    const updatedCategory = await this.categoryRepository.updateCategoryById(
       id,
       updateCategoryDto,
     );
-    if (updateStatus !== 1)
+    if (!updatedCategory)
       throw new ConflictException('Conflicted! Cannot update category.');
 
-    return this.categoryRepository.findById(id) as Promise<Category>;
+    return updatedCategory;
   }
 
   async deleteCategory(id: string) {

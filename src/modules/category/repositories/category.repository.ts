@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
+import { rawToEntity } from '@/base/utils';
 import {
   CategorySearchDto,
   CreateCategoryDto,
@@ -62,9 +63,36 @@ export class CategoryRepository extends Repository<Category> {
     return this.existsBy({ id });
   }
 
-  async updateCategoryById(id: string, updateCategoryDto: UpdateCategoryDto) {
-    const updateResult = await this.update({ id }, updateCategoryDto);
+  async updateCategoryById(id: string, { name }: UpdateCategoryDto) {
+    try {
+      const updateQuery = this.createQueryBuilder()
+        .update()
+        .set({
+          ...(name && { name: () => `'${name}'` }),
+        })
+        .where(`id = '${id}'`)
+        .returning('*')
+        .getQuery();
 
-    return updateResult.affected;
+      const selectQuery = this.createQueryBuilder('category')
+        .getQuery()
+        .replaceAll(`"public"."categories"`, `"updated_categories"`);
+
+      const rawUpdatedCategories = (await this.query(
+        `WITH "updated_categories" AS (${updateQuery}) ${selectQuery}`,
+      )) as any[];
+
+      if (rawUpdatedCategories.length === 0) return null;
+
+      const category = rawToEntity(
+        Category,
+        rawUpdatedCategories[0],
+        'category',
+      );
+
+      return category;
+    } catch (err) {
+      return null;
+    }
   }
 }
