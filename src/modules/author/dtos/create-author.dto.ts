@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsNotEmpty,
   IsOptional,
@@ -23,6 +24,7 @@ export class CreateAuthorDto {
     example: 1965,
     required: false,
   })
+  @Transform(({ value }) => parseInt(value, 10))
   @IsPositive({ message: 'Year of birth must be a positive number' })
   @IsOptional()
   yearOfBirth?: number;
@@ -32,6 +34,7 @@ export class CreateAuthorDto {
     example: null,
     required: false,
   })
+  @Transform(({ value }) => parseInt(value, 10))
   @IsPositive({ message: 'Year of death must be a positive number' })
   @IsOptional()
   yearOfDeath?: number;

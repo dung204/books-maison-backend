@@ -27,7 +27,6 @@ import {
   CreateAuthorDto,
   UpdateAuthorDto,
 } from '@/modules/author/dtos';
-import { Author } from '@/modules/author/entities';
 import { AuthorService } from '@/modules/author/services';
 
 @ApiTags('authors')
@@ -124,7 +123,7 @@ export class AuthorController {
   async update(
     @Param('id') id: string,
     @Body() updateAuthorDto: UpdateAuthorDto,
-  ): Promise<SuccessResponse<Author>> {
+  ): Promise<SuccessResponse<AuthorDto>> {
     return {
       data: await this.authorService.update(id, updateAuthorDto),
     };

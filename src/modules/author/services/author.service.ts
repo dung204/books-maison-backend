@@ -14,7 +14,6 @@ import {
   CreateAuthorDto,
   UpdateAuthorDto,
 } from '@/modules/author/dtos';
-import { Author } from '@/modules/author/entities';
 import { AuthorRepository } from '@/modules/author/repositories';
 
 @Injectable()
@@ -73,14 +72,14 @@ export class AuthorService {
     if (!this.authorRepository.isExistedById(id))
       throw new NotFoundException('Author not found.');
 
-    const updateStatus = await this.authorRepository.updateAuthorById(
+    const updatedAuthor = await this.authorRepository.updateAuthorById(
       id,
       updateAuthorDto,
     );
-    if (updateStatus !== 1)
+    if (!updatedAuthor)
       throw new ConflictException('Conflicted! Cannot update author.');
 
-    return this.authorRepository.findById(id) as Promise<Author>;
+    return AuthorDto.fromAuthor(updatedAuthor);
   }
 
   async softDeleteAuthor(id: string) {

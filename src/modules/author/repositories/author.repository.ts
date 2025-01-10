@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
+import { rawToEntity } from '@/base/utils';
 import {
   AuthorSearchDto,
   CreateAuthorDto,
@@ -91,9 +92,47 @@ export class AuthorRepository extends Repository<Author> {
     return author;
   }
 
-  async updateAuthorById(id: string, updateAuthorDto: UpdateAuthorDto) {
-    const updateResult = await this.update({ id }, updateAuthorDto);
+  async updateAuthorById(
+    id: string,
+    {
+      biography,
+      imageUrl,
+      name,
+      nationality,
+      yearOfBirth,
+      yearOfDeath,
+    }: UpdateAuthorDto,
+  ) {
+    try {
+      const updateQuery = this.createQueryBuilder()
+        .update()
+        .set({
+          ...(biography && { biography: () => `'${biography}'` }),
+          ...(imageUrl && { imageUrl: () => `'${imageUrl}'` }),
+          ...(name && { name: () => `'${name}'` }),
+          ...(nationality && { nationality: () => `'${nationality}'` }),
+          ...(yearOfBirth && { yearOfBirth: () => `${yearOfBirth}` }),
+          ...(yearOfDeath && { yearOfDeath: () => `'${yearOfDeath}'` }),
+        })
+        .where(`id = '${id}'`)
+        .returning('*')
+        .getQuery();
 
-    return updateResult.affected;
+      const selectQuery = this.createQueryBuilder('author')
+        .getQuery()
+        .replaceAll(`"public"."authors"`, `"updated_authors"`);
+
+      const rawUpdatedAuthors = (await this.query(
+        `WITH "updated_authors" AS (${updateQuery}) ${selectQuery}`,
+      )) as any[];
+
+      if (rawUpdatedAuthors.length === 0) return null;
+
+      const author = rawToEntity(Author, rawUpdatedAuthors[0], 'author');
+
+      return author;
+    } catch (err) {
+      return null;
+    }
   }
 }
