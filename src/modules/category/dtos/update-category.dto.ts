@@ -1,5 +1,14 @@
-import { PartialType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
-import { CreateCategoryDto } from '@/modules/category/dtos/create-category.dto';
-
-export class UpdateCategoryDto extends PartialType(CreateCategoryDto) {}
+export class UpdateCategoryDto {
+  @ApiProperty({
+    description: 'The name of the category',
+    example: 'Action/Adventure',
+  })
+  @IsOptional()
+  @IsNotEmpty({ message: 'Category name must not be empty.' })
+  @IsString({ message: 'Category name must be a string' })
+  @MaxLength(100)
+  name?: string;
+}

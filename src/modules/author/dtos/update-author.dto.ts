@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsInt,
   IsOptional,
   IsPositive,
   IsString,
@@ -30,10 +31,11 @@ export class UpdateAuthorDto {
     required: false,
     type: String,
   })
-  @SQLNullableTransform(({ value }) => parseInt(value, 10))
+  @SQLNullableTransform(({ value }) => Number(value))
+  @IsInt({ message: 'Year of birth must be an integer' })
   @IsPositive({ message: 'Year of birth must be a positive number' })
   @IsOptional()
-  yearOfBirth?: SQLNullable<number>;
+  yearOfBirth?: number | null;
 
   @ApiProperty({
     description:
@@ -42,10 +44,11 @@ export class UpdateAuthorDto {
     required: false,
     type: String,
   })
-  @SQLNullableTransform(({ value }) => parseInt(value, 10))
+  @SQLNullableTransform(({ value }) => Number(value))
+  @IsInt({ message: 'Year of death must be an integer' })
   @IsPositive({ message: 'Year of death must be a positive number' })
   @IsOptional()
-  yearOfDeath?: SQLNullable<number>;
+  yearOfDeath?: number | null;
 
   @ApiProperty({
     description:
@@ -69,7 +72,7 @@ export class UpdateAuthorDto {
   @SQLNullableTransform()
   @IsUrl({}, { message: 'Image URL not valid.' })
   @IsOptional()
-  imageUrl?: SQLNullable<string>;
+  imageUrl?: string | null;
 
   @ApiProperty({
     description:
@@ -82,5 +85,5 @@ export class UpdateAuthorDto {
   @SQLNullableTransform()
   @IsString({ message: 'Biography must be a string' })
   @IsOptional()
-  biography?: SQLNullable<string>;
+  biography?: string | null;
 }

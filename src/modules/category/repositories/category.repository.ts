@@ -63,35 +63,50 @@ export class CategoryRepository extends Repository<Category> {
     return this.existsBy({ id });
   }
 
-  async updateCategoryById(id: string, { name }: UpdateCategoryDto) {
+  async updateCategoryById(id: string, updateCategoryDto: UpdateCategoryDto) {
     try {
+      await this.query(`BEGIN TRANSACTION`);
+
+      const selectQuery = this.createQueryBuilder('category');
+
+      const updatedValues = {
+        ...(updateCategoryDto.name && { name: () => '' }),
+      };
+
+      if (Object.keys(updatedValues).length === 0) {
+        await this.query('COMMIT');
+        return selectQuery.where('category.id = :id', { id }).getOne();
+      }
+
+      Object.keys(updatedValues).forEach((key, index) => {
+        updatedValues[key as keyof typeof updatedValues] = () =>
+          `$${index + 1}`;
+      });
+
+      const parameters = Object.keys(updatedValues).map(
+        (key) => updateCategoryDto[key as keyof typeof updateCategoryDto],
+      );
+
       const updateQuery = this.createQueryBuilder()
         .update()
-        .set({
-          ...(name && { name: () => `'${name}'` }),
-        })
-        .where(`id = '${id}'`)
+        .set(updatedValues)
+        .where(`id = $${Object.keys(updatedValues).length + 1}`)
         .returning('*')
         .getQuery();
 
-      const selectQuery = this.createQueryBuilder('category')
-        .getQuery()
-        .replaceAll(`"public"."categories"`, `"updated_categories"`);
-
       const rawUpdatedCategories = (await this.query(
-        `WITH "updated_categories" AS (${updateQuery}) ${selectQuery}`,
+        `WITH "updated_categories" AS (${updateQuery}) ${selectQuery
+          .getQuery()
+          .replaceAll(`"public"."categories"`, `"updated_categories"`)}`,
+        [...parameters, id],
       )) as any[];
+      await this.query(`COMMIT`);
 
       if (rawUpdatedCategories.length === 0) return null;
 
-      const category = rawToEntity(
-        Category,
-        rawUpdatedCategories[0],
-        'category',
-      );
-
-      return category;
+      return rawToEntity(Category, rawUpdatedCategories[0], 'category');
     } catch (err) {
+      await this.query(`ROLLBACK`);
       return null;
     }
   }

@@ -92,46 +92,59 @@ export class AuthorRepository extends Repository<Author> {
     return author;
   }
 
-  async updateAuthorById(
-    id: string,
-    {
-      biography,
-      imageUrl,
-      name,
-      nationality,
-      yearOfBirth,
-      yearOfDeath,
-    }: UpdateAuthorDto,
-  ) {
+  async updateAuthorById(id: string, updateAuthorDto: UpdateAuthorDto) {
     try {
+      await this.query(`BEGIN TRANSACTION`);
+
+      const selectQuery = this.createQueryBuilder('author');
+
+      const updatedValues = {
+        ...(updateAuthorDto.biography !== undefined && { biography: () => '' }),
+        ...(updateAuthorDto.imageUrl !== undefined && { imageUrl: () => '' }),
+        ...(updateAuthorDto.name !== undefined && { name: () => '' }),
+        ...(updateAuthorDto.nationality !== undefined && {
+          nationality: () => '',
+        }),
+        ...(updateAuthorDto.yearOfBirth !== undefined && {
+          yearOfBirth: () => '',
+        }),
+        ...(updateAuthorDto.yearOfDeath !== undefined && {
+          yearOfDeath: () => '',
+        }),
+      };
+
+      if (Object.keys(updatedValues).length === 0) {
+        await this.query('COMMIT');
+        return selectQuery.where('author.id = :id', { id }).getOne();
+      }
+
+      Object.keys(updatedValues).forEach((key, index) => {
+        updatedValues[key as keyof typeof updatedValues] = () =>
+          `$${index + 1}`;
+      });
+
+      const parameters = Object.keys(updatedValues).map(
+        (key) => updateAuthorDto[key as keyof typeof updateAuthorDto],
+      );
+
       const updateQuery = this.createQueryBuilder()
         .update()
-        .set({
-          ...(biography && { biography: () => `'${biography}'` }),
-          ...(imageUrl && { imageUrl: () => `'${imageUrl}'` }),
-          ...(name && { name: () => `'${name}'` }),
-          ...(nationality && { nationality: () => `'${nationality}'` }),
-          ...(yearOfBirth && { yearOfBirth: () => `${yearOfBirth}` }),
-          ...(yearOfDeath && { yearOfDeath: () => `'${yearOfDeath}'` }),
-        })
-        .where(`id = '${id}'`)
+        .set(updatedValues)
+        .where(`id = $${Object.keys(updatedValues).length + 1}`)
         .returning('*')
         .getQuery();
 
-      const selectQuery = this.createQueryBuilder('author')
-        .getQuery()
-        .replaceAll(`"public"."authors"`, `"updated_authors"`);
-
       const rawUpdatedAuthors = (await this.query(
-        `WITH "updated_authors" AS (${updateQuery}) ${selectQuery}`,
+        `WITH "updated_authors" AS (${updateQuery}) ${selectQuery.getQuery().replaceAll(`"public"."authors"`, `"updated_authors"`)}`,
+        [...parameters, id],
       )) as any[];
+      await this.query(`COMMIT`);
 
       if (rawUpdatedAuthors.length === 0) return null;
 
-      const author = rawToEntity(Author, rawUpdatedAuthors[0], 'author');
-
-      return author;
+      return rawToEntity(Author, rawUpdatedAuthors[0], 'author');
     } catch (err) {
+      await this.query(`ROLLBACK`);
       return null;
     }
   }
