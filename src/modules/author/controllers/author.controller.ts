@@ -123,10 +123,8 @@ export class AuthorController {
   async update(
     @Param('id') id: string,
     @Body() updateAuthorDto: UpdateAuthorDto,
-  ): Promise<SuccessResponse<AuthorDto>> {
-    return {
-      data: await this.authorService.update(id, updateAuthorDto),
-    };
+  ) {
+    return this.authorService.update(id, updateAuthorDto);
   }
 
   @Admin()

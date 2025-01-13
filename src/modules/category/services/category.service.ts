@@ -65,7 +65,10 @@ export class CategoryService {
     return category;
   }
 
-  async update(id: string, updateCategoryDto: UpdateCategoryDto) {
+  async update(
+    id: string,
+    updateCategoryDto: UpdateCategoryDto,
+  ): Promise<SuccessResponse<CategoryDto>> {
     if (!this.categoryRepository.isExistedById(id))
       throw new NotFoundException('Category not found.');
 
@@ -76,7 +79,9 @@ export class CategoryService {
     if (!updatedCategory)
       throw new ConflictException('Conflicted! Cannot update category.');
 
-    return updatedCategory;
+    return {
+      data: CategoryDto.fromCategory(updatedCategory),
+    };
   }
 
   async deleteCategory(id: string) {

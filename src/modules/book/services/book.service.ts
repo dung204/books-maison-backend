@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { DeepPartial } from 'typeorm';
 
@@ -93,32 +98,20 @@ export class BookService {
     return book;
   }
 
-  async update(
-    id: string,
-    { authorIds, categoryIds, ...updateBookDto }: UpdateBookDto,
-  ) {
-    const book = await this.findOne(id);
+  async update(id: string, { ...updateBookDto }: UpdateBookDto, user?: User) {
+    if (!(await this.bookRepository.isExistedById(id)))
+      throw new NotFoundException('Book not found.');
 
-    const categories =
-      !categoryIds || categoryIds.length === 0
-        ? book.categories
-        : await Promise.all(
-            categoryIds.map((id) => this.categoryService.findCategoryById(id)),
-          );
-    const authors =
-      !authorIds || authorIds.length === 0
-        ? book.authors
-        : await Promise.all(
-            authorIds.map((id) => this.authorService.findAuthorById(id)),
-          );
+    const updatedBook = await this.bookRepository.updateBookById(
+      id,
+      updateBookDto,
+      user,
+    );
 
-    Object.assign(book, {
-      authors,
-      categories,
-      ...updateBookDto,
-    });
+    if (!updatedBook)
+      throw new ConflictException('Conflicted! Cannot update book.');
 
-    return this.bookRepository.save(book);
+    return updatedBook;
   }
 
   async softDeleteBook(id: string) {

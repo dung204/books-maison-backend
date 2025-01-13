@@ -124,12 +124,8 @@ export class CategoryController {
   async update(
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
-  ): Promise<SuccessResponse<CategoryDto>> {
-    return {
-      data: CategoryDto.fromCategory(
-        await this.categoryService.update(id, updateCategoryDto),
-      ),
-    };
+  ) {
+    return this.categoryService.update(id, updateCategoryDto);
   }
 
   @Admin()

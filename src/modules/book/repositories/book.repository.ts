@@ -3,7 +3,7 @@ import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 
 import { StringUtils, rawToEntity } from '@/base/utils';
 import { Author } from '@/modules/author/entities';
-import { BookDto, BookSearchDto } from '@/modules/book/dtos';
+import { BookDto, BookSearchDto, UpdateBookDto } from '@/modules/book/dtos';
 import { Book } from '@/modules/book/entities';
 import { BookOrderableField } from '@/modules/book/enums';
 import { Category } from '@/modules/category/entities';
@@ -18,6 +18,10 @@ export class BookRepository extends Repository<Book> {
     super(Book, dataSource.createEntityManager());
   }
 
+  async isExistedById(id: string) {
+    return this.existsBy({ id });
+  }
+
   async findById(id: string, user?: User) {
     const query = this.createQueryBuilder('book')
       .leftJoinAndSelect('book.authors', 'author')
@@ -28,44 +32,114 @@ export class BookRepository extends Repository<Book> {
 
     const rawResults = await query.getRawMany();
 
-    if (rawResults.length === 0) return null;
-
-    const result = rawToEntity(Book, rawResults[0], 'book');
-    result.categories = [];
-    result.authors = [];
-
-    rawResults.forEach((item) => {
-      const categoryId = item['category_id'];
-      const authorId = item['author_id'];
-
-      if (categoryId && !result.categories.find((c) => c.id === categoryId)) {
-        result.categories.push(rawToEntity(Category, item, 'category'));
-      }
-
-      if (authorId && !result.authors.find((c) => c.id === authorId)) {
-        result.authors.push(rawToEntity(Author, item, 'author'));
-      }
-    });
-
-    if (user) {
-      return {
-        ...result,
-        userData: {
-          isBorrowing: rawResults[0].isBorrowing,
-          isFavouring: rawResults[0].isFavouring,
-        },
-      };
-    }
-
-    return result;
+    return this.processRawResultsToSingleEntity(rawResults, user);
   }
 
-  async findByIdWithoutUserData(id: string) {
-    return this.createQueryBuilder('book')
-      .leftJoinAndSelect('book.authors', 'author')
-      .leftJoinAndSelect('book.categories', 'category')
-      .where('book.id = :id', { id })
-      .getOne();
+  async updateBookById(
+    id: string,
+    { categoryIds, authorIds, ...updateBookDto }: UpdateBookDto,
+    user?: User,
+  ) {
+    try {
+      await this.query(`BEGIN TRANSACTION`);
+
+      if (categoryIds) {
+        const parameters = categoryIds.reduce<string[]>(
+          (prev, curr) => [...prev, id, curr],
+          [],
+        );
+        let count = 0;
+        const sqlValuesToInsert = categoryIds
+          .map((_, index) => `($${index + count + 1},$${index + count++ + 2})`)
+          .join(',');
+
+        await this.query(
+          `DELETE FROM "public"."books_categories_categories" WHERE "books_id" = $1`,
+          [id],
+        );
+        await this.query(
+          `INSERT INTO "public"."books_categories_categories" ("books_id", "categories_id") VALUES ${sqlValuesToInsert}`,
+          parameters,
+        );
+      }
+
+      if (authorIds) {
+        const parameters = authorIds.reduce<string[]>(
+          (prev, curr) => [...prev, id, curr],
+          [],
+        );
+        let count = 0;
+        const sqlValuesToInsert = authorIds
+          .map((_, index) => `($${index + count + 1},$${index + count++ + 2})`)
+          .join(',');
+
+        await this.query(
+          `DELETE FROM "public"."books_authors_authors" WHERE "books_id" = $1`,
+          [id],
+        );
+        await this.query(
+          `INSERT INTO "public"."books_authors_authors" ("books_id", "authors_id") VALUES ${sqlValuesToInsert}`,
+          parameters,
+        );
+      }
+
+      const selectQuery = this.createQueryBuilder('book')
+        .leftJoinAndSelect('book.authors', 'author')
+        .leftJoinAndSelect('book.categories', 'category');
+
+      const updatedValues = {
+        ...(updateBookDto.isbn !== undefined && { isbn: () => '' }),
+        ...(updateBookDto.title !== undefined && { title: () => '' }),
+        ...(updateBookDto.publishedYear !== undefined && {
+          publishedYear: () => '',
+        }),
+        ...(updateBookDto.publisher !== undefined && { publisher: () => '' }),
+        ...(updateBookDto.language !== undefined && { language: () => '' }),
+        ...(updateBookDto.numberOfPages !== undefined && {
+          numberOfPages: () => '',
+        }),
+        ...(updateBookDto.imageUrl !== undefined && { imageUrl: () => '' }),
+        ...(updateBookDto.description !== undefined && {
+          description: () => '',
+        }),
+        ...(updateBookDto.quantity !== undefined && { quantity: () => '' }),
+      };
+
+      if (Object.keys(updatedValues).length === 0) {
+        await this.query(`COMMIT`);
+        const rawBooks = await selectQuery
+          .where('book.id = :id', { id })
+          .getRawMany();
+        return this.processRawResultsToSingleEntity(rawBooks, user);
+      }
+
+      Object.keys(updatedValues).forEach((key, index) => {
+        updatedValues[key as keyof typeof updatedValues] = () =>
+          `$${index + 1}`;
+      });
+
+      const parameters = Object.keys(updatedValues).map(
+        (key) => updateBookDto[key as keyof typeof updateBookDto],
+      );
+
+      const updateQuery = this.createQueryBuilder()
+        .update()
+        .set(updatedValues)
+        .where(`id = $${Object.keys(updatedValues).length + 1}`)
+        .returning('*')
+        .getQuery();
+
+      const rawUpdatedBooks = (await this.query(
+        `WITH "updated_books" AS (${updateQuery}) ${selectQuery.getQuery().replaceAll(`"public"."books"`, `"updated_books"`)}`,
+        [...parameters, id],
+      )) as any[];
+
+      await this.query(`COMMIT`);
+      return this.processRawResultsToSingleEntity(rawUpdatedBooks, user);
+    } catch (err) {
+      await this.query(`ROLLBACK`);
+      return null;
+    }
   }
 
   async findAllAndCount(
@@ -318,5 +392,41 @@ export class BookRepository extends Repository<Book> {
 
     const books = await query.getMany();
     return books.map((book) => book.id);
+  }
+
+  private async processRawResultsToSingleEntity(
+    rawResults: any[],
+    user?: User,
+  ) {
+    if (rawResults.length === 0) return null;
+
+    const result = rawToEntity(Book, rawResults[0], 'book');
+    result.categories = [];
+    result.authors = [];
+
+    rawResults.forEach((item) => {
+      const categoryId = item['category_id'];
+      const authorId = item['author_id'];
+
+      if (categoryId && !result.categories.find((c) => c.id === categoryId)) {
+        result.categories.push(rawToEntity(Category, item, 'category'));
+      }
+
+      if (authorId && !result.authors.find((c) => c.id === authorId)) {
+        result.authors.push(rawToEntity(Author, item, 'author'));
+      }
+    });
+
+    if (user) {
+      return {
+        ...result,
+        userData: {
+          isBorrowing: rawResults[0].isBorrowing,
+          isFavouring: rawResults[0].isFavouring,
+        },
+      };
+    }
+
+    return result;
   }
 }

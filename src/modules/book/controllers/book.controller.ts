@@ -136,11 +136,14 @@ export class BookController {
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   async update(
+    @Request() req: CustomRequest,
     @Param('id') id: string,
     @Body() updateBookDto: UpdateBookDto,
   ): Promise<SuccessResponse<BookDto>> {
     return {
-      data: BookDto.convert(await this.bookService.update(id, updateBookDto)),
+      data: BookDto.convert(
+        await this.bookService.update(id, updateBookDto, req.user),
+      ),
     };
   }
 

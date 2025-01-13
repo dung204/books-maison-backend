@@ -52,6 +52,7 @@ export class UpdateAuthorDto {
       'The nationality of the author (use `NULL` string if updating to null)',
     example: 'United Kingdom',
     required: false,
+    type: String,
   })
   @SQLNullableTransform()
   @IsString({ message: 'Nationality must be a string' })
@@ -63,6 +64,7 @@ export class UpdateAuthorDto {
       'The image URL of the author (use `NULL` string if updating to null)',
     example: 'http://offuv.na/dupat',
     required: false,
+    type: String,
   })
   @SQLNullableTransform()
   @IsUrl({}, { message: 'Image URL not valid.' })
@@ -75,6 +77,7 @@ export class UpdateAuthorDto {
     example:
       'lost medicine worse unhappy recognize largest equal anything point beauty hurried add dry paid orbit knew question animal region route able show task or',
     required: false,
+    type: String,
   })
   @SQLNullableTransform()
   @IsString({ message: 'Biography must be a string' })

@@ -68,7 +68,10 @@ export class AuthorService {
     return author;
   }
 
-  async update(id: string, updateAuthorDto: UpdateAuthorDto) {
+  async update(
+    id: string,
+    updateAuthorDto: UpdateAuthorDto,
+  ): Promise<SuccessResponse<AuthorDto>> {
     if (!this.authorRepository.isExistedById(id))
       throw new NotFoundException('Author not found.');
 
@@ -79,7 +82,9 @@ export class AuthorService {
     if (!updatedAuthor)
       throw new ConflictException('Conflicted! Cannot update author.');
 
-    return AuthorDto.fromAuthor(updatedAuthor);
+    return {
+      data: AuthorDto.fromAuthor(updatedAuthor),
+    };
   }
 
   async softDeleteAuthor(id: string) {

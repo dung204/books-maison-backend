@@ -12,12 +12,10 @@ type TransformParams = Partial<Parameters<typeof Transform>>;
 export function SQLNullableTransform(...args: TransformParams) {
   return applyDecorators(
     ValidateIf((_, value) => value !== StringUtils.SQL_NULL),
-    Transform(
-      (params) =>
-        !args[0] || params.value === StringUtils.SQL_NULL
-          ? params.value
-          : args[0](params),
-      args[1],
-    ),
+    Transform((params) => {
+      if (params.value === StringUtils.SQL_NULL) return null;
+      if (args[0]) return args[0](params);
+      return params.value;
+    }, args[1]),
   );
 }
