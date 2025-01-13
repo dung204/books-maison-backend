@@ -25,6 +25,12 @@ export class LoginSuccessPayload {
   accessToken!: string;
 
   @ApiProperty({
+    description: 'The active state of the user',
+    example: true,
+  })
+  isActive!: boolean;
+
+  @ApiProperty({
     description:
       'The JWT token to create new (refresh) the access token if it expires',
     example:

@@ -78,11 +78,16 @@ export class AuthService {
     return null;
   }
 
-  async login({ id, role }: User): Promise<LoginSuccessResponse> {
+  async login({
+    id,
+    role,
+    deletedTimestamp,
+  }: User): Promise<LoginSuccessResponse> {
     return {
       data: {
         id,
         role,
+        isActive: deletedTimestamp === null,
         ...(await this.getTokens(id, role)),
       },
     };
@@ -109,6 +114,7 @@ export class AuthService {
       data: {
         id: user.id,
         role: user.role,
+        isActive: user.deletedTimestamp === null,
         ...(await this.getTokens(user.id, user.role)),
       },
     };
