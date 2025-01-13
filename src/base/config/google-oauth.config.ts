@@ -7,7 +7,7 @@ export interface GoogleOAuthConfigOptions {
   redirect_uri: string;
 }
 
-export default registerAs(
+export const googleOauthConfig = registerAs(
   'google_oauth',
   (): GoogleOAuthConfigOptions => ({
     client_id: process.env.GOOGLE_OAUTH_CLIENT_ID!,

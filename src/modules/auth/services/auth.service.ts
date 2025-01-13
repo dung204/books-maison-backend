@@ -2,32 +2,32 @@ import { RedisService } from '@liaoliaots/nestjs-redis';
 import { HttpService } from '@nestjs/axios';
 import {
   ConflictException,
-  Inject,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Redis } from 'ioredis';
 
-import { Role } from '@/base/common/enum/role.enum';
-import { SuccessResponse } from '@/base/common/responses/success.response';
-import { GoogleOAuthConfigOptions } from '@/base/config/google-oauth.config';
-import { JwtConfigOptions } from '@/base/config/jwt.config';
-import { PasswordUtils } from '@/base/utils/password.utils';
-import { OAuthAction } from '@/modules/auth/enums/oauth-action.enum';
-import { GoogleRequest } from '@/modules/auth/requests/google.request';
-import { RegisterRequest } from '@/modules/auth/requests/register.request';
-import { GoogleUserInfoResponse } from '@/modules/auth/responses/google-user-info.response';
-import { LoginSuccessResponse } from '@/modules/auth/responses/login-success.response';
-import { RefreshSuccessResponse } from '@/modules/auth/responses/refresh-success.response';
-import { JwtPayload } from '@/modules/auth/types/jwt-payload.type';
-import { AvatarService } from '@/modules/me/services/avatar.service';
-import { MediaService } from '@/modules/media/services/media.service';
-import { UserDto } from '@/modules/user/dto/user.dto';
-import { User } from '@/modules/user/entities/user.entity';
-import { UserRepository } from '@/modules/user/repositories/user.repository';
-import { UserService } from '@/modules/user/services/user.service';
+import { Role } from '@/base/common/enum';
+import { SuccessResponse } from '@/base/common/responses';
+import { GoogleOAuthConfigOptions, JwtConfigOptions } from '@/base/config';
+import { PasswordUtils } from '@/base/utils';
+import { OAuthAction } from '@/modules/auth/enums';
+import { GoogleRequest, RegisterRequest } from '@/modules/auth/requests';
+import {
+  GoogleUserInfoResponse,
+  LoginSuccessResponse,
+  RefreshSuccessResponse,
+} from '@/modules/auth/responses';
+import { JwtPayload } from '@/modules/auth/types';
+import { AvatarService } from '@/modules/me/services';
+import { MediaService } from '@/modules/media/services';
+import { UserDto } from '@/modules/user/dtos';
+import { User } from '@/modules/user/entities';
+import { UserRepository } from '@/modules/user/repositories';
+import { UserService } from '@/modules/user/services';
 
 @Injectable()
 export class AuthService {
@@ -35,7 +35,7 @@ export class AuthService {
   private readonly redis: Redis;
 
   constructor(
-    @Inject(UserRepository) private readonly userRepository: UserRepository,
+    private readonly userRepository: UserRepository,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
@@ -66,12 +66,12 @@ export class AuthService {
     };
   }
 
-  async validateUser(email: string, password: string): Promise<User> {
+  async validateUser(email: string, password: string): Promise<User | null> {
     const user = await this.userRepository.findByEmail(email, true);
 
     if (
       user &&
-      (await PasswordUtils.isPasswordMatched(password, user.password))
+      (await PasswordUtils.isPasswordMatched(password, user.password!))
     )
       return user;
 
@@ -99,15 +99,17 @@ export class AuthService {
     const { sub: userId } = this.jwtService.verify<JwtPayload>(refreshToken, {
       secret: refreshSecret,
     });
-    const { id, role } = await this.userRepository.findById(userId);
+    const user = await this.userRepository.findById(userId);
+
+    if (!user) throw new NotFoundException('User not found.');
 
     await this.blacklistToken(refreshToken);
 
     return {
       data: {
-        id,
-        role,
-        ...(await this.getTokens(id, role)),
+        id: user.id,
+        role: user.role,
+        ...(await this.getTokens(user.id, user.role)),
       },
     };
   }
@@ -116,7 +118,8 @@ export class AuthService {
     const refreshToken = await this.redis.getdel(id);
 
     await this.blacklistToken(accessToken);
-    await this.blacklistToken(refreshToken);
+
+    if (refreshToken) await this.blacklistToken(refreshToken);
   }
 
   async getTokens(userId: string, role: Role) {
@@ -153,7 +156,7 @@ export class AuthService {
 
   async blacklistToken(token: string) {
     const { exp } = this.jwtService.decode<JwtPayload>(token);
-    await this.redis.set(token, this.BLACKLISTED, 'EXAT', exp);
+    await this.redis.set(token, this.BLACKLISTED, 'EXAT', exp!);
   }
 
   async isTokenBlacklisted(token: string) {
@@ -192,6 +195,8 @@ export class AuthService {
         return this.login(existingUser);
 
       case OAuthAction.LINK:
+        if (!existingUser) throw new NotFoundException('User not found.');
+
         if (existingUser.googleId) {
           throw new ConflictException(
             'Can not link because a user already linked to Google has been found.',
@@ -203,6 +208,8 @@ export class AuthService {
         return this.login(linkedUser);
 
       case OAuthAction.OVERRIDE:
+        if (!existingUser) throw new NotFoundException('User not found.');
+
         const overriddenUser = await this.handleGoogleOverride(
           existingUser,
           googleUserInfo,

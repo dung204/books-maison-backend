@@ -1,6 +1,6 @@
 import { ParseFilePipeBuilder, UploadedFile } from '@nestjs/common';
 
-import { CustomFileValidator } from '@/modules/media/validators/custom-file.validator';
+import { CustomFileValidator } from '@/modules/media/validators';
 
 export const CustomUploadedFile = () =>
   UploadedFile(

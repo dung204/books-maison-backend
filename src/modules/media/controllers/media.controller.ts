@@ -15,13 +15,15 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
-import { Private } from '@/modules/auth/decorators/private.decorator';
-import { CustomUploadedFile } from '@/modules/media/decorators/custom-uploaded-file.decorator';
-import { DeleteMediaDto } from '@/modules/media/dto/delete-media.dto';
-import { UploadQueryDto } from '@/modules/media/dto/upload-query.dto';
-import { UploadSuccessDto } from '@/modules/media/dto/upload-success.dto';
-import { MediaService } from '@/modules/media/services/media.service';
+import { ApiSuccessResponse } from '@/base/common/decorators';
+import { Private } from '@/modules/auth/decorators';
+import { CustomUploadedFile } from '@/modules/media/decorators';
+import {
+  DeleteMediaDto,
+  UploadQueryDto,
+  UploadSuccessDto,
+} from '@/modules/media/dtos';
+import { MediaService } from '@/modules/media/services';
 
 @ApiTags('media')
 @Controller('/media')

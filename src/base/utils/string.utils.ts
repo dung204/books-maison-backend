@@ -1,4 +1,6 @@
 export class StringUtils {
+  public static readonly SQL_NULL = 'NULL';
+
   public static snakeToCamel(snakeStr: string) {
     return snakeStr.replace(/(_\w)/g, (matches) => matches[1].toUpperCase());
   }

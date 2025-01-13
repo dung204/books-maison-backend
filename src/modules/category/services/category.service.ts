@@ -6,13 +6,14 @@ import {
 } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
-import { SuccessResponse } from '@/base/common/responses/success.response';
-import { CategorySearchDto } from '@/modules/category/dto/category-search.dto';
-import { CategoryDto } from '@/modules/category/dto/category.dto';
-import { CategoryRepository } from '@/modules/category/repositories/category.repository';
-
-import { CreateCategoryDto } from '../dto/create-category.dto';
-import { UpdateCategoryDto } from '../dto/update-category.dto';
+import { SuccessResponse } from '@/base/common/responses';
+import {
+  CategoryDto,
+  CategorySearchDto,
+  CreateCategoryDto,
+  UpdateCategoryDto,
+} from '@/modules/category/dtos';
+import { CategoryRepository } from '@/modules/category/repositories';
 
 @Injectable()
 export class CategoryService {
@@ -64,18 +65,23 @@ export class CategoryService {
     return category;
   }
 
-  async update(id: string, updateCategoryDto: UpdateCategoryDto) {
+  async update(
+    id: string,
+    updateCategoryDto: UpdateCategoryDto,
+  ): Promise<SuccessResponse<CategoryDto>> {
     if (!this.categoryRepository.isExistedById(id))
       throw new NotFoundException('Category not found.');
 
-    const updateStatus = await this.categoryRepository.updateCategoryById(
+    const updatedCategory = await this.categoryRepository.updateCategoryById(
       id,
       updateCategoryDto,
     );
-    if (updateStatus !== 1)
+    if (!updatedCategory)
       throw new ConflictException('Conflicted! Cannot update category.');
 
-    return this.categoryRepository.findById(id);
+    return {
+      data: CategoryDto.fromCategory(updatedCategory),
+    };
   }
 
   async deleteCategory(id: string) {

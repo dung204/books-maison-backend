@@ -1,11 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
-import { CategorySearchDto } from '@/modules/category/dto/category-search.dto';
-import { CreateCategoryDto } from '@/modules/category/dto/create-category.dto';
-import { UpdateCategoryDto } from '@/modules/category/dto/update-category.dto';
-import { Category } from '@/modules/category/entities/category.entity';
-import { CategoryOrderableField } from '@/modules/category/enums/category-orderable-field.enum';
+import { rawToEntity } from '@/base/utils';
+import {
+  CategorySearchDto,
+  CreateCategoryDto,
+  UpdateCategoryDto,
+} from '@/modules/category/dtos';
+import { Category } from '@/modules/category/entities';
+import { CategoryOrderableField } from '@/modules/category/enums';
 
 @Injectable()
 export class CategoryRepository extends Repository<Category> {
@@ -61,8 +64,50 @@ export class CategoryRepository extends Repository<Category> {
   }
 
   async updateCategoryById(id: string, updateCategoryDto: UpdateCategoryDto) {
-    const updateResult = await this.update({ id }, updateCategoryDto);
+    try {
+      await this.query(`BEGIN TRANSACTION`);
 
-    return updateResult.affected;
+      const selectQuery = this.createQueryBuilder('category');
+
+      const updatedValues = {
+        ...(updateCategoryDto.name && { name: () => '' }),
+      };
+
+      if (Object.keys(updatedValues).length === 0) {
+        await this.query('COMMIT');
+        return selectQuery.where('category.id = :id', { id }).getOne();
+      }
+
+      Object.keys(updatedValues).forEach((key, index) => {
+        updatedValues[key as keyof typeof updatedValues] = () =>
+          `$${index + 1}`;
+      });
+
+      const parameters = Object.keys(updatedValues).map(
+        (key) => updateCategoryDto[key as keyof typeof updateCategoryDto],
+      );
+
+      const updateQuery = this.createQueryBuilder()
+        .update()
+        .set(updatedValues)
+        .where(`id = $${Object.keys(updatedValues).length + 1}`)
+        .returning('*')
+        .getQuery();
+
+      const rawUpdatedCategories = (await this.query(
+        `WITH "updated_categories" AS (${updateQuery}) ${selectQuery
+          .getQuery()
+          .replaceAll(`"public"."categories"`, `"updated_categories"`)}`,
+        [...parameters, id],
+      )) as any[];
+      await this.query(`COMMIT`);
+
+      if (rawUpdatedCategories.length === 0) return null;
+
+      return rawToEntity(Category, rawUpdatedCategories[0], 'category');
+    } catch (err) {
+      await this.query(`ROLLBACK`);
+      return null;
+    }
   }
 }

@@ -1,8 +1,8 @@
 import { SetMetadata, UseGuards, applyDecorators } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
-import { Public } from '@/modules/auth/decorators/public.decorator';
-import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard';
+import { Public } from '@/modules/auth/decorators';
+import { JwtAccessGuard } from '@/modules/auth/guards';
 
 export const IS_OPTIONAL_AUTH_KEY = 'isOptionalAuth';
 

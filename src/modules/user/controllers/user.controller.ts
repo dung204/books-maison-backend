@@ -15,13 +15,11 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
-import { SuccessResponse } from '@/base/common/responses/success.response';
-import { Admin } from '@/modules/auth/decorators/admin.decorator';
-import { UserSearchDto } from '@/modules/user/dto/user-search.dto';
-import { UserDto } from '@/modules/user/dto/user.dto';
-
-import { UserService } from '../services/user.service';
+import { ApiSuccessResponse } from '@/base/common/decorators';
+import { SuccessResponse } from '@/base/common/responses';
+import { Admin } from '@/modules/auth/decorators';
+import { UserDto, UserSearchDto } from '@/modules/user/dtos';
+import { UserService } from '@/modules/user/services';
 
 @ApiTags('users')
 @Controller('/users')

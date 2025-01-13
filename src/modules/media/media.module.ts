@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { v2 as cloudinary } from 'cloudinary';
 
-import { MediaController } from '@/modules/media/controllers/media.controller';
-import { MediaService } from '@/modules/media/services/media.service';
+import { MediaController } from '@/modules/media/controllers';
+import { MediaService } from '@/modules/media/services';
 
 @Module({
   controllers: [MediaController],

@@ -18,17 +18,16 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
-import { SuccessResponse } from '@/base/common/responses/success.response';
-import { Admin } from '@/modules/auth/decorators/admin.decorator';
-import { Public } from '@/modules/auth/decorators/public.decorator';
-import { AuthorSearchDto } from '@/modules/author/dto/author-search.dto';
-import { Author } from '@/modules/author/entities/author.entity';
-import { AuthorService } from '@/modules/author/services/author.service';
-
-import { AuthorDto } from '../dto/author.dto';
-import { CreateAuthorDto } from '../dto/create-author.dto';
-import { UpdateAuthorDto } from '../dto/update-author.dto';
+import { ApiSuccessResponse } from '@/base/common/decorators';
+import { SuccessResponse } from '@/base/common/responses';
+import { Admin, Public } from '@/modules/auth/decorators';
+import {
+  AuthorDto,
+  AuthorSearchDto,
+  CreateAuthorDto,
+  UpdateAuthorDto,
+} from '@/modules/author/dtos';
+import { AuthorService } from '@/modules/author/services';
 
 @ApiTags('authors')
 @Controller('authors')
@@ -124,10 +123,8 @@ export class AuthorController {
   async update(
     @Param('id') id: string,
     @Body() updateAuthorDto: UpdateAuthorDto,
-  ): Promise<SuccessResponse<Author>> {
-    return {
-      data: await this.authorService.update(id, updateAuthorDto),
-    };
+  ) {
+    return this.authorService.update(id, updateAuthorDto);
   }
 
   @Admin()

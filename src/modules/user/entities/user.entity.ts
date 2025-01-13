@@ -1,38 +1,27 @@
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  JoinColumn,
-  OneToMany,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 
-import { Role } from '@/base/common/enum/role.enum';
-import { Checkout } from '@/modules/checkout/entities/checkout.entity';
-import { Avatar } from '@/modules/me/entities/avatar.entity';
-import { Transaction } from '@/modules/transaction/entities/transaction.entity';
+import { IdGeneratedEntity } from '@/base/common/entities';
+import { Role } from '@/base/common/enum';
+import { Checkout } from '@/modules/checkout/entities';
+import { Avatar } from '@/modules/me/entities';
+import { Transaction } from '@/modules/transaction/entities';
 
 @Entity({ schema: 'public', name: 'users' })
-export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
+export class User extends IdGeneratedEntity {
   @Column('character varying', { length: 100, unique: true })
-  email: string;
+  email!: string;
 
   @Column('character varying', { length: 100, nullable: true })
-  password: string;
+  password!: string | null;
 
   @Column('character varying', { length: 100 })
-  firstName: string;
+  firstName!: string;
 
   @Column('character varying', { length: 100 })
-  lastName: string;
+  lastName!: string;
 
   @Column('character varying', { length: 256, nullable: true })
-  address: string;
+  address!: string;
 
   @OneToOne(() => Avatar, {
     cascade: true,
@@ -40,30 +29,21 @@ export class User {
     onDelete: 'SET NULL',
   })
   @JoinColumn()
-  avatar: Avatar;
+  avatar!: Avatar | null;
 
   @Column('enum', { enum: Role, default: Role.USER })
-  role: Role;
+  role!: Role;
 
   @Column('character varying', { nullable: true })
-  googleId: string;
-
-  @CreateDateColumn({
-    type: 'timestamp with time zone',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  createdTimestamp: Date;
-
-  @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
-  deletedTimestamp: Date;
+  googleId!: string | null;
 
   @OneToMany(() => Checkout, (checkout) => checkout.user, {
     cascade: ['soft-remove', 'remove', 'recover'],
   })
-  checkouts: Checkout[];
+  checkouts!: Checkout[];
 
   @OneToMany(() => Transaction, (transaction) => transaction.user, {
     cascade: ['soft-remove', 'remove', 'recover'],
   })
-  transactions: Transaction[];
+  transactions!: Transaction[];
 }

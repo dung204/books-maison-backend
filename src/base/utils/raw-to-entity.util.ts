@@ -1,6 +1,6 @@
 import { ClassConstructor, plainToInstance } from 'class-transformer';
 
-import { StringUtils } from '@/base/utils/string.utils';
+import { StringUtils } from '@/base/utils';
 
 export function rawToEntity<T>(
   entity: ClassConstructor<T>,

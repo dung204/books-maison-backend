@@ -1,18 +1,24 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { DeepPartial } from 'typeorm';
 
-import { SuccessResponse } from '@/base/common/responses/success.response';
-import { AuthorService } from '@/modules/author/services/author.service';
-import { BookSearchDto } from '@/modules/book/dto/book-search.dto';
-import { BookDto } from '@/modules/book/dto/book.dto';
-import { Book } from '@/modules/book/entities/book.entity';
-import { BookRepository } from '@/modules/book/repositories/book.repository';
-import { CategoryService } from '@/modules/category/services/category.service';
-import { User } from '@/modules/user/entities/user.entity';
-
-import { CreateBookDto } from '../dto/create-book.dto';
-import { UpdateBookDto } from '../dto/update-book.dto';
+import { SuccessResponse } from '@/base/common/responses';
+import { AuthorService } from '@/modules/author/services';
+import {
+  BookDto,
+  BookSearchDto,
+  CreateBookDto,
+  UpdateBookDto,
+} from '@/modules/book/dtos';
+import { Book } from '@/modules/book/entities';
+import { BookRepository } from '@/modules/book/repositories';
+import { CategoryService } from '@/modules/category/services';
+import { User } from '@/modules/user/entities';
 
 @Injectable()
 export class BookService {
@@ -48,7 +54,7 @@ export class BookService {
     });
 
     return {
-      data: BookDto.fromBook(await this.bookRepository.save(book)),
+      data: BookDto.convert(await this.bookRepository.save(book)),
     };
   }
 
@@ -64,7 +70,7 @@ export class BookService {
     const totalPage = Math.ceil(total / pageSize);
 
     return {
-      data: books.map(BookDto.fromBook),
+      data: books.map(BookDto.convert),
       pagination: {
         total,
         page,
@@ -92,32 +98,20 @@ export class BookService {
     return book;
   }
 
-  async update(
-    id: string,
-    { authorIds, categoryIds, ...updateBookDto }: UpdateBookDto,
-  ) {
-    const book = await this.findOne(id);
+  async update(id: string, { ...updateBookDto }: UpdateBookDto, user?: User) {
+    if (!(await this.bookRepository.isExistedById(id)))
+      throw new NotFoundException('Book not found.');
 
-    const categories =
-      !categoryIds || categoryIds.length === 0
-        ? book.categories
-        : await Promise.all(
-            categoryIds.map((id) => this.categoryService.findCategoryById(id)),
-          );
-    const authors =
-      !authorIds || authorIds.length === 0
-        ? book.authors
-        : await Promise.all(
-            authorIds.map((id) => this.authorService.findAuthorById(id)),
-          );
+    const updatedBook = await this.bookRepository.updateBookById(
+      id,
+      updateBookDto,
+      user,
+    );
 
-    Object.assign(book, {
-      authors,
-      categories,
-      ...updateBookDto,
-    });
+    if (!updatedBook)
+      throw new ConflictException('Conflicted! Cannot update book.');
 
-    return this.bookRepository.save(book);
+    return updatedBook;
   }
 
   async softDeleteBook(id: string) {
@@ -157,7 +151,7 @@ export class BookService {
       );
 
     return {
-      data: BookDto.fromBook(await this.bookRepository.recover(book)),
+      data: BookDto.convert(await this.bookRepository.recover(book)),
     };
   }
 

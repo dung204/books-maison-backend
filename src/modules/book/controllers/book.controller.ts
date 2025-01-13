@@ -19,17 +19,17 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
-import { SuccessResponse } from '@/base/common/responses/success.response';
-import { CustomRequest } from '@/base/common/types/custom-request.type';
-import { Admin } from '@/modules/auth/decorators/admin.decorator';
-import { OptionalAuth } from '@/modules/auth/decorators/optional-auth.decorator';
-import { BookSearchDto } from '@/modules/book/dto/book-search.dto';
-import { BookDto } from '@/modules/book/dto/book.dto';
-import { BookService } from '@/modules/book/services/book.service';
-
-import { CreateBookDto } from '../dto/create-book.dto';
-import { UpdateBookDto } from '../dto/update-book.dto';
+import { ApiSuccessResponse } from '@/base/common/decorators';
+import { SuccessResponse } from '@/base/common/responses';
+import { CustomRequest } from '@/base/common/types';
+import { Admin, OptionalAuth } from '@/modules/auth/decorators';
+import {
+  BookDto,
+  BookSearchDto,
+  CreateBookDto,
+  UpdateBookDto,
+} from '@/modules/book/dtos';
+import { BookService } from '@/modules/book/services';
 
 @ApiTags('books')
 @Controller('books')
@@ -120,7 +120,7 @@ export class BookController {
   ): Promise<SuccessResponse<BookDto>> {
     const currentUser = req.user;
     return {
-      data: BookDto.fromBook(await this.bookService.findOne(id, currentUser)),
+      data: BookDto.convert(await this.bookService.findOne(id, currentUser)),
     };
   }
 
@@ -136,11 +136,14 @@ export class BookController {
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   async update(
+    @Request() req: CustomRequest,
     @Param('id') id: string,
     @Body() updateBookDto: UpdateBookDto,
   ): Promise<SuccessResponse<BookDto>> {
     return {
-      data: BookDto.fromBook(await this.bookService.update(id, updateBookDto)),
+      data: BookDto.convert(
+        await this.bookService.update(id, updateBookDto, req.user),
+      ),
     };
   }
 

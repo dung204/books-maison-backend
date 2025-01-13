@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
-import { TransactionSearchDto } from '@/modules/transaction/dto/transaction-search.dto';
-import { Transaction } from '@/modules/transaction/entities/transaction.entity';
-import { TransactionOrderableField } from '@/modules/transaction/enums/transaction-orderable-field.enum';
+import { TransactionSearchDto } from '@/modules/transaction/dtos';
+import { Transaction } from '@/modules/transaction/entities';
+import { TransactionOrderableField } from '@/modules/transaction/enums';
 
 @Injectable()
 export class TransactionRepository extends Repository<Transaction> {

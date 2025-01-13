@@ -9,22 +9,24 @@ import {
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { addWeeks } from 'date-fns';
 
-import { Role } from '@/base/common/enum/role.enum';
-import { SuccessResponse } from '@/base/common/responses/success.response';
-import { BookService } from '@/modules/book/services/book.service';
-import { AdminCreateCheckoutDto } from '@/modules/checkout/dto/admin-create-checkout.dto';
-import { CheckoutSearchDto } from '@/modules/checkout/dto/checkout-search.dto';
-import { CheckoutDto } from '@/modules/checkout/dto/checkout.dto';
-import { MarkReturnedCheckoutDto } from '@/modules/checkout/dto/mark-returned-checkout.dto';
-import { UpdateCheckoutNoteDto } from '@/modules/checkout/dto/update-checkout-note.dto';
-import { UserCheckoutSearchDto } from '@/modules/checkout/dto/user-checkout-search.dto';
-import { UserCreateCheckoutDto } from '@/modules/checkout/dto/user-create-checkout.dto';
-import { Checkout } from '@/modules/checkout/entities/checkout.entity';
-import { CheckoutStatus } from '@/modules/checkout/enums/checkout-status.enum';
-import { CheckoutRepository } from '@/modules/checkout/repositories/checkout.repository';
-import { FineService } from '@/modules/fine/services/fine.service';
-import { User } from '@/modules/user/entities/user.entity';
-import { UserService } from '@/modules/user/services/user.service';
+import { Role } from '@/base/common/enum';
+import { SuccessResponse } from '@/base/common/responses';
+import { BookService } from '@/modules/book/services';
+import {
+  AdminCreateCheckoutDto,
+  CheckoutDto,
+  CheckoutSearchDto,
+  MarkReturnedCheckoutDto,
+  UpdateCheckoutNoteDto,
+  UserCheckoutSearchDto,
+  UserCreateCheckoutDto,
+} from '@/modules/checkout/dtos';
+import { Checkout } from '@/modules/checkout/entities';
+import { CheckoutStatus } from '@/modules/checkout/enums';
+import { CheckoutRepository } from '@/modules/checkout/repositories';
+import { FineService } from '@/modules/fine/services';
+import { User } from '@/modules/user/entities';
+import { UserService } from '@/modules/user/services';
 
 @Injectable()
 export class CheckoutService {
@@ -187,7 +189,6 @@ export class CheckoutService {
 
     const book = checkout.book;
     checkout.book = await this.bookService.update(book.id, {
-      ...book,
       quantity: book.quantity + 1,
     });
 

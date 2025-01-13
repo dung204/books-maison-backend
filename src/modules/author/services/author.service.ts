@@ -7,13 +7,14 @@ import {
 } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
-import { SuccessResponse } from '@/base/common/responses/success.response';
-import { AuthorSearchDto } from '@/modules/author/dto/author-search.dto';
-import { AuthorRepository } from '@/modules/author/repositories/author.repository';
-
-import { AuthorDto } from '../dto/author.dto';
-import { CreateAuthorDto } from '../dto/create-author.dto';
-import { UpdateAuthorDto } from '../dto/update-author.dto';
+import { SuccessResponse } from '@/base/common/responses';
+import {
+  AuthorDto,
+  AuthorSearchDto,
+  CreateAuthorDto,
+  UpdateAuthorDto,
+} from '@/modules/author/dtos';
+import { AuthorRepository } from '@/modules/author/repositories';
 
 @Injectable()
 export class AuthorService {
@@ -67,18 +68,23 @@ export class AuthorService {
     return author;
   }
 
-  async update(id: string, updateAuthorDto: UpdateAuthorDto) {
+  async update(
+    id: string,
+    updateAuthorDto: UpdateAuthorDto,
+  ): Promise<SuccessResponse<AuthorDto>> {
     if (!this.authorRepository.isExistedById(id))
       throw new NotFoundException('Author not found.');
 
-    const updateStatus = await this.authorRepository.updateAuthorById(
+    const updatedAuthor = await this.authorRepository.updateAuthorById(
       id,
       updateAuthorDto,
     );
-    if (updateStatus !== 1)
+    if (!updatedAuthor)
       throw new ConflictException('Conflicted! Cannot update author.');
 
-    return this.authorRepository.findById(id);
+    return {
+      data: AuthorDto.fromAuthor(updatedAuthor),
+    };
   }
 
   async softDeleteAuthor(id: string) {

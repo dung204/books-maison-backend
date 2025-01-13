@@ -1,38 +1,20 @@
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  ManyToOne,
-  PrimaryColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne } from 'typeorm';
 
-import { TransactionMethod } from '@/modules/transaction/enums/transaction-method.enum';
-import { User } from '@/modules/user/entities/user.entity';
+import { IdNonGeneratedEntity } from '@/base/common/entities';
+import { TransactionMethod } from '@/modules/transaction/enums';
+import { User } from '@/modules/user/entities';
 
 @Entity({ schema: 'public', name: 'transactions' })
-export class Transaction {
-  @PrimaryColumn('character varying')
-  id: string;
-
+export class Transaction extends IdNonGeneratedEntity {
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  user: User;
+  user!: User;
 
   @Column('integer')
-  amount: number;
+  amount!: number;
 
   @Column({
     enum: TransactionMethod,
     enumName: 'TransactionMethod',
   })
-  method: TransactionMethod;
-
-  @CreateDateColumn({
-    type: 'timestamp with time zone',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  createdTimestamp: Date;
-
-  @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
-  deletedTimestamp: Date;
+  method!: TransactionMethod;
 }

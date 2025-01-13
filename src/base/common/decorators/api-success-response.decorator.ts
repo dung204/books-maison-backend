@@ -6,7 +6,7 @@ import {
   getSchemaPath,
 } from '@nestjs/swagger';
 
-import { Pagination } from '@/base/common/types/pagination.type';
+import { Pagination } from '@/base/common/types';
 
 type ApiSuccessResponseOptions<DataDto extends Type<unknown>> = Omit<
   ApiResponseSchemaHost,

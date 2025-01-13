@@ -1,54 +1,35 @@
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  ManyToOne,
-  OneToOne,
-  PrimaryColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, OneToOne } from 'typeorm';
 
-import { Book } from '@/modules/book/entities/book.entity';
-import { CheckoutStatus } from '@/modules/checkout/enums/checkout-status.enum';
-import { Fine } from '@/modules/fine/entities/fine.entity';
-import { User } from '@/modules/user/entities/user.entity';
+import { IdNonGeneratedEntity } from '@/base/common/entities';
+import { Book } from '@/modules/book/entities';
+import { CheckoutStatus } from '@/modules/checkout/enums';
+import { Fine } from '@/modules/fine/entities';
+import { User } from '@/modules/user/entities';
 
 @Entity({ schema: 'public', name: 'checkouts' })
-export class Checkout {
-  @PrimaryColumn('character varying')
-  id: string;
-
+export class Checkout extends IdNonGeneratedEntity {
   @ManyToOne(() => User, {
     onDelete: 'CASCADE',
   })
-  user: User;
+  user!: User;
 
   @ManyToOne(() => Book)
-  book: Book;
+  book!: Book;
 
   @Column('enum', { enum: CheckoutStatus, default: CheckoutStatus.BORROWING })
-  status: CheckoutStatus;
-
-  @CreateDateColumn({
-    type: 'timestamp with time zone',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  createdTimestamp: Date;
+  status!: CheckoutStatus;
 
   @Column('timestamp with time zone')
-  dueTimestamp: Date;
+  dueTimestamp!: Date;
 
   @Column('timestamp with time zone', { nullable: true })
-  returnedTimestamp?: Date;
+  returnedTimestamp!: Date | null;
 
   @Column('text', { nullable: true })
   note?: string;
 
-  @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
-  deletedTimestamp: Date;
-
   @OneToOne(() => Fine, (fine) => fine.checkout, {
     cascade: ['soft-remove', 'remove', 'recover'],
   })
-  fine: Fine;
+  fine!: Fine;
 }

@@ -7,10 +7,12 @@ import {
 } from 'cloudinary';
 import { Readable } from 'stream';
 
-import { SuccessResponse } from '@/base/common/responses/success.response';
-import { DeleteMediaDto } from '@/modules/media/dto/delete-media.dto';
-import { GetMediaDto } from '@/modules/media/dto/get-media.dto';
-import { UploadSuccessDto } from '@/modules/media/dto/upload-success.dto';
+import { SuccessResponse } from '@/base/common/responses';
+import {
+  DeleteMediaDto,
+  GetMediaDto,
+  UploadSuccessDto,
+} from '@/modules/media/dtos';
 
 @Injectable()
 export class MediaService {
@@ -35,9 +37,9 @@ export class MediaService {
     >((resolve) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         { transformation, resource_type: 'auto', folder },
-        (error: UploadApiErrorResponse, result: UploadApiResponse) => {
+        (error?: UploadApiErrorResponse, result?: UploadApiResponse) => {
           if (error) resolve([null, error]);
-          resolve([result, null]);
+          resolve([result!, null]);
         },
       );
 
@@ -51,8 +53,8 @@ export class MediaService {
     return {
       data: {
         originalName: file.originalname,
-        name: result.public_id,
-        url: result.secure_url,
+        name: result!.public_id,
+        url: result!.secure_url,
       },
     };
   }
@@ -70,7 +72,7 @@ export class MediaService {
         },
       });
       return result;
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException(error.message, error.http_code);
     }
   }

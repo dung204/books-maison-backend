@@ -8,7 +8,7 @@ export class SetAvatarDto {
     example: 'metpk6lemi4eccrgzosm',
   })
   @IsString()
-  id: string;
+  id!: string;
 
   @ApiProperty({
     description:
@@ -17,7 +17,7 @@ export class SetAvatarDto {
   })
   @Transform(({ value }) => Number(value))
   @IsNumber({ allowNaN: false, allowInfinity: false })
-  offsetX: number;
+  offsetX!: number;
 
   @ApiProperty({
     description:
@@ -26,7 +26,7 @@ export class SetAvatarDto {
   })
   @Transform(({ value }) => Number(value))
   @IsNumber({ allowNaN: false, allowInfinity: false })
-  offsetY: number;
+  offsetY!: number;
 
   @ApiProperty({
     description:
@@ -35,7 +35,7 @@ export class SetAvatarDto {
   })
   @Transform(({ value }) => Number(value))
   @IsNumber({ allowNaN: false, allowInfinity: false })
-  zoom: number;
+  zoom!: number;
 
   @ApiProperty({
     description:
@@ -45,5 +45,5 @@ export class SetAvatarDto {
   @Transform(({ value }) => Number(value))
   @IsNumber({ allowNaN: false, allowInfinity: false })
   @IsPositive()
-  baseDimension: number;
+  baseDimension!: number;
 }

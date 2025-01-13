@@ -1,4 +1,4 @@
-import { Role } from '@/base/common/enum/role.enum';
+import { Role } from '@/base/common/enum';
 
 export type JwtPayload = {
   sub: string;

@@ -1,40 +1,24 @@
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity } from 'typeorm';
+
+import { IdGeneratedEntity } from '@/base/common/entities';
 
 @Entity({ schema: 'public', name: 'authors' })
-export class Author {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
+export class Author extends IdGeneratedEntity {
   @Column('character varying', { length: 100 })
-  name: string;
+  name!: string;
 
   @Column('integer', { nullable: true })
-  yearOfBirth: number;
+  yearOfBirth!: number | null;
 
   @Column('integer', { nullable: true })
-  yearOfDeath: number;
+  yearOfDeath!: number | null;
 
   @Column('character varying', { length: 100, nullable: true })
-  nationality: string;
+  nationality!: string | null;
 
   @Column('character varying', { length: 256, nullable: true })
-  imageUrl: string;
+  imageUrl!: string | null;
 
   @Column('text', { nullable: true })
-  biography: string;
-
-  @CreateDateColumn({
-    type: 'timestamp with time zone',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  createdTimestamp: Date;
-
-  @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
-  deletedTimestamp: Date;
+  biography!: string | null;
 }

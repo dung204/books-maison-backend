@@ -3,7 +3,6 @@ import { HttpService } from '@nestjs/axios';
 import {
   BadRequestException,
   ForbiddenException,
-  Inject,
   Injectable,
   Logger,
   NotFoundException,
@@ -14,20 +13,24 @@ import * as crypto from 'crypto';
 import { minutesToSeconds } from 'date-fns';
 import { Redis } from 'ioredis';
 
-import { Role } from '@/base/common/enum/role.enum';
-import { SuccessResponse } from '@/base/common/responses/success.response';
-import { CreateTransactionDto } from '@/modules/transaction/dto/create-transaction.dto';
-import { MomoNotifyDto } from '@/modules/transaction/dto/momo-notify.dto';
-import { SavedTransactionEventDto } from '@/modules/transaction/dto/saved-transaction-event.dto';
-import { TransactionSearchDto } from '@/modules/transaction/dto/transaction-search.dto';
-import { TransactionDto } from '@/modules/transaction/dto/transaction.dto';
-import { Transaction } from '@/modules/transaction/entities/transaction.entity';
-import { TransactionEvents } from '@/modules/transaction/enums/transaction-events.enum';
-import { TransactionMethod } from '@/modules/transaction/enums/transaction-method.enum';
-import { TransactionRepository } from '@/modules/transaction/repositories/transaction.repository';
-import { CreateMomoLinkSuccessResponse } from '@/modules/transaction/responses/create-momo-link-success.response';
-import { User } from '@/modules/user/entities/user.entity';
-import { UserService } from '@/modules/user/services/user.service';
+import { Role } from '@/base/common/enum';
+import { SuccessResponse } from '@/base/common/responses';
+import {
+  CreateTransactionDto,
+  MomoNotifyDto,
+  SavedTransactionEventDto,
+  TransactionDto,
+  TransactionSearchDto,
+} from '@/modules/transaction/dtos';
+import { Transaction } from '@/modules/transaction/entities';
+import {
+  TransactionEvents,
+  TransactionMethod,
+} from '@/modules/transaction/enums';
+import { TransactionRepository } from '@/modules/transaction/repositories';
+import { CreateMomoLinkSuccessResponse } from '@/modules/transaction/responses';
+import { User } from '@/modules/user/entities';
+import { UserService } from '@/modules/user/services';
 
 @Injectable()
 export class TransactionService {
@@ -36,7 +39,6 @@ export class TransactionService {
   private readonly redis: Redis;
 
   constructor(
-    @Inject(TransactionRepository)
     private readonly transactionRepository: TransactionRepository,
     private readonly userService: UserService,
     private readonly httpService: HttpService,
@@ -130,28 +132,26 @@ export class TransactionService {
     }
 
     transaction.createdTimestamp = new Date();
-    if (transactionMethod === TransactionMethod.MOMO) {
-      const purchaseUrl = await this.generateMomoPurchaseLink(
-        transaction.id,
-        user,
-        amount,
-        redirectUrl,
-        extraData,
-      );
+    const purchaseUrl = await this.generateMomoPurchaseLink(
+      transaction.id,
+      user,
+      amount,
+      redirectUrl!,
+      extraData,
+    );
 
-      this.redis.set(
-        transaction.id,
-        JSON.stringify(transaction),
-        'EX',
-        minutesToSeconds(
-          +this.configService.getOrThrow<string>('MOMO_EXPIRE_TIME_MINUTES'),
-        ),
-      );
-      return {
-        ...TransactionDto.fromTransaction(transaction),
-        purchaseUrl,
-      };
-    }
+    this.redis.set(
+      transaction.id,
+      JSON.stringify(transaction),
+      'EX',
+      minutesToSeconds(
+        +this.configService.getOrThrow<string>('MOMO_EXPIRE_TIME_MINUTES'),
+      ),
+    );
+    return {
+      ...TransactionDto.fromTransaction(transaction),
+      purchaseUrl,
+    };
   }
 
   async handleMomoTransactionNotify({

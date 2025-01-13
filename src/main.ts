@@ -13,9 +13,8 @@ import {
   initializeTransactionalContext,
 } from 'typeorm-transactional';
 
-import { configSwagger } from '@/base/config/swagger.config';
-
-import { AppModule } from './modules/app/app.module';
+import { configSwagger } from '@/base/config';
+import { AppModule } from '@/modules/app';
 
 async function bootstrap() {
   const logger = new Logger(bootstrap.name);
@@ -45,9 +44,9 @@ async function bootstrap() {
 
   httpService.axiosRef.interceptors.response.use(
     (response) => response,
-    (error: AxiosError) => {
+    (error: AxiosError<string | Record<string, any>>) => {
       const response = error.response;
-      throw new HttpException(error.response.data, response.status);
+      throw new HttpException(response!.data, response!.status);
     },
   );
 

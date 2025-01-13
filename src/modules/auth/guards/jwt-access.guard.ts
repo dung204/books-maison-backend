@@ -6,8 +6,8 @@ import {
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 
-import { IS_OPTIONAL_AUTH_KEY } from '@/modules/auth/decorators/optional-auth.decorator';
-import { User } from '@/modules/user/entities/user.entity';
+import { IS_OPTIONAL_AUTH_KEY } from '@/modules/auth/decorators';
+import { User } from '@/modules/user/entities';
 
 @Injectable()
 export class JwtAccessGuard extends AuthGuard('jwt') {
@@ -20,7 +20,7 @@ export class JwtAccessGuard extends AuthGuard('jwt') {
     user: TUser,
     info: any,
     context: ExecutionContext,
-  ): TUser {
+  ): TUser | null {
     const isOptionalAuth = this.reflector.getAllAndOverride<boolean>(
       IS_OPTIONAL_AUTH_KEY,
       [context.getHandler()],

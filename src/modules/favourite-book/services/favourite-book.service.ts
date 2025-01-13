@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 
 import { SuccessResponse } from '@/base/common/responses/success.response';
-import { BookSearchDto } from '@/modules/book/dto/book-search.dto';
-import { BookDto } from '@/modules/book/dto/book.dto';
+import { BookSearchDto } from '@/modules/book/dtos/book-search.dto';
+import { BookDto } from '@/modules/book/dtos/book.dto';
 import { BookService } from '@/modules/book/services/book.service';
 import { FavouriteBook } from '@/modules/favourite-book/entities/favourite-book.entity';
 import { FavouriteBookRepository } from '@/modules/favourite-book/repositories/favourite-book.repository';

@@ -1,13 +1,12 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 
-import { SuccessResponse } from '@/base/common/responses/success.response';
-import { AvatarDto } from '@/modules/me/dtos/avatar.dto';
-import { SetAvatarDto } from '@/modules/me/dtos/set-avatar.dto';
-import { Avatar } from '@/modules/me/entities/avatar.entity';
-import { AvatarRepository } from '@/modules/me/repositories/avatar.repository';
-import { MediaService } from '@/modules/media/services/media.service';
-import { User } from '@/modules/user/entities/user.entity';
-import { UserRepository } from '@/modules/user/repositories/user.repository';
+import { SuccessResponse } from '@/base/common/responses';
+import { AvatarDto, SetAvatarDto } from '@/modules/me/dtos';
+import { Avatar } from '@/modules/me/entities';
+import { AvatarRepository } from '@/modules/me/repositories';
+import { MediaService } from '@/modules/media/services';
+import { User } from '@/modules/user/entities';
+import { UserRepository } from '@/modules/user/repositories';
 
 @Injectable()
 export class AvatarService {

@@ -7,16 +7,17 @@ import {
 } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
-import { SuccessResponse } from '@/base/common/responses/success.response';
-import { PasswordUtils } from '@/base/utils/password.utils';
-import { ChangePasswordDto } from '@/modules/user/dto/change-password.dto';
-import { UserSearchDto } from '@/modules/user/dto/user-search.dto';
-import { UserDto } from '@/modules/user/dto/user.dto';
-import { User } from '@/modules/user/entities/user.entity';
-import { UserRepository } from '@/modules/user/repositories/user.repository';
-
-import { CreateUserDto } from '../dto/create-user.dto';
-import { UpdateUserDto } from '../dto/update-user.dto';
+import { SuccessResponse } from '@/base/common/responses';
+import { PasswordUtils } from '@/base/utils';
+import {
+  ChangePasswordDto,
+  CreateUserDto,
+  UpdateUserDto,
+  UserDto,
+  UserSearchDto,
+} from '@/modules/user/dtos';
+import { User } from '@/modules/user/entities';
+import { UserRepository } from '@/modules/user/repositories';
 
 @Injectable()
 export class UserService {
@@ -67,7 +68,7 @@ export class UserService {
     return user;
   }
 
-  async findUserByEmail(email: string): Promise<User> {
+  async findUserByEmail(email: string) {
     return this.userRepository.findByEmail(email);
   }
 
@@ -75,31 +76,23 @@ export class UserService {
     id: string,
     updateUserDto: UpdateUserDto,
   ): Promise<SuccessResponse<UserDto>> {
-    if (!this.userRepository.isExistedById(id))
-      throw new NotFoundException('User not found.');
-
-    const existedUserByEmail = await this.userRepository.findByEmail(
-      updateUserDto.email,
-    );
-    if (existedUserByEmail?.id !== id)
-      throw new ConflictException('Email already taken');
-
-    const updateStatus = await this.userRepository.updateUserById(
+    const updatedUser = await this.userRepository.updateUserById(
       id,
       updateUserDto,
     );
-    if (updateStatus != 1)
+
+    if (!updatedUser)
       throw new ConflictException('Conflicted! Cannot update user.');
 
     return {
-      data: UserDto.fromUser(await this.userRepository.findById(id)),
+      data: UserDto.fromUser(updatedUser),
     };
   }
 
   async changePassword(user: User, changePasswordDto: ChangePasswordDto) {
     const passwordMatched = await PasswordUtils.isPasswordMatched(
       changePasswordDto.password,
-      user.password,
+      user.password!,
     );
 
     if (!passwordMatched)

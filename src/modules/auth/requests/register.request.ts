@@ -15,7 +15,7 @@ export class RegisterRequest {
   })
   @IsEmail({}, { message: 'Email is not a valid email' })
   @MaxLength(64)
-  email: string;
+  email!: string;
 
   @ApiProperty({
     description: 'The password of the user',
@@ -23,7 +23,7 @@ export class RegisterRequest {
   })
   @MinLength(6, { message: 'Password must contain at least 6 characters' })
   @MaxLength(100, { message: 'Password must not exceed 100 characters' })
-  password: string;
+  password!: string;
 
   @ApiProperty({
     description: 'The first name of the user',
@@ -32,7 +32,7 @@ export class RegisterRequest {
   @IsNotEmpty({ message: 'Last name must not be empty' })
   @IsString({ message: 'First name must be a string' })
   @MaxLength(128)
-  firstName: string;
+  firstName!: string;
 
   @ApiProperty({
     description: 'The last name of the user',
@@ -41,7 +41,7 @@ export class RegisterRequest {
   @IsNotEmpty({ message: 'Last name must not be empty' })
   @IsString({ message: 'Last name must be a string' })
   @MaxLength(128)
-  lastName: string;
+  lastName!: string;
 
   @ApiPropertyOptional({
     description: 'The last name of the user',

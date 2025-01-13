@@ -21,30 +21,31 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
-import { ApiSuccessResponse } from '@/base/common/decorators/api-success-response.decorator';
-import { SuccessResponse } from '@/base/common/responses/success.response';
-import { CustomRequest } from '@/base/common/types/custom-request.type';
-import { Private } from '@/modules/auth/decorators/private.decorator';
-import { BookSearchDto } from '@/modules/book/dto/book-search.dto';
-import { BookDto } from '@/modules/book/dto/book.dto';
-import { CheckoutDto } from '@/modules/checkout/dto/checkout.dto';
-import { UserCheckoutSearchDto } from '@/modules/checkout/dto/user-checkout-search.dto';
-import { UserCreateCheckoutDto } from '@/modules/checkout/dto/user-create-checkout.dto';
-import { CheckoutService } from '@/modules/checkout/services/checkout.service';
-import { FavouriteBookService } from '@/modules/favourite-book/services/favourite-book.service';
-import { FineDto } from '@/modules/fine/dto/fine.dto';
-import UserFineSearchDto from '@/modules/fine/dto/user-fine-search.dto';
-import { FineService } from '@/modules/fine/services/fine.service';
-import { AvatarDto } from '@/modules/me/dtos/avatar.dto';
-import { SetAvatarDto } from '@/modules/me/dtos/set-avatar.dto';
-import { AvatarService } from '@/modules/me/services/avatar.service';
-import { TransactionDto } from '@/modules/transaction/dto/transaction.dto';
-import { UserTransactionSearchDto } from '@/modules/transaction/dto/user-transaction-search.dto';
-import { TransactionService } from '@/modules/transaction/services/transaction.service';
-import { ChangePasswordDto } from '@/modules/user/dto/change-password.dto';
-import { UserDto } from '@/modules/user/dto/user.dto';
-import { UpdateProfileRequest } from '@/modules/user/requests/update-profile.request';
-import { UserService } from '@/modules/user/services/user.service';
+import { ApiSuccessResponse } from '@/base/common/decorators';
+import { SuccessResponse } from '@/base/common/responses';
+import { CustomRequest } from '@/base/common/types';
+import { Private } from '@/modules/auth/decorators';
+import { BookDto, BookSearchDto } from '@/modules/book/dtos';
+import {
+  CheckoutDto,
+  UserCheckoutSearchDto,
+  UserCreateCheckoutDto,
+} from '@/modules/checkout/dtos';
+import { CheckoutService } from '@/modules/checkout/services';
+import { FavouriteBookService } from '@/modules/favourite-book/services';
+import { FineDto } from '@/modules/fine/dtos';
+import UserFineSearchDto from '@/modules/fine/dtos/user-fine-search.dto';
+import { FineService } from '@/modules/fine/services';
+import { AvatarDto, SetAvatarDto } from '@/modules/me/dtos';
+import { AvatarService } from '@/modules/me/services';
+import {
+  TransactionDto,
+  UserTransactionSearchDto,
+} from '@/modules/transaction/dtos';
+import { TransactionService } from '@/modules/transaction/services';
+import { ChangePasswordDto, UserDto } from '@/modules/user/dtos';
+import { UpdateProfileRequest } from '@/modules/user/requests';
+import { UserService } from '@/modules/user/services';
 
 @ApiTags('me')
 @Controller('/me')
@@ -70,7 +71,7 @@ export class MeController {
     @Request() req: CustomRequest,
   ): Promise<SuccessResponse<UserDto>> {
     return {
-      data: UserDto.fromUser(req.user),
+      data: UserDto.fromUser(req.user!),
     };
   }
 
@@ -85,6 +86,9 @@ export class MeController {
   @ApiBadRequestResponse({
     description: 'Update information is invalid',
   })
+  @ApiConflictResponse({
+    description: 'Email has been already taken or other conflicts occur',
+  })
   @Patch('/profile')
   @HttpCode(HttpStatus.OK)
   async updateCurrentUserProfile(
@@ -92,7 +96,7 @@ export class MeController {
     @Body() updateProfileRequest: UpdateProfileRequest,
   ) {
     const currentUser = req.user;
-    return this.userService.update(currentUser.id, updateProfileRequest);
+    return this.userService.update(currentUser!.id, updateProfileRequest);
   }
 
   @Private()
@@ -117,7 +121,7 @@ export class MeController {
     @Request() req: CustomRequest,
     @Body() setAvatarDto: SetAvatarDto,
   ) {
-    return this.avatarService.setAvatar(req.user, setAvatarDto);
+    return this.avatarService.setAvatar(req.user!, setAvatarDto);
   }
 
   @Private()
@@ -136,7 +140,7 @@ export class MeController {
     @Body() changePasswordDto: ChangePasswordDto,
   ) {
     const currentUser = req.user;
-    return this.userService.changePassword(currentUser, changePasswordDto);
+    return this.userService.changePassword(currentUser!, changePasswordDto);
   }
 
   @Private()
@@ -158,7 +162,7 @@ export class MeController {
   ) {
     const currentUser = req.user;
     return this.favouriteBookService.getAllFavouriteBooks(
-      currentUser,
+      currentUser!,
       bookSearchDto,
     );
   }
@@ -180,7 +184,7 @@ export class MeController {
   @HttpCode(HttpStatus.NO_CONTENT)
   addFavouriteBook(@Request() req: CustomRequest, @Param('id') bookId: string) {
     const currentUser = req.user;
-    return this.favouriteBookService.addFavouriteBook(currentUser, bookId);
+    return this.favouriteBookService.addFavouriteBook(currentUser!, bookId);
   }
 
   @Private()
@@ -201,7 +205,7 @@ export class MeController {
     @Param('id') bookId: string,
   ) {
     const currentUser = req.user;
-    return this.favouriteBookService.deleteFavouriteBook(currentUser, bookId);
+    return this.favouriteBookService.deleteFavouriteBook(currentUser!, bookId);
   }
 
   @Private()
@@ -223,7 +227,7 @@ export class MeController {
   ) {
     const currentUser = req.user;
     return this.checkoutService.findAllCheckoutsOfCurrentUser(
-      currentUser,
+      currentUser!,
       userCheckoutSearchDto,
     );
   }
@@ -251,7 +255,7 @@ export class MeController {
   ) {
     const currentUser = req.user;
     return this.checkoutService.createCheckoutUsingCurrentUser(
-      currentUser,
+      currentUser!,
       userCreateCheckoutDto,
     );
   }
@@ -274,7 +278,7 @@ export class MeController {
   ) {
     const currentUser = req.user;
     return this.fineService.findAllFinesOfCurrentUser(
-      currentUser,
+      currentUser!,
       userFineSearchDto,
     );
   }
@@ -298,7 +302,7 @@ export class MeController {
   ) {
     const currentUser = req.user;
     return this.transactionService.findAll({
-      userId: currentUser.id,
+      userId: currentUser!.id,
       ...userTransactionSearchDto,
     });
   }
@@ -314,7 +318,7 @@ export class MeController {
   @Delete('/deactivate/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deactivateUser(@Request() req: CustomRequest) {
-    return this.userService.deactivateUser(req.user);
+    return this.userService.deactivateUser(req.user!);
   }
 
   @Private()
@@ -330,6 +334,6 @@ export class MeController {
   })
   @Patch('/reactivate/:id')
   async reactivateUser(@Request() req: CustomRequest) {
-    return this.userService.reactivateUser(req.user);
+    return this.userService.reactivateUser(req.user!);
   }
 }

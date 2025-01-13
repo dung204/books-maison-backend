@@ -1,11 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
-import { AuthorSearchDto } from '@/modules/author/dto/author-search.dto';
-import { CreateAuthorDto } from '@/modules/author/dto/create-author.dto';
-import { UpdateAuthorDto } from '@/modules/author/dto/update-author.dto';
-import { Author } from '@/modules/author/entities/author.entity';
-import { AuthorOrderableField } from '@/modules/author/enums/author-orderable-field.enum';
+import { rawToEntity } from '@/base/utils';
+import {
+  AuthorSearchDto,
+  CreateAuthorDto,
+  UpdateAuthorDto,
+} from '@/modules/author/dtos';
+import { Author } from '@/modules/author/entities';
+import { AuthorOrderableField } from '@/modules/author/enums';
 
 @Injectable()
 export class AuthorRepository extends Repository<Author> {
@@ -90,8 +93,59 @@ export class AuthorRepository extends Repository<Author> {
   }
 
   async updateAuthorById(id: string, updateAuthorDto: UpdateAuthorDto) {
-    const updateResult = await this.update({ id }, updateAuthorDto);
+    try {
+      await this.query(`BEGIN TRANSACTION`);
 
-    return updateResult.affected;
+      const selectQuery = this.createQueryBuilder('author');
+
+      const updatedValues = {
+        ...(updateAuthorDto.biography !== undefined && { biography: () => '' }),
+        ...(updateAuthorDto.imageUrl !== undefined && { imageUrl: () => '' }),
+        ...(updateAuthorDto.name !== undefined && { name: () => '' }),
+        ...(updateAuthorDto.nationality !== undefined && {
+          nationality: () => '',
+        }),
+        ...(updateAuthorDto.yearOfBirth !== undefined && {
+          yearOfBirth: () => '',
+        }),
+        ...(updateAuthorDto.yearOfDeath !== undefined && {
+          yearOfDeath: () => '',
+        }),
+      };
+
+      if (Object.keys(updatedValues).length === 0) {
+        await this.query('COMMIT');
+        return selectQuery.where('author.id = :id', { id }).getOne();
+      }
+
+      Object.keys(updatedValues).forEach((key, index) => {
+        updatedValues[key as keyof typeof updatedValues] = () =>
+          `$${index + 1}`;
+      });
+
+      const parameters = Object.keys(updatedValues).map(
+        (key) => updateAuthorDto[key as keyof typeof updateAuthorDto],
+      );
+
+      const updateQuery = this.createQueryBuilder()
+        .update()
+        .set(updatedValues)
+        .where(`id = $${Object.keys(updatedValues).length + 1}`)
+        .returning('*')
+        .getQuery();
+
+      const rawUpdatedAuthors = (await this.query(
+        `WITH "updated_authors" AS (${updateQuery}) ${selectQuery.getQuery().replaceAll(`"public"."authors"`, `"updated_authors"`)}`,
+        [...parameters, id],
+      )) as any[];
+      await this.query(`COMMIT`);
+
+      if (rawUpdatedAuthors.length === 0) return null;
+
+      return rawToEntity(Author, rawUpdatedAuthors[0], 'author');
+    } catch (err) {
+      await this.query(`ROLLBACK`);
+      return null;
+    }
   }
 }
